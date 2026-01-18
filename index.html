@@ -60,21 +60,22 @@ body {
     font-size: 18px;
     opacity: 0.75;
 }
-
-/* Dashboard layout */
-#calendar-container {
+#main-container {
     position: absolute;
     top: 110px;
     left: 0;
-    width: 75%;
+    width: 100%;
     height: calc(100% - 110px);
+    display: flex;
+    flex-direction: row;
 }
-#doc-container {
-    position: absolute;
-    top: 110px;
-    right: 0;
-    width: 25%;
-    height: calc(100% - 110px);
+#calendar-container {
+    flex: 3;
+    height: 100%;
+}
+#shopping-container {
+    flex: 1;
+    height: 100%;
     border-left: 2px solid rgba(255,255,255,0.1);
 }
 iframe {
@@ -95,20 +96,13 @@ iframe {
     </div>
 </div>
 
-<!-- Calendar Panel (left 75%) -->
-<div id="calendar-container">
-    <iframe id="calendar" 
-        src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FChicago&showPrint=0&mode=WEEK&showTabs=0&showCalendars=0&showTz=0&showDate=0&showNav=0&showTitle=0&src=ZmFtaWx5MDYxNTI5MjM0MzA1OTI5MTA2NzJAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&color=%23e4c441" 
-        scrolling="no">
-    </iframe>
-</div>
-
-<!-- Google Doc Panel (right 25%) -->
-<div id="doc-container">
-    <iframe 
-        src="https://docs.google.com/document/d/1hk5WXRGhZB5l8QZF45QlTsfMBG8_AtW-AcWHDLxNO6I/preview" 
-        scrolling="yes">
-    </iframe>
+<div id="main-container">
+    <div id="calendar-container">
+        <iframe id="calendar" src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FChicago&showPrint=0&mode=WEEK&showTabs=0&showCalendars=0&showTz=0&showDate=0&showNav=0&showTitle=0&src=ZmFtaWx5MDYxNTI5MjM0MzA1OTI5MTA2NzJAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&color=%23e4c441" scrolling="no"></iframe>
+    </div>
+    <div id="shopping-container">
+        <iframe id="shopping" src="https://sharelist.app/list/H2GX2Y" scrolling="no"></iframe>
+    </div>
 </div>
 
 <script>
@@ -148,12 +142,19 @@ function updateWeather() {
 updateWeather();
 setInterval(updateWeather, 300000);
 
-// Refresh Calendar iframe every 30 seconds
+// Refresh calendar every 30 seconds
 function refreshCalendar() {
     const cal = document.getElementById("calendar");
     cal.src = cal.src;
 }
 setInterval(refreshCalendar, 30000);
+
+// Refresh shopping list every 30 seconds
+function refreshShopping() {
+    const shop = document.getElementById("shopping");
+    shop.src = shop.src;
+}
+setInterval(refreshShopping, 30000);
 </script>
 
 </body>
