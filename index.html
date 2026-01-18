@@ -72,42 +72,22 @@ iframe {
     height: 100%;
     border: none;
 }
-#refresh-overlay {
-    position: absolute;
-    top: 110px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 110px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(13,17,23,0.6);
-    color: #fff;
-    font-size: 36px;
-    font-weight: 700;
-    z-index: 20;
-    display: none;
-}
 </style>
 </head>
 <body>
 
-
 <div class="top-bar">
     <div class="location">Prairieville, LA</div>
-    <div class="weather" id="weather">Loading weather…</div>
+    <div class="weather" id="weather">--°F</div>
     <div class="clock">
         <div class="time" id="time">--:--</div>
         <div class="date" id="date">---</div>
     </div>
 </div>
 
-
 <div id="calendar-container">
     <iframe id="calendar" src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FChicago&showPrint=0&mode=WEEK&showTabs=0&showCalendars=0&showTz=0&showDate=0&showNav=0&showTitle=0&src=ZmFtaWx5MDYxNTI5MjM0MzA1OTI5MTA2NzJAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&color=%23e4c441" scrolling="no"></iframe>
-    <div id="refresh-overlay">Refreshing...</div>
 </div>
-
 
 <script>
 function updateClock() {
@@ -128,7 +108,6 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
-
 const lat = 30.3697;
 const lon = -91.1273;
 function updateWeather() {
@@ -139,28 +118,18 @@ function updateWeather() {
         document.getElementById("weather").textContent = ` ${Math.round(w.temperature)}°F`;
     })
     .catch(() => {
-        document.getElementById("weather").textContent = "Weather unavailable";
+        document.getElementById("weather").textContent = "--°F";
     });
 }
 updateWeather();
 setInterval(updateWeather, 300000);
 
-
 function refreshCalendar() {
-    const overlay = document.getElementById("refresh-overlay");
-    overlay.style.display = "flex";
     const cal = document.getElementById("calendar");
-    // small delay to show message before reload
-    setTimeout(() => {
-        cal.src = cal.src;
-        setTimeout(() => {
-            overlay.style.display = "none";
-        }, 2000);
-    }, 500);
+    cal.src = cal.src;
 }
 setInterval(refreshCalendar, 30000);
 </script>
-
 
 </body>
 </html>
