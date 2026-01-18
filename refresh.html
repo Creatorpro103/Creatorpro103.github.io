@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Auto-Refresh</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// Refresh the dashboard every 10 minutes (600,000 ms)
+setInterval(() => {
+    location.reload();
+}, 600000);
+</script>
+</head>
+<body>
+<iframe src="index.html" style="width:100%;height:100%;border:none;"></iframe>
+</body>
+</html>
