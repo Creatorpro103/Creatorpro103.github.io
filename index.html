@@ -101,7 +101,7 @@ iframe {
         <iframe id="calendar" src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FChicago&showPrint=0&mode=WEEK&showTabs=0&showCalendars=0&showTz=0&showDate=0&showNav=0&showTitle=0&src=ZmFtaWx5MDYxNTI5MjM0MzA1OTI5MTA2NzJAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&color=%23e4c441" scrolling="no"></iframe>
     </div>
     <div id="shopping-container">
-        <iframe id="shopping" src="https://sharelist.app/list/H2GX2Y" scrolling="no"></iframe>
+        <iframe id="shopping" src="https://docs.google.com/document/d/1hk5WXRGhZB5l8QZF45QlTsfMBG8_AtW-AcWHDLxNO6I/preview"></iframe>
     </div>
 </div>
 
@@ -149,12 +149,12 @@ function refreshCalendar() {
 }
 setInterval(refreshCalendar, 30000);
 
-// Refresh shopping list every 30 seconds
-function refreshShopping() {
-    const shop = document.getElementById("shopping");
-    shop.src = shop.src;
+// Refresh Google Doc every 30 seconds
+function refreshDoc() {
+    const doc = document.getElementById("shopping");
+    doc.src = doc.src;
 }
-setInterval(refreshShopping, 30000);
+setInterval(refreshDoc, 30000);
 </script>
 
 </body>
