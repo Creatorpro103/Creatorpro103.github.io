@@ -60,18 +60,22 @@ body {
     font-size: 18px;
     opacity: 0.75;
 }
-#calendar-container, #shopping-container {
-    position: absolute;
-    left: 0;
-    width: 100%;
-}
+
+/* Dashboard layout */
 #calendar-container {
+    position: absolute;
     top: 110px;
-    height: 50%;
+    left: 0;
+    width: 75%;
+    height: calc(100% - 110px);
 }
-#shopping-container {
-    top: calc(110px + 50%);
-    height: calc(50% - 110px);
+#doc-container {
+    position: absolute;
+    top: 110px;
+    right: 0;
+    width: 25%;
+    height: calc(100% - 110px);
+    border-left: 2px solid rgba(255,255,255,0.1);
 }
 iframe {
     width: 100%;
@@ -91,7 +95,7 @@ iframe {
     </div>
 </div>
 
-<!-- Calendar Panel -->
+<!-- Calendar Panel (left 75%) -->
 <div id="calendar-container">
     <iframe id="calendar" 
         src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FChicago&showPrint=0&mode=WEEK&showTabs=0&showCalendars=0&showTz=0&showDate=0&showNav=0&showTitle=0&src=ZmFtaWx5MDYxNTI5MjM0MzA1OTI5MTA2NzJAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&color=%23e4c441" 
@@ -99,10 +103,10 @@ iframe {
     </iframe>
 </div>
 
-<!-- Shopping List Panel -->
-<div id="shopping-container">
-    <iframe id="shopping-list" 
-        src="https://sharelist.app/list/H2GX2Y" 
+<!-- Google Doc Panel (right 25%) -->
+<div id="doc-container">
+    <iframe 
+        src="https://docs.google.com/document/d/1hk5WXRGhZB5l8QZF45QlTsfMBG8_AtW-AcWHDLxNO6I/preview" 
         scrolling="yes">
     </iframe>
 </div>
@@ -150,13 +154,6 @@ function refreshCalendar() {
     cal.src = cal.src;
 }
 setInterval(refreshCalendar, 30000);
-
-// Refresh Shopping iframe every 10 minutes
-function refreshShopping() {
-    const shop = document.getElementById("shopping-list");
-    shop.src = shop.src;
-}
-setInterval(refreshShopping, 600000);
 </script>
 
 </body>
