@@ -404,33 +404,64 @@
       gravityActive = true;
       
       const elements = document.querySelectorAll('*');
+      const fallingElements = [];
+
       elements.forEach(el => {
         if (el.classList.contains('chaos-button')) return;
-        let vx = (Math.random() - 0.5) * 4;
+        if (el.classList.contains('chaos-container')) return;
+        if (el.classList.contains('button-wrapper')) return;
+        
+        let vx = (Math.random() - 0.5) * 2;
         let vy = 0;
         let x = el.getBoundingClientRect().left;
         let y = el.getBoundingClientRect().top;
+        let bounceCount = 0;
 
         const fall = setInterval(() => {
-          vy += 0.2;
+          vy += 0.3; // gravity acceleration
           y += vy;
           x += vx;
 
-          if (y > window.innerHeight) {
-            clearInterval(fall);
+          // Bounce at bottom
+          if (y + 50 > window.innerHeight) {
+            y = window.innerHeight - 50;
+            vy = -vy * 0.7; // bounce with energy loss
+            vx *= 0.95; // friction
+            bounceCount++;
+
+            if (Math.abs(vy) < 1) {
+              vy = 0;
+            }
+
+            if (bounceCount > 5 || (Math.abs(vy) < 0.1 && bounceCount > 2)) {
+              clearInterval(fall);
+            }
+          }
+
+          // Bounce at sides
+          if (x < 0) {
+            x = 0;
+            vx = -vx * 0.7;
+          }
+          if (x + 50 > window.innerWidth) {
+            x = window.innerWidth - 50;
+            vx = -vx * 0.7;
           }
 
           el.style.position = 'fixed';
           el.style.left = x + 'px';
           el.style.top = y + 'px';
           el.style.pointerEvents = 'none';
-        }, 30);
+        }, 20);
+
+        fallingElements.push(fall);
       });
 
       showStatus('GRAVITY ON!');
       setTimeout(() => {
         gravityActive = false;
-      }, 3000);
+        fallingElements.forEach(interval => clearInterval(interval));
+      }, 8000);
     }
 
     function spawnDucks() {
