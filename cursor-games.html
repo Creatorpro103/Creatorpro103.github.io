@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cursor Games</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      min-height: 100vh;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    #gameContainer {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      background: radial-gradient(ellipse at center, rgba(48, 43, 99, 0.8) 0%, rgba(15, 12, 41, 0.95) 100%);
+    }
+
+    .cursor-circle {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #00d4ff;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px #00d4ff, inset 0 0 10px rgba(0, 212, 255, 0.3);
+    }
+
+    .cursor-dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #00d4ff;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      opacity: 0.8;
+    }
+
+    .ui-panel {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(20, 15, 55, 0.95);
+      border: 2px solid #00d4ff;
+      border-radius: 15px;
+      padding: 20px;
+      color: #00d4ff;
+      font-family: 'Courier New', monospace;
+      z-index: 1000;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .game-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-shadow: 0 0 10px #00d4ff;
+    }
+
+    .game-mode {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #00ff88;
+    }
+
+    .stat {
+      font-size: 12px;
+      margin: 4px 0;
+      opacity: 0.8;
+    }
+
+    .mode-buttons {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    button {
+      background: rgba(0, 212, 255, 0.1);
+      border: 2px solid #00d4ff;
+      color: #00d4ff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: bold;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+
+    button:hover {
+      background: rgba(0, 212, 255, 0.3);
+      box-shadow: 0 0 15px #00d4ff;
+      transform: scale(1.05);
+    }
+
+    button.active {
+      background: #00d4ff;
+      color: #0f0c29;
+      box-shadow: 0 0 20px #00d4ff;
+    }
+
+    .particle {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .trail {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .enemy {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #ff006e;
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 0 10px #ff006e;
+    }
+
+    .target {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #00ff88;
+      border-radius: 2px;
+      pointer-events: none;
+      box-shadow: 0 0 8px #00ff88;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    .magnet-zone {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 2px dashed #ffd60a;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .instructions {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(20, 15, 55, 0.95);
+      border: 2px solid #00d4ff;
+      border-radius: 15px;
+      padding: 15px;
+      color: #00ff88;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+      max-width: 250px;
+      z-index: 1000;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .instructions h3 {
+      color: #00d4ff;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .instructions p {
+      margin: 4px 0;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div id="gameContainer"></div>
+
+  <div class="ui-panel">
+    <div class="game-title">⚡ CURSOR GAMES</div>
+    <div class="game-mode" id="modeDisplay">Mode: EVADE</div>
+    <div class="stat" id="score">Score: 0</div>
+    <div class="stat" id="combo">Combo: 0</div>
+    <div class="stat" id="timer">Time: 0s</div>
+  </div>
+
+  <div class="instructions">
+    <h3>Controls</h3>
+    <p><strong>EVADE:</strong> Avoid red enemies</p>
+    <p><strong>CHASE:</strong> Catch green targets</p>
+    <p><strong>DUPE:</strong> Create cursor copies</p>
+    <p><strong>MAGNET:</strong> Attract with gravity</p>
+    <p><strong>TRAIL:</strong> Leave particle trails</p>
+    <p style="margin-top: 10px; color: #ffd60a;">Switch modes with buttons below ↓</p>
+  </div>
+
+  <div class="mode-buttons">
+    <button class="active" data-mode="evade">EVADE</button>
+    <button data-mode="chase">CHASE</button>
+    <button data-mode="dupe">DUPE</button>
+    <button data-mode="magnet">MAGNET</button>
+    <button data-mode="trail">TRAIL</button>
+  </div>
+
+  <script>
+    const container = document.getElementById('gameContainer');
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let currentMode = 'evade';
+    let score = 0;
+    let combo = 0;
+    let gameTime = 0;
+    let gameActive = true;
+
+    // Game state
+    const gameState = {
+      evade: { enemies: [], gameTime: 0, lastEnemySpawn: 0 },
+      chase: { targets: [], caughtCount: 0 },
+      dupe: { copies: [] },
+      magnet: { zones: [], particles: [] },
+      trail: { trails: [] }
+    };
+
+    // Mouse tracking
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      updateMainCursor();
+    });
+
+    function updateMainCursor() {
+      let cursor = document.querySelector('.cursor-circle');
+      if (!cursor) {
+        cursor = document.createElement('div');
+        cursor.className = 'cursor-circle';
+        container.appendChild(cursor);
+      }
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+    }
+
+    // Mode switching
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        switchMode(e.target.dataset.mode);
+      });
+    });
+
+    function switchMode(mode) {
+      currentMode = mode;
+      container.innerHTML = '';
+      score = 0;
+      combo = 0;
+      gameState.evade.enemies = [];
+      gameState.chase.targets = [];
+      gameState.dupe.copies = [];
+      gameState.magnet.zones = [];
+      gameState.magnet.particles = [];
+      gameState.trail.trails = [];
+      updateMainCursor();
+      updateUI();
+    }
+
+    function updateUI() {
+      document.getElementById('modeDisplay').textContent = `Mode: ${currentMode.toUpperCase()}`;
+      document.getElementById('score').textContent = `Score: ${score}`;
+      document.getElementById('combo').textContent = `Combo: ${combo}`;
+      document.getElementById('timer').textContent = `Time: ${gameTime}s`;
+    }
+
+    // ========== EVADE MODE ==========
+    function spawnEnemy() {
+      const enemy = document.createElement('div');
+      enemy.className = 'enemy';
+      const side = Math.floor(Math.random() * 4);
+      let x, y;
+      
+      switch(side) {
+        case 0: x = Math.random() * window.innerWidth; y = -20; break;
+        case 1: x = window.innerWidth + 20; y = Math.random() * window.innerHeight; break;
+        case 2: x = Math.random() * window.innerWidth; y = window.innerHeight + 20; break;
+        case 3: x = -20; y = Math.random() * window.innerHeight; break;
+      }
+      
+      enemy.style.left = x + 'px';
+      enemy.style.top = y + 'px';
+      container.appendChild(enemy);
+      
+      const enemyObj = { el: enemy, x, y, vx: 0, vy: 0 };
+      gameState.evade.enemies.push(enemyObj);
+      
+      return enemyObj;
+    }
+
+    function updateEvadeMode() {
+      gameState.evade.gameTime++;
+      if (gameState.evade.gameTime - gameState.evade.lastEnemySpawn > 30) {
+        spawnEnemy();
+        gameState.evade.lastEnemySpawn = gameState.evade.gameTime;
+      }
+
+      gameState.evade.enemies.forEach(enemy => {
+        const dx = mouseX - enemy.x;
+        const dy = mouseY - enemy.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const speed = 2;
+        
+        enemy.vx = (dx / dist) * speed;
+        enemy.vy = (dy / dist) * speed;
+        
+        enemy.x += enemy.vx;
+        enemy.y += enemy.vy;
+        enemy.el.style.left = enemy.x + 'px';
+        enemy.el.style.top = enemy.y + 'px';
+
+        const distToMouse = Math.sqrt(Math.pow(mouseX - enemy.x, 2) + Math.pow(mouseY - enemy.y, 2));
+        if (distToMouse < 30) {
+          combo = 0;
+        }
+
+        if (enemy.x < -30 || enemy.x > window.innerWidth + 30 || 
+            enemy.y < -30 || enemy.y > window.innerHeight + 30) {
+          enemy.el.remove();
+          gameState.evade.enemies.splice(gameState.evade.enemies.indexOf(enemy), 1);
+          score += 10;
+          combo++;
+        }
+      });
+    }
+
+    // ========== CHASE MODE ==========
+    function spawnTarget() {
+      const target = document.createElement('div');
+      target.className = 'target';
+      const x = Math.random() * (window.innerWidth - 50) + 25;
+      const y = Math.random() * (window.innerHeight - 50) + 25;
+      target.style.left = x + 'px';
+      target.style.top = y + 'px';
+      container.appendChild(target);
+      
+      gameState.chase.targets.push({ el: target, x, y });
+    }
+
+    function updateChaseMode() {
+      if (gameState.chase.targets.length < 1 && Math.random() < 0.02) {
+        spawnTarget();
+      }
+
+      gameState.chase.targets.forEach(target => {
+        const distToMouse = Math.sqrt(Math.pow(mouseX - target.x, 2) + Math.pow(mouseY - target.y, 2));
+        if (distToMouse < 30) {
+          target.el.remove();
+          gameState.chase.targets.splice(gameState.chase.targets.indexOf(target), 1);
+          score += 25;
+          combo++;
+          spawnTarget();
+        }
+      });
+    }
+
+    // ========== DUPE MODE ==========
+    function updateDupeMode() {
+      if (gameState.dupe.copies.length > 0) {
+        gameState.dupe.copies.forEach((copy, index) => {
+          const dx = mouseX - copy.x;
+          const dy = mouseY - copy.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance > 100) {
+            copy.x += (dx / distance) * 3;
+            copy.y += (dy / distance) * 3;
+          }
+          
+          copy.el.style.left = copy.x + 'px';
+          copy.el.style.top = copy.y + 'px';
+        });
+      }
+    }
+
+    document.addEventListener('click', () => {
+      if (currentMode === 'dupe') {
+        const copy = document.createElement('div');
+        copy.className = 'cursor-circle';
+        copy.style.left = mouseX + 'px';
+        copy.style.top = mouseY + 'px';
+        copy.style.borderColor = '#ff006e';
+        copy.style.boxShadow = '0 0 10px #ff006e, inset 0 0 10px rgba(255, 0, 110, 0.3)';
+        container.appendChild(copy);
+        
+        gameState.dupe.copies.push({ 
+          el: copy, 
+          x: mouseX, 
+          y: mouseY 
+        });
+        score += 5;
+        
+        if (gameState.dupe.copies.length > 10) {
+          const oldest = gameState.dupe.copies.shift();
+          oldest.el.remove();
+        }
+      }
+    });
+
+    // ========== MAGNET MODE ==========
+    document.addEventListener('click', () => {
+      if (currentMode === 'magnet') {
+        const zone = document.createElement('div');
+        zone.className = 'magnet-zone';
+        zone.style.left = (mouseX - 20) + 'px';
+        zone.style.top = (mouseY - 20) + 'px';
+        container.appendChild(zone);
+        
+        gameState.magnet.zones.push({ el: zone, x: mouseX, y: mouseY, life: 120 });
+        score += 10;
+        
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.left = mouseX + 'px';
+          particle.style.top = mouseY + 'px';
+          particle.style.width = '6px';
+          particle.style.height = '6px';
+          particle.style.background = '#ffd60a';
+          particle.style.borderRadius = '50%';
+          particle.style.boxShadow = '0 0 8px #ffd60a';
+          container.appendChild(particle);
+          
+          gameState.magnet.particles.push({
+            el: particle,
+            x: mouseX,
+            y: mouseY,
+            vx: Math.cos(angle) * 5,
+            vy: Math.sin(angle) * 5,
+            life: 60
+          });
+        }
+      }
+    });
+
+    function updateMagnetMode() {
+      gameState.magnet.zones = gameState.magnet.zones.filter(zone => {
+        zone.life--;
+        zone.el.style.opacity = zone.life / 120;
+        if (zone.life <= 0) {
+          zone.el.remove();
+          return false;
+        }
+        return true;
+      });
+
+      gameState.magnet.particles = gameState.magnet.particles.filter(p => {
+        p.life--;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2;
+        p.el.style.left = p.x + 'px';
+        p.el.style.top = p.y + 'px';
+        p.el.style.opacity = p.life / 60;
+        
+        if (p.life <= 0) {
+          p.el.remove();
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // ========== TRAIL MODE ==========
+    function updateTrailMode() {
+      if (Math.random() < 0.3) {
+        const trail = document.createElement('div');
+        trail.className = 'trail';
+        trail.style.left = mouseX + 'px';
+        trail.style.top = mouseY + 'px';
+        trail.style.width = '8px';
+        trail.style.height = '8px';
+        trail.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        trail.style.borderRadius = '50%';
+        trail.style.opacity = '1';
+        container.appendChild(trail);
+        
+        gameState.trail.trails.push({ el: trail, life: 40 });
+        score++;
+      }
+
+      gameState.trail.trails = gameState.trail.trails.filter(t => {
+        t.life--;
+        t.el.style.opacity = t.life / 40;
+        if (t.life <= 0) {
+          t.el.remove();
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // Main game loop
+    function gameLoop() {
+      gameTime++;
+      
+      switch(currentMode) {
+        case 'evade':
+          updateEvadeMode();
+          break;
+        case 'chase':
+          updateChaseMode();
+          break;
+        case 'dupe':
+          updateDupeMode();
+          break;
+        case 'magnet':
+          updateMagnetMode();
+          break;
+        case 'trail':
+          updateTrailMode();
+          break;
+      }
+      
+      updateUI();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Initialize
+    updateMainCursor();
+    gameLoop();
+
+    // Spawn initial target for chase mode when switched
+    document.querySelectorAll('button')[1].addEventListener('click', () => {
+      setTimeout(spawnTarget, 100);
+    });
+  </script>
+</body>
+</html>
