@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cursor Games</title>
+  <title>Chaos Button</title>
   <style>
     * {
       margin: 0;
@@ -12,544 +12,788 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
-      cursor: none;
+      transition: filter 0.3s ease;
     }
 
-    #gameContainer {
+    body.inverted {
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    .chaos-container {
+      position: relative;
       width: 100%;
       height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button-wrapper {
       position: relative;
-      background: radial-gradient(ellipse at center, rgba(48, 43, 99, 0.8) 0%, rgba(15, 12, 41, 0.95) 100%);
+      z-index: 100;
     }
 
-    .cursor-circle {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #00d4ff;
+    .chaos-button {
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 10px #00d4ff, inset 0 0 10px rgba(0, 212, 255, 0.3);
-    }
-
-    .cursor-dot {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #00d4ff;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      opacity: 0.8;
-    }
-
-    .ui-panel {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(20, 15, 55, 0.95);
-      border: 2px solid #00d4ff;
-      border-radius: 15px;
-      padding: 20px;
-      color: #00d4ff;
-      font-family: 'Courier New', monospace;
-      z-index: 1000;
-      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-      backdrop-filter: blur(10px);
-    }
-
-    .game-title {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border: none;
+      color: white;
       font-size: 24px;
       font-weight: bold;
-      margin-bottom: 15px;
-      text-shadow: 0 0 10px #00d4ff;
-    }
-
-    .game-mode {
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: #00ff88;
-    }
-
-    .stat {
-      font-size: 12px;
-      margin: 4px 0;
-      opacity: 0.8;
-    }
-
-    .mode-buttons {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    button {
-      background: rgba(0, 212, 255, 0.1);
-      border: 2px solid #00d4ff;
-      color: #00d4ff;
-      padding: 10px 15px;
-      border-radius: 8px;
       cursor: pointer;
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-      font-weight: bold;
-      transition: all 0.3s;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s;
       text-transform: uppercase;
+      letter-spacing: 2px;
     }
 
-    button:hover {
-      background: rgba(0, 212, 255, 0.3);
-      box-shadow: 0 0 15px #00d4ff;
+    .chaos-button:hover {
       transform: scale(1.05);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
     }
 
-    button.active {
-      background: #00d4ff;
-      color: #0f0c29;
-      box-shadow: 0 0 20px #00d4ff;
+    .chaos-button:active {
+      transform: scale(0.95);
+    }
+
+    .floating-duck {
+      position: fixed;
+      font-size: 60px;
+      pointer-events: none;
+      user-select: none;
+      animation: float 3s ease-in-out infinite;
+      z-index: 50;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-30px) rotate(5deg);
+      }
+    }
+
+    .running-cursor {
+      position: fixed;
+      font-size: 40px;
+      pointer-events: none;
+      z-index: 50;
+      animation: run 0.5s steps(4, end) infinite;
+    }
+
+    @keyframes run {
+      0% { transform: scaleX(1); }
+      50% { transform: scaleX(1); }
+      100% { transform: scaleX(1); }
+    }
+
+    .falling-object {
+      position: fixed;
+      pointer-events: none;
+      font-size: 40px;
+      animation: fall linear forwards;
+      z-index: 40;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+
+    .shake {
+      animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .fake-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      z-index: 200;
+      max-width: 400px;
+      text-align: center;
+      animation: popupAppear 0.3s ease;
+    }
+
+    @keyframes popupAppear {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .popup-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .popup-message {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .popup-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .popup-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .popup-ok {
+      background: #667eea;
+      color: white;
+    }
+
+    .popup-ok:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+    }
+
+    .popup-cancel {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .popup-cancel:hover {
+      background: #e0e0e0;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 150;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .text-effect {
+      position: fixed;
+      font-size: 48px;
+      font-weight: bold;
+      color: #fff;
+      pointer-events: none;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      animation: textFloat 2s ease-out forwards;
+      z-index: 50;
+    }
+
+    @keyframes textFloat {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1.2);
+      }
+    }
+
+    .explosion {
+      position: fixed;
+      pointer-events: none;
+      animation: explode 0.6s ease-out forwards;
+      z-index: 50;
+    }
+
+    @keyframes explode {
+      0% {
+        opacity: 1;
+        transform: scale(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1);
+      }
+    }
+
+    .emoji-rain {
+      position: fixed;
+      font-size: 50px;
+      pointer-events: none;
+      animation: rain linear forwards;
+      z-index: 40;
+    }
+
+    @keyframes rain {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
     }
 
     .particle {
-      position: absolute;
-      pointer-events: none;
-    }
-
-    .trail {
-      position: absolute;
-      pointer-events: none;
-    }
-
-    .enemy {
-      position: absolute;
-      width: 15px;
-      height: 15px;
-      background: #ff006e;
-      border-radius: 50%;
-      pointer-events: none;
-      box-shadow: 0 0 10px #ff006e;
-    }
-
-    .target {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: #00ff88;
-      border-radius: 2px;
-      pointer-events: none;
-      box-shadow: 0 0 8px #00ff88;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-    }
-
-    .magnet-zone {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border: 2px dashed #ffd60a;
-      border-radius: 50%;
-      pointer-events: none;
-      opacity: 0.5;
-    }
-
-    .instructions {
       position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(20, 15, 55, 0.95);
-      border: 2px solid #00d4ff;
-      border-radius: 15px;
-      padding: 15px;
-      color: #00ff88;
-      font-size: 12px;
-      font-family: 'Courier New', monospace;
-      max-width: 250px;
-      z-index: 1000;
-      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-      backdrop-filter: blur(10px);
+      pointer-events: none;
+      border-radius: 50%;
+      animation: particle-move 1s ease-out forwards;
+      z-index: 40;
     }
 
-    .instructions h3 {
-      color: #00d4ff;
-      margin-bottom: 8px;
-      font-size: 13px;
+    @keyframes particle-move {
+      to {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+      }
     }
 
-    .instructions p {
-      margin: 4px 0;
-      line-height: 1.4;
+    .status-text {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 16px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      z-index: 80;
+      animation: fadeInOut 2s ease;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      animation: confetti-fall 3s linear forwards;
+      z-index: 40;
+    }
+
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotateZ(720deg);
+        opacity: 0;
+      }
+    }
+
+    .glitch {
+      animation: glitch 0.3s;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 #ff006e, -2px 0 #00d4ff; }
+      25% { text-shadow: -2px 0 #ff006e, 2px 0 #00d4ff; }
+      50% { text-shadow: 2px 0 #00d4ff, -2px 0 #ff006e; }
+      75% { text-shadow: -2px 0 #00d4ff, 2px 0 #ff006e; }
+      100% { text-shadow: none; }
+    }
+
+    .message-display {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 72px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 100;
+      text-align: center;
+      animation: messageFloat 1.5s ease-out forwards;
+    }
+
+    @keyframes messageFloat {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0);
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
     }
   </style>
 </head>
 <body>
-  <div id="gameContainer"></div>
-
-  <div class="ui-panel">
-    <div class="game-title">⚡ CURSOR GAMES</div>
-    <div class="game-mode" id="modeDisplay">Mode: EVADE</div>
-    <div class="stat" id="score">Score: 0</div>
-    <div class="stat" id="combo">Combo: 0</div>
-    <div class="stat" id="timer">Time: 0s</div>
-  </div>
-
-  <div class="instructions">
-    <h3>Controls</h3>
-    <p><strong>EVADE:</strong> Avoid red enemies</p>
-    <p><strong>CHASE:</strong> Catch green targets</p>
-    <p><strong>DUPE:</strong> Create cursor copies</p>
-    <p><strong>MAGNET:</strong> Attract with gravity</p>
-    <p><strong>TRAIL:</strong> Leave particle trails</p>
-    <p style="margin-top: 10px; color: #ffd60a;">Switch modes with buttons below ↓</p>
-  </div>
-
-  <div class="mode-buttons">
-    <button class="active" data-mode="evade">EVADE</button>
-    <button data-mode="chase">CHASE</button>
-    <button data-mode="dupe">DUPE</button>
-    <button data-mode="magnet">MAGNET</button>
-    <button data-mode="trail">TRAIL</button>
+  <div class="chaos-container">
+    <div class="button-wrapper">
+      <button class="chaos-button">CHAOS</button>
+    </div>
   </div>
 
   <script>
-    const container = document.getElementById('gameContainer');
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let currentMode = 'evade';
-    let score = 0;
-    let combo = 0;
-    let gameTime = 0;
-    let gameActive = true;
+    const button = document.querySelector('.chaos-button');
+    let clickCount = 0;
+    let gravityActive = false;
+    let invertActive = false;
+    let duckSpawned = false;
 
-    // Game state
-    const gameState = {
-      evade: { enemies: [], gameTime: 0, lastEnemySpawn: 0 },
-      chase: { targets: [], caughtCount: 0 },
-      dupe: { copies: [] },
-      magnet: { zones: [], particles: [] },
-      trail: { trails: [] }
-    };
+    const effects = [
+      shake,
+      gravity,
+      spawnDucks,
+      cursorRunaway,
+      fakePopup,
+      invertColors,
+      explosion,
+      emojiRain,
+      confetti,
+      glitchText,
+      floatingText,
+      bounce,
+      spinPage,
+      particles,
+      soundEffect,
+      flashScreen,
+      randomText,
+      slowMo,
+      bounceButton,
+      screenWobble
+    ];
 
-    // Mouse tracking
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      updateMainCursor();
-    });
-
-    function updateMainCursor() {
-      let cursor = document.querySelector('.cursor-circle');
-      if (!cursor) {
-        cursor = document.createElement('div');
-        cursor.className = 'cursor-circle';
-        container.appendChild(cursor);
-      }
-      cursor.style.left = mouseX + 'px';
-      cursor.style.top = mouseY + 'px';
+    function shake() {
+      document.body.classList.add('shake');
+      setTimeout(() => document.body.classList.remove('shake'), 300);
+      showStatus('SHAKEN!');
     }
 
-    // Mode switching
-    document.querySelectorAll('button').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        switchMode(e.target.dataset.mode);
-      });
-    });
-
-    function switchMode(mode) {
-      currentMode = mode;
-      container.innerHTML = '';
-      score = 0;
-      combo = 0;
-      gameState.evade.enemies = [];
-      gameState.chase.targets = [];
-      gameState.dupe.copies = [];
-      gameState.magnet.zones = [];
-      gameState.magnet.particles = [];
-      gameState.trail.trails = [];
-      updateMainCursor();
-      updateUI();
-    }
-
-    function updateUI() {
-      document.getElementById('modeDisplay').textContent = `Mode: ${currentMode.toUpperCase()}`;
-      document.getElementById('score').textContent = `Score: ${score}`;
-      document.getElementById('combo').textContent = `Combo: ${combo}`;
-      document.getElementById('timer').textContent = `Time: ${gameTime}s`;
-    }
-
-    // ========== EVADE MODE ==========
-    function spawnEnemy() {
-      const enemy = document.createElement('div');
-      enemy.className = 'enemy';
-      const side = Math.floor(Math.random() * 4);
-      let x, y;
+    function gravity() {
+      if (gravityActive) return;
+      gravityActive = true;
       
-      switch(side) {
-        case 0: x = Math.random() * window.innerWidth; y = -20; break;
-        case 1: x = window.innerWidth + 20; y = Math.random() * window.innerHeight; break;
-        case 2: x = Math.random() * window.innerWidth; y = window.innerHeight + 20; break;
-        case 3: x = -20; y = Math.random() * window.innerHeight; break;
-      }
-      
-      enemy.style.left = x + 'px';
-      enemy.style.top = y + 'px';
-      container.appendChild(enemy);
-      
-      const enemyObj = { el: enemy, x, y, vx: 0, vy: 0 };
-      gameState.evade.enemies.push(enemyObj);
-      
-      return enemyObj;
-    }
+      const elements = document.querySelectorAll('*');
+      elements.forEach(el => {
+        if (el.classList.contains('chaos-button')) return;
+        let vx = (Math.random() - 0.5) * 4;
+        let vy = 0;
+        let x = el.getBoundingClientRect().left;
+        let y = el.getBoundingClientRect().top;
 
-    function updateEvadeMode() {
-      gameState.evade.gameTime++;
-      if (gameState.evade.gameTime - gameState.evade.lastEnemySpawn > 30) {
-        spawnEnemy();
-        gameState.evade.lastEnemySpawn = gameState.evade.gameTime;
-      }
+        const fall = setInterval(() => {
+          vy += 0.2;
+          y += vy;
+          x += vx;
 
-      gameState.evade.enemies.forEach(enemy => {
-        const dx = mouseX - enemy.x;
-        const dy = mouseY - enemy.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const speed = 2;
-        
-        enemy.vx = (dx / dist) * speed;
-        enemy.vy = (dy / dist) * speed;
-        
-        enemy.x += enemy.vx;
-        enemy.y += enemy.vy;
-        enemy.el.style.left = enemy.x + 'px';
-        enemy.el.style.top = enemy.y + 'px';
-
-        const distToMouse = Math.sqrt(Math.pow(mouseX - enemy.x, 2) + Math.pow(mouseY - enemy.y, 2));
-        if (distToMouse < 30) {
-          combo = 0;
-        }
-
-        if (enemy.x < -30 || enemy.x > window.innerWidth + 30 || 
-            enemy.y < -30 || enemy.y > window.innerHeight + 30) {
-          enemy.el.remove();
-          gameState.evade.enemies.splice(gameState.evade.enemies.indexOf(enemy), 1);
-          score += 10;
-          combo++;
-        }
-      });
-    }
-
-    // ========== CHASE MODE ==========
-    function spawnTarget() {
-      const target = document.createElement('div');
-      target.className = 'target';
-      const x = Math.random() * (window.innerWidth - 50) + 25;
-      const y = Math.random() * (window.innerHeight - 50) + 25;
-      target.style.left = x + 'px';
-      target.style.top = y + 'px';
-      container.appendChild(target);
-      
-      gameState.chase.targets.push({ el: target, x, y });
-    }
-
-    function updateChaseMode() {
-      if (gameState.chase.targets.length < 1 && Math.random() < 0.02) {
-        spawnTarget();
-      }
-
-      gameState.chase.targets.forEach(target => {
-        const distToMouse = Math.sqrt(Math.pow(mouseX - target.x, 2) + Math.pow(mouseY - target.y, 2));
-        if (distToMouse < 30) {
-          target.el.remove();
-          gameState.chase.targets.splice(gameState.chase.targets.indexOf(target), 1);
-          score += 25;
-          combo++;
-          spawnTarget();
-        }
-      });
-    }
-
-    // ========== DUPE MODE ==========
-    function updateDupeMode() {
-      if (gameState.dupe.copies.length > 0) {
-        gameState.dupe.copies.forEach((copy, index) => {
-          const dx = mouseX - copy.x;
-          const dy = mouseY - copy.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance > 100) {
-            copy.x += (dx / distance) * 3;
-            copy.y += (dy / distance) * 3;
+          if (y > window.innerHeight) {
+            clearInterval(fall);
           }
-          
-          copy.el.style.left = copy.x + 'px';
-          copy.el.style.top = copy.y + 'px';
-        });
-      }
-    }
 
-    document.addEventListener('click', () => {
-      if (currentMode === 'dupe') {
-        const copy = document.createElement('div');
-        copy.className = 'cursor-circle';
-        copy.style.left = mouseX + 'px';
-        copy.style.top = mouseY + 'px';
-        copy.style.borderColor = '#ff006e';
-        copy.style.boxShadow = '0 0 10px #ff006e, inset 0 0 10px rgba(255, 0, 110, 0.3)';
-        container.appendChild(copy);
-        
-        gameState.dupe.copies.push({ 
-          el: copy, 
-          x: mouseX, 
-          y: mouseY 
-        });
-        score += 5;
-        
-        if (gameState.dupe.copies.length > 10) {
-          const oldest = gameState.dupe.copies.shift();
-          oldest.el.remove();
-        }
-      }
-    });
-
-    // ========== MAGNET MODE ==========
-    document.addEventListener('click', () => {
-      if (currentMode === 'magnet') {
-        const zone = document.createElement('div');
-        zone.className = 'magnet-zone';
-        zone.style.left = (mouseX - 20) + 'px';
-        zone.style.top = (mouseY - 20) + 'px';
-        container.appendChild(zone);
-        
-        gameState.magnet.zones.push({ el: zone, x: mouseX, y: mouseY, life: 120 });
-        score += 10;
-        
-        for (let i = 0; i < 8; i++) {
-          const angle = (i / 8) * Math.PI * 2;
-          const particle = document.createElement('div');
-          particle.className = 'particle';
-          particle.style.left = mouseX + 'px';
-          particle.style.top = mouseY + 'px';
-          particle.style.width = '6px';
-          particle.style.height = '6px';
-          particle.style.background = '#ffd60a';
-          particle.style.borderRadius = '50%';
-          particle.style.boxShadow = '0 0 8px #ffd60a';
-          container.appendChild(particle);
-          
-          gameState.magnet.particles.push({
-            el: particle,
-            x: mouseX,
-            y: mouseY,
-            vx: Math.cos(angle) * 5,
-            vy: Math.sin(angle) * 5,
-            life: 60
-          });
-        }
-      }
-    });
-
-    function updateMagnetMode() {
-      gameState.magnet.zones = gameState.magnet.zones.filter(zone => {
-        zone.life--;
-        zone.el.style.opacity = zone.life / 120;
-        if (zone.life <= 0) {
-          zone.el.remove();
-          return false;
-        }
-        return true;
+          el.style.position = 'fixed';
+          el.style.left = x + 'px';
+          el.style.top = y + 'px';
+          el.style.pointerEvents = 'none';
+        }, 30);
       });
 
-      gameState.magnet.particles = gameState.magnet.particles.filter(p => {
-        p.life--;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.2;
-        p.el.style.left = p.x + 'px';
-        p.el.style.top = p.y + 'px';
-        p.el.style.opacity = p.life / 60;
-        
-        if (p.life <= 0) {
-          p.el.remove();
-          return false;
-        }
-        return true;
-      });
+      showStatus('GRAVITY ON!');
+      setTimeout(() => {
+        gravityActive = false;
+      }, 3000);
     }
 
-    // ========== TRAIL MODE ==========
-    function updateTrailMode() {
-      if (Math.random() < 0.3) {
-        const trail = document.createElement('div');
-        trail.className = 'trail';
-        trail.style.left = mouseX + 'px';
-        trail.style.top = mouseY + 'px';
-        trail.style.width = '8px';
-        trail.style.height = '8px';
-        trail.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        trail.style.borderRadius = '50%';
-        trail.style.opacity = '1';
-        container.appendChild(trail);
-        
-        gameState.trail.trails.push({ el: trail, life: 40 });
-        score++;
+    function spawnDucks() {
+      const duckCount = Math.floor(Math.random() * 3) + 5;
+      const ducks = ['🦆', '🦢', '🦅', '🐦', '🦉'];
+
+      for (let i = 0; i < duckCount; i++) {
+        const duck = document.createElement('div');
+        duck.className = 'floating-duck';
+        duck.textContent = ducks[Math.floor(Math.random() * ducks.length)];
+        duck.style.left = Math.random() * 90 + 5 + '%';
+        duck.style.top = Math.random() * 80 + 10 + '%';
+        duck.style.animationDelay = Math.random() * 2 + 's';
+        document.body.appendChild(duck);
+
+        setTimeout(() => duck.remove(), 4000);
       }
 
-      gameState.trail.trails = gameState.trail.trails.filter(t => {
-        t.life--;
-        t.el.style.opacity = t.life / 40;
-        if (t.life <= 0) {
-          t.el.remove();
-          return false;
+      showStatus('DUCKS!');
+    }
+
+    function cursorRunaway() {
+      const runningEmoji = '🏃';
+      const runner = document.createElement('div');
+      runner.className = 'running-cursor';
+      runner.textContent = runningEmoji;
+      runner.style.left = Math.random() * 80 + 10 + '%';
+      runner.style.top = Math.random() * 80 + 10 + '%';
+      document.body.appendChild(runner);
+
+      const targetX = Math.random() * (window.innerWidth - 50);
+      const targetY = Math.random() * (window.innerHeight - 50);
+      const startX = parseFloat(runner.style.left);
+      const startY = parseFloat(runner.style.top);
+      let progress = 0;
+
+      const moveInterval = setInterval(() => {
+        progress += 0.05;
+        const x = startX + (targetX - startX) * progress;
+        const y = startY + (targetY - startY) * progress;
+        runner.style.left = x + 'px';
+        runner.style.top = y + 'px';
+
+        if (progress >= 1) {
+          clearInterval(moveInterval);
+          setTimeout(() => runner.remove(), 500);
         }
-        return true;
+      }, 30);
+
+      showStatus('RUNNING AWAY!');
+    }
+
+    function fakePopup() {
+      const overlay = document.createElement('div');
+      overlay.className = 'popup-overlay';
+      document.body.appendChild(overlay);
+
+      const popup = document.createElement('div');
+      popup.className = 'fake-popup';
+
+      const messages = [
+        { title: 'Congratulations!', message: 'You won a free iPhone! Click OK to claim.' },
+        { title: 'Warning!', message: 'Your computer is infected! Click OK to continue.' },
+        { title: 'SYSTEM ALERT', message: 'RAM low. Click OK to optimize.' },
+        { title: 'Update Available', message: 'Click OK to update your browser.' },
+        { title: 'Security Notice', message: 'Unusual activity detected. Click OK to proceed.' }
+      ];
+
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+      popup.innerHTML = `
+        <div class="popup-title">${msg.title}</div>
+        <div class="popup-message">${msg.message}</div>
+        <div class="popup-buttons">
+          <button class="popup-button popup-ok">OK</button>
+          <button class="popup-button popup-cancel">Cancel</button>
+        </div>
+      `;
+
+      document.body.appendChild(popup);
+
+      popup.querySelector('.popup-ok').addEventListener('click', () => {
+        overlay.remove();
+        popup.remove();
       });
+
+      popup.querySelector('.popup-cancel').addEventListener('click', () => {
+        overlay.remove();
+        popup.remove();
+      });
+
+      showStatus('FAKE POPUP!');
     }
 
-    // Main game loop
-    function gameLoop() {
-      gameTime++;
-      
-      switch(currentMode) {
-        case 'evade':
-          updateEvadeMode();
-          break;
-        case 'chase':
-          updateChaseMode();
-          break;
-        case 'dupe':
-          updateDupeMode();
-          break;
-        case 'magnet':
-          updateMagnetMode();
-          break;
-        case 'trail':
-          updateTrailMode();
-          break;
+    function invertColors() {
+      invertActive = !invertActive;
+      document.body.classList.toggle('inverted');
+      showStatus(invertActive ? 'INVERTED!' : 'NORMAL!');
+    }
+
+    function explosion() {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 20 + 10;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+
+        const angle = (i / 20) * Math.PI * 2;
+        const distance = 200;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        particle.style.setProperty('--tx', tx + 'px');
+        particle.style.setProperty('--ty', ty + 'px');
+
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
       }
-      
-      updateUI();
-      requestAnimationFrame(gameLoop);
+
+      showStatus('BOOM!');
     }
 
-    // Initialize
-    updateMainCursor();
-    gameLoop();
+    function emojiRain() {
+      const emojis = ['⭐', '💫', '✨', '🌟', '💥', '🎉', '🎊', '🍕', '🎮', '🚀'];
+      const rainCount = 30;
 
-    // Spawn initial target for chase mode when switched
-    document.querySelectorAll('button')[1].addEventListener('click', () => {
-      setTimeout(spawnTarget, 100);
+      for (let i = 0; i < rainCount; i++) {
+        const rain = document.createElement('div');
+        rain.className = 'emoji-rain';
+        rain.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        rain.style.left = Math.random() * 100 + '%';
+        rain.style.top = '-50px';
+        rain.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        document.body.appendChild(rain);
+
+        setTimeout(() => rain.remove(), 3000);
+      }
+
+      showStatus('RAINING EMOJIS!');
+    }
+
+    function confetti() {
+      const confettiPieces = 50;
+      const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
+
+      for (let i = 0; i < confettiPieces; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.top = '-10px';
+        piece.style.width = Math.random() * 10 + 5 + 'px';
+        piece.style.height = Math.random() * 10 + 5 + 'px';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        piece.style.animationDelay = Math.random() * 0.5 + 's';
+        document.body.appendChild(piece);
+
+        setTimeout(() => piece.remove(), 4000);
+      }
+
+      showStatus('CONFETTI!');
+    }
+
+    function glitchText() {
+      const button = document.querySelector('.chaos-button');
+      button.classList.add('glitch');
+      const originalText = button.textContent;
+      button.textContent = 'GLITCH';
+
+      setTimeout(() => {
+        button.classList.remove('glitch');
+        button.textContent = originalText;
+      }, 300);
+
+      showStatus('GLITCHED!');
+    }
+
+    function floatingText() {
+      const texts = ['WOW!', 'AWESOME!', 'CRAZY!', 'YOLO!', 'EPIC!', 'WILD!', 'INTENSE!'];
+      const text = document.createElement('div');
+      text.className = 'message-display';
+      text.textContent = texts[Math.floor(Math.random() * texts.length)];
+      document.body.appendChild(text);
+
+      setTimeout(() => text.remove(), 1500);
+      showStatus('TEXT FLOATED!');
+    }
+
+    function bounce() {
+      const button = document.querySelector('.chaos-button');
+      button.style.animation = 'bounce 0.5s';
+      setTimeout(() => button.style.animation = '', 500);
+      showStatus('BOUNCED!');
+    }
+
+    function spinPage() {
+      document.body.style.animation = 'spin 1s ease-in-out';
+      setTimeout(() => document.body.style.animation = '', 1000);
+      showStatus('SPINNING!');
+    }
+
+    function particles() {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.width = '8px';
+        particle.style.height = '8px';
+        particle.style.background = '#fff';
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+
+        const angle = (i / 15) * Math.PI * 2;
+        const distance = 150;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        particle.style.setProperty('--tx', tx + 'px');
+        particle.style.setProperty('--ty', ty + 'px');
+
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+      }
+
+      showStatus('PARTICLES!');
+    }
+
+    function soundEffect() {
+      // Create a simple beep sound using Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 400 + Math.random() * 200;
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.2);
+
+      showStatus('BEEP!');
+    }
+
+    function flashScreen() {
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.background = 'white';
+      overlay.style.zIndex = '999';
+      overlay.style.animation = 'fadeInOut 0.3s ease';
+      overlay.style.pointerEvents = 'none';
+      document.body.appendChild(overlay);
+
+      setTimeout(() => overlay.remove(), 300);
+      showStatus('FLASH!');
+    }
+
+    function randomText() {
+      const textArray = [
+        'YOU CLICKED!',
+        'CHAOS REIGNS!',
+        'ERROR 404',
+        'PRESS ANY KEY',
+        'WHAT DID YOU DO?',
+        'THIS IS FINE',
+        'LOL',
+        'NOICE'
+      ];
+
+      const text = document.createElement('div');
+      text.className = 'text-effect';
+      text.textContent = textArray[Math.floor(Math.random() * textArray.length)];
+      text.style.left = Math.random() * 80 + 10 + '%';
+      text.style.top = Math.random() * 80 + 10 + '%';
+      text.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      document.body.appendChild(text);
+
+      setTimeout(() => text.remove(), 2000);
+      showStatus('TEXT!');
+    }
+
+    function slowMo() {
+      document.body.style.animationPlayState = 'paused';
+      showStatus('SLOW MO!');
+      setTimeout(() => {
+        document.body.style.animationPlayState = 'running';
+      }, 1000);
+    }
+
+    function bounceButton() {
+      const button = document.querySelector('.chaos-button');
+      const startY = button.offsetTop;
+      let y = startY;
+      let vy = -15;
+
+      const bounce = setInterval(() => {
+        vy += 0.5;
+        y += vy;
+
+        button.style.position = 'relative';
+        button.style.top = (y - startY) + 'px';
+
+        if (y > startY && vy > 0) {
+          clearInterval(bounce);
+          button.style.top = '0';
+        }
+      }, 20);
+
+      showStatus('BOUNCY!');
+    }
+
+    function screenWobble() {
+      document.documentElement.style.animation = 'wobble 0.4s ease-in-out';
+      setTimeout(() => document.documentElement.style.animation = '', 400);
+      showStatus('WOBBLED!');
+    }
+
+    function showStatus(text) {
+      const status = document.createElement('div');
+      status.className = 'status-text';
+      status.textContent = text;
+      document.body.appendChild(status);
+      setTimeout(() => status.remove(), 2000);
+    }
+
+    // Add wobble keyframe
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes bounce {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(0); }
+      }
+      @keyframes spin {
+        0% { transform: rotateZ(0deg); }
+        50% { transform: rotateZ(180deg); }
+        100% { transform: rotateZ(360deg); }
+      }
+      @keyframes wobble {
+        0%, 100% { transform: skewX(0deg); }
+        25% { transform: skewX(5deg); }
+        75% { transform: skewX(-5deg); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    button.addEventListener('click', () => {
+      clickCount++;
+      const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+      randomEffect();
     });
   </script>
 </body>
