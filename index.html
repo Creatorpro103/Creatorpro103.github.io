@@ -1,20 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=https://docs.google.com/forms/d/e/1FAIpQLSe4oHLY7byPj8oCOo8UFsr81qOHu_CSJ1zZdRhYCqz_M-P3Cw/viewform" />
-  <title>Redirecting...</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isaac's Keychains - Custom 3D Printed Accessories</title>
 
-  <script>
-    window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLSe4oHLY7byPj8oCOo8UFsr81qOHu_CSJ1zZdRhYCqz_M-P3Cw/viewform";
-  </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #a5b4fc;
+        --secondary: #e0e7ff;
+        --accent: #06b6d4;
+        --text-dark: #0f172a;
+        --text-light: #64748b;
+        --bg-light: #f8fafc;
+        --border-radius: 16px;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+        --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 100%);
+        color: var(--text-dark);
+        line-height: 1.6;
+    }
+
+    header {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #06b6d4 100%);
+        padding: 80px 20px;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-20px) translateX(-10px); }
+    }
+
+    header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+        animation: slideDown 0.8s ease-out;
+        letter-spacing: -1px;
+    }
+
+    header p {
+        font-size: 1.2rem;
+        font-weight: 300;
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.8s ease-out 0.2s both;
+        opacity: 0.95;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .products {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 80px 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 32px;
+    }
+
+    .card {
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+    .card:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-8px);
+    }
+
+    .image-placeholder {
+        height: 240px;
+        background: linear-gradient(135deg, var(--secondary) 0%, #e0e7ff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: var(--primary);
+        font-weight: 600;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .image-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover .image-placeholder img {
+        transform: scale(1.05);
+    }
+
+    .card-content {
+        padding: 28px;
+    }
+
+    .card-content h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .card-content p {
+        color: var(--text-light);
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .order-section {
+        text-align: center;
+        padding: 100px 20px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+        margin: 40px 20px;
+        border-radius: var(--border-radius);
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .order-section h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+        font-weight: 700;
+    }
+
+    .order-section p {
+        margin-bottom: 35px;
+        color: var(--text-light);
+        font-size: 1.05rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .order-button {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        text-decoration: none;
+        padding: 18px 42px;
+        border-radius: 999px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .order-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+
+    .order-button:hover::before {
+        left: 100%;
+    }
+
+    .order-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    .order-button:active {
+        transform: translateY(-1px);
+    }
+
+    footer {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: white;
+        margin-top: 60px;
+    }
+
+    @media (max-width: 768px) {
+        header h1 {
+            font-size: 2.2rem;
+        }
+
+        header p {
+            font-size: 1rem;
+        }
+
+        .products {
+            grid-template-columns: 1fr;
+            padding: 60px 20px;
+            gap: 24px;
+        }
+
+        .order-section h2 {
+            font-size: 2rem;
+        }
+
+        .order-section {
+            padding: 60px 20px;
+            margin: 40px 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    .scroll-fade {
+        opacity: 0;
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+</style>
 </head>
 <body>
-  <p>
-    Redirecting... If nothing happens,
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSe4oHLY7byPj8oCOo8UFsr81qOHu_CSJ1zZdRhYCqz_M-P3Cw/viewform">
-      click here
-    </a>.
-  </p>
+
+<header>
+    <h1>iPrint Keychains</h1>
+    <p>3D Printed Accessories</p>
+</header>
+
+<section class="products">
+
+    <div class="card">
+        <div class="image-placeholder"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVBtB_Y_MrxxIjKpmGc1uaDBiWUNh_8t8JHmvWnhroBUwzELvDbR5F9AHOi7tPhDf9pXYm2_Var6gGiKRAWilUBxfGlR_Hz-Mmy7YdnoXxmbcK5k3SxPHPgaRBoGrOMJ4tJLxoPu8gPyWvVhr85nC2NevOaF4_3KV1z392KRQb39Cjz58cQVlKPh4MH2laIIv8C08Cv0cUrpw83q=w1350?key=YtUivrP-NlKTleUP6T1zBw" alt="Baseball Keychain"></div>
+        <div class="card-content">
+            <h2>Baseball Keychains</h2>
+            <p>Baseball keychains that can be customized to make sure items such as bags don't get mixed up!</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="image-placeholder"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVDBFKhT3NtI0XEwge07rhfneiJMfVawnTcEF5wYTDYb3VfgQSgedEhcAV5bFI19N8Ia8DVeauad5KTaR-cm_b9SN8nAtCiihOfYNi6QRCVzmB5oY6TXZiRZ5gzc0qy_iVboQVb7YQrlPggZPsUEEP-k2aHjevFRx8h7CxjT2R5y47ounfg-5ZIWa0-8ZExKlwfWlYSWWSnLw7FY=w2048?key=YtUivrP-NlKTleUP6T1zBw" alt="Disney Keychain"></div>
+        <div class="card-content">
+            <h2>Disney Keychains</h2>
+            <p>Fun Disney keychains that will bring some magic to your keyring or if you ever go to Disney World!</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="image-placeholder"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVBgSxKEVEmY3PC35nSCqnUbaOVooCn7dfLHAD2upNML0vvEuYu0UxniKeS_jIWUprfamVibwo2LDyzBDbhXcB1SsME79U5Xaz-TSL-7MyVkAKCxELgk0XnhESoG_bvTM2OHk1wNuWQFpuK8i8xn_t3IRHEx3mntA8E58nNJvOCEUJNl9MeB7T8mYGk0ac3i56yNsv94fY7Rnq0s=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Custom Name Keychain"></div>
+        <div class="card-content">
+            <h2>Custom Name Keychains</h2>
+            <p>Personalized name keychains in tons of colors and font styles.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="image-placeholder"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVDr5_kkCngFcQkhrB0Bw4uE1ueVsqGQZbHbVb2MzWI4bmD0sIZ2GrLjLXOJSJ7apss-6HJZbhZZqmbrT_8WuUcxBpNPrHftp8Z0O5-PFMBhCRXMgwbCVyv2Zrnz-jIiEWuu7r0ImfCsdmlOzdSgIZ7HvX5HfCpf406qQn5Y6rfc6FVaZmL_CU-wEp1nhedizO-35gYy72v2BPM=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Cheer Megaphone"></div>
+        <div class="card-content">
+            <h2>Cheer Megaphones</h2>
+            <p>Custom megaphone keychains for cheerleaders </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="image-placeholder"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCoV2Wn0fvvHzxf6M17odWQbPIWiXNw3zMVUz7y3Bel4x7qNgYUW2cXtmePxk_gD-ZWG0Oo1BGjWG0jKMGkTrD45HBSdGBrb7prxjyUwfNUhaiWPeVyibxSDdNbMIHauthnmcm1xw9CG99HZUtQpirudrngD9qwFb61N_MOcAnLtmGFVmGVo39YnU-pRqFGT_xlROiHXVKXi-s=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Soccer Keychain"></div>
+        <div class="card-content">
+            <h2>Soccer Keychains</h2>
+            <p>Personalized soccer keychains for players to put on their bags and gear to keep items from getting lost!</p>
+        </div>
+    </div>
+
+   
+
+</section>
+
+<section class="order-section">
+    <h2>Ready to Order?</h2>
+    <p>Click the button below to place your order. We use premium quality materials to incerease durability and overall design</p>
+    <a class="order-button" href="https://docs.google.com/forms/d/e/1FAIpQLSe4oHLY7byPj8oCOo8UFsr81qOHu_CSJ1zZdRhYCqz_M-P3Cw/viewform?usp=header" target="_blank">
+        Order Now
+    </a>
+</section>
+
+<footer>
+    <a href="https://isaacneal.com" target="_blank" style="color: var(--text-light); text-decoration: none; font-weight: 500;">Our website</a> | &copy; 2026 iPrintKeychains 
+</footer>
+
 </body>
 </html>
