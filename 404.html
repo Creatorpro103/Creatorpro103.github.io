@@ -1,27 +1,255 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Page not found</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page not found · iPrintKeychains</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --void: #0b0b0f;
+      --ink: #ece9f4;
+      --dim: #76718c;
+      --line: #232130;
+      --glitch-a: #ff3b6b;
+      --glitch-b: #3bf0ff;
+      --brass: #ffc24b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      background: #0f0f0f;
-      color: white;
-      font-family: Arial;
+      background: var(--void);
+      color: var(--ink);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      overflow-x: hidden;
+      background-image: radial-gradient(ellipse 80% 60% at 50% 40%, #14121c 0%, var(--void) 70%);
+    }
+
+    main {
       text-align: center;
-      padding-top: 100px;
+      padding: 4rem 1.5rem 2rem;
+      max-width: 34rem;
+      margin: auto;
     }
+
+    /* terminal-style status line */
+    .status {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: var(--dim);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      display: inline-block;
+      padding: 0.45em 1.1em;
+      margin-bottom: 2.5rem;
+    }
+    .status::before {
+      content: "";
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--glitch-a);
+      margin-right: 0.7em;
+      vertical-align: 1px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* signature: glitchy 404 with a keychain dangling off it */
+    .code-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .code {
+      position: relative;
+      font-size: clamp(6rem, 22vw, 11rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      user-select: none;
+    }
+    .code span[aria-hidden] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+    }
+    .code .ghost-a { color: var(--glitch-a); }
+    .code .ghost-b { color: var(--glitch-b); }
+
+    .code.glitching .ghost-a { animation: split-a 0.35s steps(2, end) 1; }
+    .code.glitching .ghost-b { animation: split-b 0.35s steps(2, end) 1; }
+
+    /* the keychain charm hanging from the last 4 */
+    .charm {
+      position: absolute;
+      right: clamp(-6px, -0.5vw, -2px);
+      bottom: -78px;
+      width: 56px;
+      transform-origin: 50% 6px;
+      animation: swing 3.4s ease-in-out infinite;
+      filter: drop-shadow(0 6px 14px rgba(255, 194, 75, 0.18));
+    }
+
+    @keyframes swing {
+      0%, 100% { transform: rotate(7deg); }
+      50% { transform: rotate(-7deg); }
+    }
+
+    @keyframes split-a {
+      0%   { opacity: 0.8; transform: translate(-6px, 2px); clip-path: inset(10% 0 55% 0); }
+      50%  { opacity: 0.8; transform: translate(4px, -1px); clip-path: inset(60% 0 5% 0); }
+      100% { opacity: 0; transform: none; }
+    }
+    @keyframes split-b {
+      0%   { opacity: 0.8; transform: translate(6px, -2px); clip-path: inset(50% 0 20% 0); }
+      50%  { opacity: 0.8; transform: translate(-4px, 1px); clip-path: inset(0 0 70% 0); }
+      100% { opacity: 0; transform: none; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
     h1 {
-      font-size: 60px;
+      font-size: 1.35rem;
+      font-weight: 500;
+      margin-top: 4.5rem;
     }
-    p {
-      font-size: 20px;
-      opacity: 0.7;
+
+    .blame {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.85rem;
+      color: var(--dim);
+      margin-top: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.9rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+    .btn {
+      display: inline-block;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border-radius: 4px;
+      padding: 0.7em 1.6em;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .btn-shop {
+      color: var(--void);
+      background: var(--brass);
+      border: 1px solid var(--brass);
+      font-weight: 500;
+    }
+    .btn-shop:hover, .btn-shop:focus-visible {
+      box-shadow: 0 0 24px rgba(255, 194, 75, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-home {
+      color: var(--ink);
+      border: 1px solid var(--dim);
+    }
+    .btn-home::before { content: "cd "; color: var(--dim); }
+    .btn-home:hover, .btn-home:focus-visible {
+      border-color: var(--glitch-b);
+      box-shadow: 0 0 24px rgba(59, 240, 255, 0.18);
+      transform: translateY(-1px);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--glitch-b);
+      outline-offset: 3px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.6rem 1rem 2rem;
+      border-top: 1px solid var(--line);
+    }
+    .brand {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: var(--dim);
+    }
+    .brand b {
+      color: var(--brass);
+      font-weight: 500;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .code.glitching .ghost-a,
+      .code.glitching .ghost-b,
+      .status::before,
+      .charm { animation: none; }
+      .btn { transition: none; }
     }
   </style>
 </head>
 <body>
-  <h1>404</h1>
-  <p>That page doesn’t exist. You probably typed something cursed.</p>
-  <a href="/">Go home</a>
+  <main>
+    <p class="status">ERR_KEY_NOT_FOUND</p>
+
+    <div class="code-wrap">
+      <div class="code" id="code">
+        404
+        <span class="ghost-a" aria-hidden="true">404</span>
+        <span class="ghost-b" aria-hidden="true">404</span>
+      </div>
+
+      <!-- keychain charm dangling off the 404 -->
+      <svg class="charm" viewBox="0 0 56 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- split ring -->
+        <circle cx="28" cy="14" r="10" stroke="#9a93ad" stroke-width="3.5"/>
+        <!-- chain links -->
+        <circle cx="28" cy="29" r="4" stroke="#9a93ad" stroke-width="2.5"/>
+        <circle cx="28" cy="38" r="4" stroke="#9a93ad" stroke-width="2.5"/>
+        <!-- charm tag -->
+        <rect x="13" y="44" width="30" height="42" rx="7" fill="#ffc24b"/>
+        <rect x="13" y="44" width="30" height="42" rx="7" stroke="#b8862e" stroke-width="2"/>
+        <circle cx="28" cy="51" r="2.5" fill="#0b0b0f"/>
+        <!-- tiny key icon on the tag -->
+        <circle cx="24" cy="64" r="4.5" stroke="#0b0b0f" stroke-width="2.5"/>
+        <path d="M27.5 67 L35 75 M32 72 L35 70 M34 74 L37 72" stroke="#0b0b0f" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h1>This page lost its keyrings.</h1>
+    <p class="blame">We checked every keyring. Twice.<br>Whatever you typed isn’t hanging here.</p>
+
+    <div class="actions">
+      <a class="btn btn-shop" href="https://forms.gle/4RqgULYWgq9ZEH6K6">Order now</a>
+      <a class="btn btn-home" href="https://isaacneal.com">~/home</a>
+    </div>
+  </main>
+
+  <footer>
+    <p class="brand"><b>IPrintKeychains</b></p>
+  </footer>
+
+  <script>
+    // periodic glitch on the 404 — skipped if the user prefers reduced motion
+    const code = document.getElementById("code");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) {
+      const glitch = () => {
+        code.classList.add("glitching");
+        setTimeout(() => code.classList.remove("glitching"), 400);
+        setTimeout(glitch, 2500 + Math.random() * 4000);
+      };
+      setTimeout(glitch, 1200);
+    }
+  </script>
 </body>
 </html>
