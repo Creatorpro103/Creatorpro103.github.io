@@ -38,7 +38,6 @@
       margin: auto;
     }
 
-    /* terminal-style status line */
     .status {
       font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 0.8rem;
@@ -61,7 +60,6 @@
       animation: pulse 2s ease-in-out infinite;
     }
 
-    /* signature: glitchy 404 with a keychain dangling off it */
     .code-wrap {
       position: relative;
       display: inline-block;
@@ -85,7 +83,6 @@
     .code.glitching .ghost-a { animation: split-a 0.35s steps(2, end) 1; }
     .code.glitching .ghost-b { animation: split-b 0.35s steps(2, end) 1; }
 
-    /* the keychain charm hanging from the last 4 */
     .charm {
       position: absolute;
       right: clamp(-6px, -0.5vw, -2px);
@@ -199,7 +196,6 @@
 </head>
 <body>
   <main>
-    <p class="status">ERR_KEY_NOT_FOUND</p>
 
     <div class="code-wrap">
       <div class="code" id="code">
@@ -208,7 +204,6 @@
         <span class="ghost-b" aria-hidden="true">404</span>
       </div>
 
-      <!-- keychain charm dangling off the 404 -->
       <svg class="charm" viewBox="0 0 56 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <!-- split ring -->
         <circle cx="28" cy="14" r="10" stroke="#9a93ad" stroke-width="3.5"/>
@@ -239,7 +234,6 @@
   </footer>
 
   <script>
-    // periodic glitch on the 404 — skipped if the user prefers reduced motion
     const code = document.getElementById("code");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!reduced) {
