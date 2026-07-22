@@ -1,10 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Isaac's Keychains - Isaac Neal</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%236366f1' width='100' height='100' rx='20'/><text x='50' y='65' font-size='60' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>K</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #a5b4fc;
+        --secondary: #e0e7ff;
+        --accent: #06b6d4;
+        --text-dark: #0f172a;
+        --text-light: #64748b;
+        --bg-light: #f8fafc;
+        --border-radius: 16px;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+        --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 100%);
+        color: var(--text-dark);
+        line-height: 1.6;
+    }
+
+    header {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #06b6d4 100%);
+        padding: 60px 20px;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+
+    header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-20px) translateX(-10px); }
+    }
+
+    .nav-bar {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+    }
+
+    .nav-bar a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        opacity: 0.9;
+    }
+
+    .nav-bar a:hover {
+        opacity: 1;
+        transform: translateY(-2px);
+    }
+
+    header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+        animation: slideDown 0.8s ease-out;
+        letter-spacing: -1px;
+    }
+
+    header p {
+        font-size: 1.2rem;
+        font-weight: 300;
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.8s ease-out 0.2s both;
+        opacity: 0.95;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 80px 20px;
+    }
+
+    .about-content {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 50px;
+        box-shadow: var(--shadow-sm);
+        animation: fadeInUp 0.8s ease-out;
+        line-height: 1.8;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .about-content h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        margin-bottom: 25px;
+        color: var(--primary);
+        font-weight: 700;
+    }
+
+    .about-content p {
+        font-size: 1.05rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+        text-align: justify;
+    }
+
+    .highlight {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .about-content a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .about-content a:hover {
+        text-decoration: underline;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+        margin: 50px 0;
+    }
+
+    .feature-box {
+        padding: 25px;
+        background: linear-gradient(135deg, var(--secondary) 0%, #e0e7ff 100%);
+        border-radius: var(--border-radius);
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .feature-box:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-md);
+        background: linear-gradient(135deg, #c7d2fe 0%, #dbeafe 100%);
+    }
+
+    .feature-box h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        color: var(--primary);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .feature-box p {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        margin: 0;
+        text-align: center;
+    }
+
+    .cta-section {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+        padding: 40px;
+        border-radius: var(--border-radius);
+        text-align: center;
+        margin-top: 40px;
+    }
+
+    .cta-section h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        color: var(--text-dark);
+    }
+
+    .cta-section p {
+        font-size: 1.05rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+    }
+
+    .cta-button {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        text-decoration: none;
+        padding: 15px 35px;
+        border-radius: 999px;
+        font-weight: 600;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    footer {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: white;
+        margin-top: 60px;
+    }
+
+    footer a {
+        color: var(--text-light);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    footer a:hover {
+        color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+        header h1 {
+            font-size: 2.2rem;
+        }
+
+        .about-content {
+            padding: 30px 20px;
+        }
+
+        .about-content h2 {
+            font-size: 1.8rem;
+        }
+
+        .about-content p {
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        .nav-bar {
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
+</head>
+<body>
+
 <p>&nbsp;</p>
 <p> </p>
+
 <header>
 <div class="nav-bar"><a href="isaacs-keychains.html">Home</a> <a style="opacity: 1; text-decoration: underline;" href="about.html">About</a></div>
 <h1>About Isaac Neal</h1>
 <p>Founder of iPrint Keychains</p>
 </header>
+
 <div class="container">
 <div class="about-content">
 <h2>Welcome to iPrint Keychains</h2>
@@ -32,4 +357,8 @@
 <a class="cta-button" href="https://docs.google.com/forms/d/e/1FAIpQLSe4oHLY7byPj8oCOo8UFsr81qOHu_CSJ1zZdRhYCqz_M-P3Cw/viewform?usp=header" target="_blank" rel="noopener"><span style="color: #ffffff;"> Order Now</span> </a></div>
 </div>
 </div>
+
 <footer><a href="https://isaacneal.com" target="_blank" rel="noopener">isaacneal.com</a> | &copy; 2026 iPrint Keychains by Isaac Neal</footer>
+
+</body>
+</html>
