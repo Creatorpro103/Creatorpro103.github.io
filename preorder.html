@@ -1,164 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Preorder</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elf Box Preorder | iPrint Keychains</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%236366f1' width='100' height='100' rx='20'/><text x='50' y='65' font-size='60' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>K</text></svg>">
 
-  <style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #a5b4fc;
+        --secondary: #e0e7ff;
+        --accent: #06b6d4;
+        --text-dark: #0f172a;
+        --text-light: #64748b;
+        --bg-light: #f8fafc;
+        --border-radius: 16px;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+        --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     * {
-      box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
     }
 
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 100%);
+        color: var(--text-dark);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #06b6d4 100%);
+        padding: 80px 20px 60px;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-20px) translateX(-10px); }
+    }
+
+    header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+        animation: slideDown 0.8s ease-out;
+        letter-spacing: -1px;
+    }
+
+    header p {
+        font-size: 1.15rem;
+        font-weight: 300;
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.8s ease-out 0.2s both;
+        opacity: 0.95;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    main {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        padding: 60px 20px 80px;
     }
 
     .container {
-      background: white;
-      width: 90%;
-      max-width: 500px;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+        background: white;
+        width: 100%;
+        max-width: 540px;
+        padding: 40px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        animation: fadeInUp 0.6s ease-out backwards;
+        animation-delay: 0.1s;
     }
 
-    h1 {
-      margin-top: 0;
-      text-align: center;
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-align: center;
+        color: var(--text-dark);
+    }
+
+    .container > p.subtitle {
+        text-align: center;
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .price-tag {
+        display: block;
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 30px;
+    }
+
+    .price-tag span {
+        font-size: 0.85rem;
+        font-weight: 400;
+        font-family: 'Poppins', sans-serif;
+        color: var(--text-light);
+        display: block;
+        margin-top: 2px;
     }
 
     label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: bold;
+        display: block;
+        margin-top: 18px;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-dark);
     }
 
     input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        color: var(--text-dark);
+        background: var(--bg-light);
+        transition: var(--transition);
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
 
     textarea {
-      height: 100px;
-      resize: vertical;
+        height: 100px;
+        resize: vertical;
     }
 
     button {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      background: #111;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
+        width: 100%;
+        margin-top: 28px;
+        padding: 16px;
+        border: none;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        font-size: 1.05rem;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+
+    button:hover::before {
+        left: 100%;
     }
 
     button:hover {
-      background: #333;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    button:active {
+        transform: translateY(-1px);
+    }
+
+    button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
     }
 
     #status {
-      margin-top: 15px;
-      text-align: center;
-      font-weight: bold;
+        margin-top: 18px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.95rem;
+        min-height: 1.2em;
     }
-  </style>
-</head>
 
+    #status.success {
+        color: #16a34a;
+    }
+
+    #status.error {
+        color: #dc2626;
+    }
+
+    #status.loading {
+        color: var(--text-light);
+    }
+
+    footer {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: white;
+    }
+
+    footer a {
+        color: var(--text-light);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        header h1 {
+            font-size: 2.2rem;
+        }
+
+        header p {
+            font-size: 1rem;
+        }
+
+        header {
+            padding: 60px 20px 40px;
+        }
+
+        .container {
+            padding: 28px;
+        }
+
+        main {
+            padding: 40px 16px 60px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
+</head>
 <body>
 
-  <div class="container">
+<header>
+    <h1>Elf Box</h1>
+    <p>Preorder your Elf Box — expected $35</p>
+</header>
 
-    <h1>Preorder Test</h1>
+<main>
+    <div class="container">
+        <h2>Place Your Preorder</h2>
+        <p class="subtitle">Fill out the form below and we'll follow up by email to confirm.</p>
+        <p class="price-tag">$35<span>Expected price per Elf Box</span></p>
 
-    <form id="preorderForm">
+        <form id="preorderForm">
+            <label for="name">Name</label>
+            <input type="text" id="name" required>
 
-      <label>Name</label>
-      <input type="text" id="name" required>
+            <label for="email">Email</label>
+            <input type="email" id="email" required>
 
-      <label>Email</label>
-      <input type="email" id="email" required>
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" min="1" value="1" required>
 
-      <label>Product</label>
-      <select id="product">
-        <option value="Blue">Blue</option>
-        <option value="Red">Red</option>
-        <option value="Green">Green</option>
-      </select>
+            <label for="notes">Notes</label>
+            <textarea id="notes" placeholder="Any special requests or details for your Elf Box (optional)"></textarea>
 
-      <label>Quantity</label>
-      <input type="number" id="quantity" min="1" value="1" required>
+            <button type="submit" id="submitBtn">Place Preorder</button>
+        </form>
+        <div id="status"></div>
+    </div>
+</main>
 
-      <label>Notes</label>
-      <textarea id="notes" placeholder="Optional"></textarea>
+<footer>
+    <a href="https://isaacneal.com" target="_blank">Our website</a> | &copy; 2026 iPrintKeychains
+</footer>
 
-      <button type="submit">
-        Place Test Preorder
-      </button>
-
-    </form>
-
-    <div id="status"></div>
-
-  </div>
-
-  <script>
-
+<script>
     const SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbyrjnXiYi9YlmK5BaVQoqloiZambYKsEUblSSJy0zoawZ7j9ThjIP3xUpZchaka-YDU/exec";
 
-    document.getElementById("preorderForm").addEventListener("submit", async function(event) {
+    const form = document.getElementById("preorderForm");
+    const status = document.getElementById("status");
+    const submitBtn = document.getElementById("submitBtn");
 
+    form.addEventListener("submit", async function(event) {
       event.preventDefault();
 
-      const status = document.getElementById("status");
-
+      status.className = "loading";
       status.textContent = "Submitting...";
+      submitBtn.disabled = true;
 
       const data = {
         name: document.getElementById("name").value,
         email: document.getElementById("email").value,
-        product: document.getElementById("product").value,
+        product: "Elf Box",
+        price: "$35",
         quantity: document.getElementById("quantity").value,
         notes: document.getElementById("notes").value
       };
 
       try {
-
         await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
           body: JSON.stringify(data)
         });
-
-        status.textContent = "✅ Preorder submitted!";
-
-        document.getElementById("preorderForm").reset();
-
+        status.className = "success";
+        status.textContent = "✅ Preorder submitted! Check your email for confirmation.";
+        form.reset();
       } catch (error) {
-
         console.error(error);
-
-        status.textContent = "❌ Something went wrong.";
-
+        status.className = "error";
+        status.textContent = "❌ Something went wrong. Please try again.";
+      } finally {
+        submitBtn.disabled = false;
       }
-
     });
-
-  </script>
+</script>
 
 </body>
 </html>
