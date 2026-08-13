@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Preorder</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #333;
+    }
+
+    #status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Preorder Test</h1>
+
+    <form id="preorderForm">
+
+      <label>Name</label>
+      <input type="text" id="name" required>
+
+      <label>Email</label>
+      <input type="email" id="email" required>
+
+      <label>Product</label>
+      <select id="product">
+        <option value="Blue">Blue</option>
+        <option value="Red">Red</option>
+        <option value="Green">Green</option>
+      </select>
+
+      <label>Quantity</label>
+      <input type="number" id="quantity" min="1" value="1" required>
+
+      <label>Notes</label>
+      <textarea id="notes" placeholder="Optional"></textarea>
+
+      <button type="submit">
+        Place Test Preorder
+      </button>
+
+    </form>
+
+    <div id="status"></div>
+
+  </div>
+
+  <script>
+
+    const SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbyrjnXiYi9YlmK5BaVQoqloiZambYKsEUblSSJy0zoawZ7j9ThjIP3xUpZchaka-YDU/exec";
+
+    document.getElementById("preorderForm").addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+      const status = document.getElementById("status");
+
+      status.textContent = "Submitting...";
+
+      const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        product: document.getElementById("product").value,
+        quantity: document.getElementById("quantity").value,
+        notes: document.getElementById("notes").value
+      };
+
+      try {
+
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify(data)
+        });
+
+        status.textContent = "✅ Preorder submitted!";
+
+        document.getElementById("preorderForm").reset();
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.textContent = "❌ Something went wrong.";
+
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
