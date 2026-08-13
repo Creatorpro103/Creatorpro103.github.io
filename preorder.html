@@ -312,7 +312,7 @@
 
 <header>
     <h1>Elf Box</h1>
-    <p>Preorder your Elf Box — expected $35</p>
+    <p>Preorder your Elf Box! expected $35</p>
 </header>
 
 <main>
@@ -375,12 +375,12 @@
           body: JSON.stringify(data)
         });
         status.className = "success";
-        status.textContent = "✅ Preorder submitted! Check your email for confirmation.";
+        status.textContent = "Preorder submitted!";
         form.reset();
       } catch (error) {
         console.error(error);
         status.className = "error";
-        status.textContent = "❌ Something went wrong. Please try again.";
+        status.textContent = "Something went wrong. Please try again.";
       } finally {
         submitBtn.disabled = false;
       }
