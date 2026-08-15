@@ -360,61 +360,30 @@
       status.textContent = "Submitting...";
       submitBtn.disabled = true;
 
-      const data = new URLSearchParams();
-
-      data.append(
-        "name",
-        document.getElementById("name").value
-      );
-
-      data.append(
-        "email",
-        document.getElementById("email").value
-      );
-
-      data.append(
-        "product",
-        "Elf Box"
-      );
-
-      data.append(
-        "price",
-        "$35"
-      );
-
-      data.append(
-        "quantity",
-        document.getElementById("quantity").value
-      );
-
-      data.append(
-        "notes",
-        document.getElementById("notes").value
-      );
+      const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        product: "Elf Box",
+        price: "$35",
+        quantity: document.getElementById("quantity").value,
+        notes: document.getElementById("notes").value
+      };
 
       try {
 
-        const response = await fetch(SCRIPT_URL, {
+        await fetch(SCRIPT_URL, {
           method: "POST",
-          body: data
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain"
+          },
+          body: JSON.stringify(data)
         });
 
-        const result = await response.json();
+        status.className = "success";
+        status.textContent = "Preorder submitted!";
 
-        if (result.success) {
-
-          status.className = "success";
-          status.textContent = "Preorder submitted!";
-
-          form.reset();
-
-        } else {
-
-          throw new Error(
-            result.error || "The preorder could not be submitted."
-          );
-
-        }
+        form.reset();
 
       } catch (error) {
 
@@ -422,7 +391,7 @@
 
         status.className = "error";
         status.textContent =
-          "Something went wrong: " + error.message;
+          "Something went wrong. Please try again.";
 
       } finally {
 
