@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Disaster Relief Robotics Board  3D Render</title>
+<title>Disaster Relief Robotics Board - 3D Render</title>
 <style>
   html, body { margin:0; padding:0; overflow:hidden; background:#0b0e1a; font-family: Arial, Helvetica, sans-serif; overscroll-behavior:none; touch-action:none; height:100%; }
   #info {
@@ -21,25 +21,46 @@
   #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   #vignette{ position:absolute; inset:0; pointer-events:none; z-index:9;
     background:radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.5) 100%); }
-  #povToggle {
+
+  /* ---- Bottom control clusters - flex-wrap so buttons never overlap regardless of screen size ---- */
+  #bottomRightStack {
     position:absolute; bottom:16px; right:16px; z-index:11;
+    display:flex; flex-direction:row-reverse; flex-wrap:wrap-reverse; gap:8px;
+    justify-content:flex-end; max-width:calc(100vw - 24px);
+  }
+  #bottomLeftStack {
+    position:absolute; bottom:16px; left:16px; z-index:11;
+    display:flex; flex-direction:column; gap:8px; align-items:flex-start;
+    max-width:calc(100vw - 24px);
+  }
+  #bottomRightStack button {
     background:rgba(15,17,26,0.88); color:#eee; border:1px solid rgba(255,255,255,0.15);
     border-radius:8px; padding:11px 16px; font-size:13px; cursor:pointer; font-weight:bold;
+    touch-action:manipulation; white-space:nowrap;
   }
-  #povToggle:hover { background:#2a2f45; }
+  #bottomRightStack button:hover { background:#2a2f45; }
   #povToggle.active { background:#3ad1ff; color:#0a1a22; }
-  #pauseToggle {
-    position:absolute; bottom:16px; right:150px; z-index:11;
-    background:rgba(15,17,26,0.88); color:#eee; border:1px solid rgba(255,255,255,0.15);
-    border-radius:8px; padding:11px 16px; font-size:13px; cursor:pointer; font-weight:bold;
-  }
-  #pauseToggle:hover { background:#2a2f45; }
   #pauseToggle.active { background:#ffcc4d; color:#2a1a00; }
+  #manualToggle.active { background:#7cff6b; color:#0a220a; }
+  #muteToggle { padding:11px 13px !important; }
   #robotStatus {
-    position:absolute; bottom:16px; left:16px; z-index:11; display:none;
-    background:rgba(15,17,26,0.88); color:#9fe8ff; border:1px solid rgba(255,255,255,0.15);
-    border-radius:8px; padding:11px 16px; font-size:13px; font-weight:bold;
+    display:none; background:rgba(15,17,26,0.88); color:#9fe8ff; border:1px solid rgba(255,255,255,0.15);
+    border-radius:8px; padding:11px 16px; font-size:13px; font-weight:bold; white-space:nowrap;
   }
+  #rcPad {
+    display:none; flex-direction:column; align-items:center; gap:4px;
+    background:rgba(15,17,26,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:8px;
+  }
+  #rcPad.show { display:flex; }
+  #rcMidRow { display:flex; gap:4px; }
+  #rcPad button {
+    width:46px; height:46px; border-radius:10px; background:rgba(58,209,255,0.18);
+    border:1px solid rgba(58,209,255,0.5); color:#9fe8ff; font-size:17px; cursor:pointer;
+    touch-action:manipulation; user-select:none;
+  }
+  #rcPad button:active, #rcPad button.pressed { background:rgba(58,209,255,0.5); }
+  #rcGrip { background:rgba(255,204,77,0.18) !important; border-color:rgba(255,204,77,0.5) !important; color:#ffcc4d !important; font-size:15px !important; }
+  #rcGrip:active, #rcGrip.pressed { background:rgba(255,204,77,0.5) !important; }
   #toolbar {
     position:absolute; top:12px; right:12px; z-index:11; width:200px;
     background:rgba(15,17,26,0.88); border:1px solid rgba(255,255,255,0.12); border-radius:10px;
@@ -66,6 +87,130 @@
     padding-right:22px;
   }
   select.tbtn option { background:#1c2036; color:#eee; }
+
+  /* ---- Dev Tools panel ---- */
+  #devToggle {
+    position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:11;
+    background:rgba(15,17,26,0.88); color:#9fe8ff; border:1px solid rgba(255,255,255,0.15);
+    border-radius:8px; padding:9px 14px; font-size:12px; cursor:pointer; font-weight:bold;
+    touch-action:manipulation;
+  }
+  #devToggle.active { background:#9fe8ff; color:#0a1a22; }
+  #devPanel {
+    display:none; position:absolute; top:54px; left:50%; transform:translateX(-50%); z-index:11;
+    width:280px; max-height:calc(100vh - 70px); overflow-y:auto; -webkit-overflow-scrolling:touch;
+    background:rgba(12,14,22,0.92); border:1px solid rgba(255,255,255,0.14); border-radius:10px;
+    padding:10px; color:#eee; font-size:12px;
+  }
+  #devPanel.open { display:block; }
+
+  /* ---- Dev Tools password gate - iOS-style spring pop-up ---- */
+  #devAuthModal {
+    position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
+    background:rgba(6,8,16,0); opacity:0; pointer-events:none; padding:20px; box-sizing:border-box;
+    transition: opacity 0.28s ease, background-color 0.28s ease;
+    -webkit-backdrop-filter:blur(0px); backdrop-filter:blur(0px);
+  }
+  #devAuthModal.show {
+    opacity:1; pointer-events:auto; background:rgba(6,8,16,0.55);
+    -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+    transition: opacity 0.28s ease, background-color 0.28s ease, backdrop-filter 0.28s ease;
+  }
+  #devAuthCard {
+    width:100%; max-width:300px; background:#1c2036; border:1px solid rgba(255,255,255,0.14);
+    border-radius:16px; padding:22px 20px; color:#eee; text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    transform: scale(0.82) translateY(14px); opacity:0;
+    transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  }
+  #devAuthModal.show #devAuthCard { transform: scale(1) translateY(0); opacity:1; }
+  #devAuthCard.shake { animation: devShake 0.4s; }
+  @keyframes devShake {
+    10%,90% { transform: translateX(-1px); }
+    20%,80% { transform: translateX(3px); }
+    30%,50%,70% { transform: translateX(-6px); }
+    40%,60% { transform: translateX(6px); }
+  }
+  #devAuthCard h3 { margin:0 0 6px 0; font-size:17px; }
+  #devAuthCard p { margin:0 0 14px 0; font-size:12px; color:#b7c2dc; line-height:1.4; }
+  #devPasswordInput {
+    width:100%; box-sizing:border-box; background:#0d0f18; color:#eee;
+    border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:12px; font-size:14px;
+    margin-bottom:6px; text-align:center; touch-action:manipulation;
+  }
+  #devAuthError { color:#ff6b6b; font-size:11.5px; min-height:16px; margin-bottom:8px; }
+  #devAuthCard .devbtns { display:flex; gap:8px; margin-bottom:0; }
+  #devAuthCard .devbtns button { flex:1; padding:12px; border-radius:10px; font-size:13px; font-weight:bold; cursor:pointer; touch-action:manipulation; }
+  #devAuthSubmit { background:#3ad1ff; color:#0a1a22; border:none; }
+  #devAuthCancel { background:#2a2f45; color:#eee; border:1px solid rgba(255,255,255,0.15); }
+
+  /* ---- Guided tour - same smooth spring pop-up as the dev-tools gate ---- */
+  #replayTourLink { color:#9fe8ff; pointer-events:auto; text-decoration:none; }
+  #replayTourLink:hover { text-decoration:underline; }
+  #tourModal {
+    position:fixed; inset:0; z-index:105; display:flex; align-items:center; justify-content:center;
+    background:rgba(6,8,16,0); opacity:0; pointer-events:none; padding:20px; box-sizing:border-box;
+    transition: opacity 0.28s ease, background-color 0.28s ease;
+  }
+  #tourModal.show {
+    opacity:1; pointer-events:auto; background:rgba(6,8,16,0.55);
+    -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+  }
+  #tourCard {
+    width:100%; max-width:340px; background:#1c2036; border:1px solid rgba(255,255,255,0.14);
+    border-radius:16px; padding:22px 20px; color:#eee; text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    transform: scale(0.82) translateY(14px); opacity:0;
+    transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  }
+  #tourModal.show #tourCard { transform: scale(1) translateY(0); opacity:1; }
+  #tourDots { display:flex; justify-content:center; gap:6px; margin-bottom:14px; }
+  .tourDot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.25); }
+  .tourDot.active { background:#3ad1ff; width:16px; border-radius:3px; }
+  #tourCard h3 { margin:0 0 8px 0; font-size:17px; }
+  #tourCard p { margin:0 0 16px 0; font-size:13px; color:#c3cce2; line-height:1.55; min-height:70px; }
+  #tourCard .devbtns { display:flex; gap:8px; }
+  #tourCard .devbtns button {
+    flex:1; padding:11px; border-radius:10px; font-size:12.5px; font-weight:bold; cursor:pointer;
+    touch-action:manipulation; background:#2a2f45; color:#eee; border:1px solid rgba(255,255,255,0.15);
+  }
+  #tourNext { background:#3ad1ff !important; color:#0a1a22 !important; border:none !important; }
+  #tourBack.hidden-btn { visibility:hidden; }
+  #devPanel h4 { margin:10px 0 6px 0; font-size:11.5px; color:#9fe8ff; letter-spacing:0.5px; }
+  #devPanel h4:first-child { margin-top:2px; }
+  .devrow { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; font-size:11.5px; }
+  .devrow label { flex:1; color:#cdd6ea; }
+  .devrow input[type="checkbox"] { width:16px; height:16px; }
+  .devrow input[type="range"] { flex:1.4; }
+  .devbtns { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px; }
+  #devPanel hr { border:none; border-top:1px solid rgba(255,255,255,0.12); margin:8px 0; }
+  #inspectorBox { font-size:11px; color:#cdd6ea; line-height:1.5; }
+  #inspectorBox input[type="number"] {
+    width:64px; background:#1c2036; color:#eee; border:1px solid rgba(255,255,255,0.2);
+    border-radius:4px; padding:3px 4px; font-size:11px;
+  }
+  #eventLog {
+    height:120px; overflow-y:auto; background:#0d0f18; border:1px solid rgba(255,255,255,0.12);
+    border-radius:6px; padding:6px 8px; font-size:10.5px; color:#9fd; line-height:1.5;
+    font-family: 'Courier New', monospace;
+  }
+  #eventLog div { border-bottom:1px solid rgba(255,255,255,0.05); padding:1px 0; }
+  #minimapWrap {
+    display:none; position:absolute; bottom:16px; left:16px; z-index:10;
+    background:rgba(10,12,20,0.75); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px;
+  }
+  #minimapWrap.show { display:block; }
+  #minimap { display:block; border-radius:4px; }
+  #consoleRow { display:flex; gap:5px; margin-bottom:6px; }
+  #consoleInput {
+    flex:1; background:#0d0f18; color:#9fe8ff; border:1px solid rgba(255,255,255,0.2);
+    border-radius:6px; padding:8px; font-family:'Courier New',monospace; font-size:11.5px;
+  }
+  #consoleOutput {
+    height:80px; overflow-y:auto; background:#0d0f18; border:1px solid rgba(255,255,255,0.12);
+    border-radius:6px; padding:6px 8px; font-size:10.5px; color:#ffcc66; line-height:1.5;
+    font-family:'Courier New',monospace; margin-bottom:6px;
+  }
   #toolbar hr { border:none; border-top:1px solid rgba(255,255,255,0.12); margin:8px 0; }
   #hint { font-size:11px; color:#bcd; line-height:1.4; min-height:28px; }
   #toolbarToggle {
@@ -85,10 +230,15 @@
     #toolbar.open { display:block; }
     .tbtn { padding:11px 8px; font-size:12.5px; min-height:38px; }
     #hint { font-size:12px; }
-    #povToggle { right:8px; bottom:8px; padding:12px 14px; font-size:13px; }
-    #pauseToggle { left:8px; right:auto; bottom:8px; padding:12px 14px; font-size:13px; }
-    #robotStatus { left:8px; right:8px; bottom:64px; font-size:12px; }
+    #bottomRightStack { bottom:8px; right:8px; max-width:calc(100vw - 16px); }
+    #bottomLeftStack { bottom:8px; left:8px; max-width:calc(100vw - 16px); }
+    #bottomRightStack button { padding:12px 14px; font-size:13px; }
+    #robotStatus { font-size:12px; }
+    #rcPad button { width:42px; height:42px; }
     #vignette { display:none; }
+    #devToggle { top:8px; left:8px; transform:none; padding:9px 10px; font-size:11px; }
+    #devPanel { top:52px; left:8px; right:8px; transform:none; width:auto; max-height:60vh; }
+    #minimapWrap { display:none !important; }
   }
   @media (max-width: 420px) {
     #info { display:none; }
@@ -115,21 +265,165 @@
 </style>
 </head>
 <body>
-<div id="info"><b>Disaster Relief Robotics Board</b><br>Drag to rotate · Scroll to zoom<br>Click the red HIGH VOLTAGE button anytime<br>Build your own road network — the robot pathfinds across whatever roads you place<br>In Robot View, drag to look around</div>
-<div id="toast">⚡ Power Restored — City Lights ON</div>
-<div id="vignette"></div>
-<div id="disclaimer">
-  <div id="disclaimerCard">
-    <h2>⚠️ This Is Only a Simulation</h2>
-    <p>This 3D board and robot are an educational, illustrative simulation. It is not a physics-accurate model and does not reflect how a real robot, real terrain, real electrical equipment, or a real disaster-response scenario would actually behave.</p>
-    <p>Please don't use it to make real-world safety, engineering, or operational decisions.</p>
-    <button id="disclaimerBtn">I Understand, Enter Simulation</button>
+<div id="info"><b>Disaster Relief Robotics Board</b><br>Drag to rotate · Scroll to zoom<br>Click the red HIGH VOLTAGE button anytime<br>Build your own road network - the robot pathfinds across whatever roads you place<br>In Robot View, drag to look around<br><a href="#" id="replayTourLink">Replay guided tour</a></div>
+<div id="tourModal">
+  <div id="tourCard">
+    <div id="tourDots"></div>
+    <h3 id="tourTitle"></h3>
+    <p id="tourBody"></p>
+    <div class="devbtns">
+      <button id="tourSkip">Skip</button>
+      <button id="tourBack">Back</button>
+      <button id="tourNext">Next</button>
+    </div>
   </div>
 </div>
-<button id="pauseToggle">⏸ Pause</button>
-<button id="povToggle">🤖 Robot View</button>
-<div id="robotStatus">Status: —</div>
-<button id="toolbarToggle">☰ Build Menu</button>
+<div id="toast">Power Restored - City Lights ON</div>
+<div id="vignette"></div>
+<button id="devToggle">Dev Tools</button>
+<div id="devAuthModal">
+  <div id="devAuthCard">
+    <h3>Developer Tools</h3>
+    <p>Enter the password to unlock developer tools.</p>
+    <input type="password" id="devPasswordInput" placeholder="Password" autocomplete="off">
+    <div id="devAuthError"></div>
+    <div class="devbtns">
+      <button id="devAuthCancel">Cancel</button>
+      <button id="devAuthSubmit">Unlock</button>
+    </div>
+  </div>
+</div>
+<div id="devPanel">
+  <h4>VISUALIZATION</h4>
+  <div class="devrow"><label for="chkTrail">Robot path trail</label><input type="checkbox" id="chkTrail"></div>
+  <div class="devrow"><label for="chkRoute">Planned route preview</label><input type="checkbox" id="chkRoute"></div>
+  <div class="devrow"><label for="chkRoadNet">Road network overlay</label><input type="checkbox" id="chkRoadNet"></div>
+  <div class="devrow"><label for="chkGrid">Coordinate grid</label><input type="checkbox" id="chkGrid"></div>
+  <div class="devrow"><label for="chkMinimap">Minimap</label><input type="checkbox" id="chkMinimap"></div>
+  <div class="devrow"><label for="chkWireframe">Wireframe</label><input type="checkbox" id="chkWireframe"></div>
+  <div class="devrow"><label for="chkShadows">Shadows</label><input type="checkbox" id="chkShadows" checked></div>
+
+  <h4>CAMERA</h4>
+  <div class="devbtns">
+    <button class="tbtn" id="camTop">Top-Down</button>
+    <button class="tbtn" id="camSide">Side</button>
+    <button class="tbtn" id="camReset">Reset</button>
+    <button class="tbtn wide" id="camFollow">Follow-Cam: OFF</button>
+  </div>
+
+  <h4>SIMULATION</h4>
+  <div class="devrow"><label for="speedSlider">Robot speed <span id="speedVal">1.0×</span></label></div>
+  <input type="range" id="speedSlider" min="0" max="300" value="100" style="width:100%; margin-bottom:8px;">
+  <div class="devrow">
+    <label for="qualitySelect">Render quality</label>
+    <select id="qualitySelect" class="tbtn" style="flex:1;">
+      <option value="auto">Auto</option>
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+  </div>
+  <div class="devrow"><label for="chkSnap">Grid snap (0.5) while dragging</label><input type="checkbox" id="chkSnap"></div>
+  <div class="devrow">
+    <label for="forceStateSelect">Force robot state</label>
+  </div>
+  <select id="forceStateSelect" class="tbtn wide" style="margin-bottom:4px;">
+    <option value="">Live (auto)</option>
+    <option value="seek">seek</option>
+    <option value="toDebris">toDebris</option>
+    <option value="lowerArm">lowerArm</option>
+    <option value="grab">grab</option>
+    <option value="lift">lift</option>
+    <option value="toBin">toBin</option>
+    <option value="lowerArm2">lowerArm2</option>
+    <option value="release">release</option>
+    <option value="liftAfter">liftAfter</option>
+    <option value="toSubstation">toSubstation</option>
+    <option value="parkHome">parkHome</option>
+    <option value="idle">idle</option>
+  </select>
+
+  <h4>INSPECTOR <span style="font-weight:normal;color:#89f;">(select a part in Edit Mode)</span></h4>
+  <div id="inspectorBox">Nothing selected.</div>
+
+  <h4>HISTORY & LAYOUT</h4>
+  <div class="devbtns">
+    <button class="tbtn" id="undoBtn" disabled>Undo</button>
+    <button class="tbtn" id="redoBtn" disabled>Redo</button>
+    <button class="tbtn" id="duplicateBtn" disabled>⧉ Duplicate</button>
+    <input type="number" id="randomizeCount" value="8" min="1" max="40" style="width:44px; background:#1c2036; color:#eee; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:6px 4px; font-size:11px;">
+    <button class="tbtn" id="randomizeBtn" style="flex:1;">Randomize Debris</button>
+    <button class="tbtn wide" id="resetLayoutBtn">Reset to Default Layout</button>
+  </div>
+
+  <h4>MORE VISUALIZATION</h4>
+  <div class="devrow"><label for="chkBBox">Bounding boxes</label><input type="checkbox" id="chkBBox"></div>
+  <div class="devrow"><label for="chkTeleport">Click-to-teleport robot</label><input type="checkbox" id="chkTeleport"></div>
+  <div class="devrow"><label for="timeSlider">Time of day <span id="timeVal"> - </span></label></div>
+  <input type="range" id="timeSlider" min="0" max="24" step="0.25" value="17" style="width:100%; margin-bottom:8px;">
+
+  <h4>COMMAND CONSOLE</h4>
+  <div id="consoleOutput"></div>
+  <div id="consoleRow">
+    <input type="text" id="consoleInput" placeholder="type 'help' and press Enter">
+    <button class="tbtn" id="consoleRunBtn">Run</button>
+  </div>
+
+  <h4>SAVE SLOTS <span style="font-weight:normal;color:#89f;">(browser storage)</span></h4>
+  <div class="devbtns">
+    <select id="slotSelect" class="tbtn" style="flex:0.6;">
+      <option value="1">Slot 1</option>
+      <option value="2">Slot 2</option>
+      <option value="3">Slot 3</option>
+    </select>
+    <button class="tbtn" id="saveSlotBtn">Save</button>
+    <button class="tbtn" id="loadSlotBtn">Load</button>
+  </div>
+
+  <h4>LIGHTING & FOG</h4>
+  <div class="devrow"><label for="chkLightHelpers">Light direction helpers</label><input type="checkbox" id="chkLightHelpers"></div>
+  <div class="devrow"><label for="chkFog">Fog enabled</label><input type="checkbox" id="chkFog" checked></div>
+  <div class="devrow"><label for="chkForceLights">Force city lights ON</label><input type="checkbox" id="chkForceLights"></div>
+  <div class="devrow"><label for="keySlider">Key light <span id="keyVal">1.15</span></label></div>
+  <input type="range" id="keySlider" min="0" max="2" step="0.05" value="1.15" style="width:100%; margin-bottom:6px;">
+  <div class="devrow"><label for="hemiSlider">Ambient sky light <span id="hemiVal">0.65</span></label></div>
+  <input type="range" id="hemiSlider" min="0" max="1.5" step="0.05" value="0.65" style="width:100%; margin-bottom:8px;">
+
+  <h4>KEYBOARD SHORTCUTS</h4>
+  <div style="font-size:10.5px; color:#9fb0cc; line-height:1.7;">
+    <b>Space</b> pause/resume &nbsp; <b>Delete</b> delete selected<br>
+    <b>R</b> rotate selected 90° &nbsp; <b>Arrows</b> nudge selected<br>
+    <b>Ctrl+Z</b> undo &nbsp; <b>Ctrl+Y</b> redo
+  </div>
+
+  <h4>EVENT LOG</h4>
+  <div class="devbtns"><button class="tbtn wide" id="clearLogBtn">Clear Log</button></div>
+  <div id="eventLog"></div>
+</div>
+<div id="minimapWrap"><canvas id="minimap" width="150" height="96"></canvas></div>
+<div id="disclaimer">
+  <div id="disclaimerCard">
+    <h2>This Is Only a Simulation</h2>
+    <p>This 3D board and robot are an educational, illustrative simulation. It is not a physics-accurate model and does not reflect how a real robot, real terrain, real electrical equipment, or a real disaster-response scenario would actually behave.</p>
+    <p>Please don't use it to make real-world safety, engineering, or operational decisions.</p>
+    <button id="disclaimerBtn">I Understand - Enter Simulation</button>
+  </div>
+</div>
+<div id="bottomRightStack">
+  <button id="povToggle">Robot View</button>
+  <button id="pauseToggle">Pause</button>
+  <button id="manualToggle">Manual Drive</button>
+  <button id="muteToggle">Mute</button>
+</div>
+<div id="bottomLeftStack">
+  <div id="rcPad">
+    <button id="rcUp">^</button>
+    <div id="rcMidRow"><button id="rcLeft">&lt;</button><button id="rcGrip">Grip</button><button id="rcRight">&gt;</button></div>
+    <button id="rcDown">v</button>
+  </div>
+  <div id="robotStatus">Status:</div>
+</div>
+<button id="toolbarToggle">Build Menu</button>
 <div id="toolbar">
   <h4>ADD PARTS</h4>
   <div class="row">
@@ -170,34 +464,34 @@
   <h4>ENVIRONMENT</h4>
   <div class="row">
     <select id="terrainSelect" class="tbtn wide">
-      <option value="grass">🌱 Terrain: Grass</option>
-      <option value="desert">🏜️ Terrain: Desert</option>
-      <option value="snow">❄️ Terrain: Snowy Ground</option>
-      <option value="urban">🏙️ Terrain: Urban Concrete</option>
-      <option value="autumn">🍂 Terrain: Autumn</option>
+      <option value="grass">Terrain: Grass</option>
+      <option value="desert">Terrain: Desert</option>
+      <option value="snow">Terrain: Snowy Ground</option>
+      <option value="urban">Terrain: Urban Concrete</option>
+      <option value="autumn">Terrain: Autumn</option>
     </select>
   </div>
   <div class="row">
     <select id="weatherSelect" class="tbtn wide">
-      <option value="clear">☀️ Weather: Clear</option>
-      <option value="rain">🌧️ Weather: Rain</option>
-      <option value="snow">🌨️ Weather: Snow</option>
-      <option value="fog">🌫️ Weather: Heavy Fog</option>
-      <option value="night">🌙 Weather: Night</option>
+      <option value="clear">Weather: Clear</option>
+      <option value="rain">Weather: Rain</option>
+      <option value="snow">Weather: Snow</option>
+      <option value="fog">Weather: Heavy Fog</option>
+      <option value="night">Weather: Night</option>
     </select>
   </div>
   <div class="row">
     <select id="robotDesignSelect" class="tbtn wide">
-      <option value="rescue">🟧 Robot: Rescue Orange</option>
-      <option value="arctic">⬜ Robot: Arctic Rescue</option>
-      <option value="stealth">⬛ Robot: Stealth Ops</option>
-      <option value="safety">🟨 Robot: Safety Yellow</option>
-      <option value="crimson">🟥 Robot: Crimson Response</option>
+      <option value="rescue">Robot: Rescue Orange</option>
+      <option value="arctic">Robot: Arctic Rescue</option>
+      <option value="stealth">Robot: Stealth Ops</option>
+      <option value="safety">Robot: Safety Yellow</option>
+      <option value="crimson">Robot: Crimson Response</option>
     </select>
   </div>
   <hr>
   <div class="row">
-    <button class="tbtn wide" id="exportBtn">⬇ Export as HTML</button>
+    <button class="tbtn wide" id="exportBtn">Export as HTML</button>
   </div>
   <div id="hint">Click "Edit Mode" then drag any object to move it. Select an object and hit Delete to remove it.</div>
 </div>
@@ -206,6 +500,8 @@
 <script>
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x262c4d, 55, 135);
+const savedFog = scene.fog; // the persistent Fog instance; scene.fog itself may be nulled by the Fog toggle
+let fogEnabled = true;
 
 // Detect phones / coarse-pointer touch devices so we can scale quality accordingly
 const IS_MOBILE = window.matchMedia('(max-width: 900px), (pointer: coarse)').matches;
@@ -427,14 +723,14 @@ startSign.position.set(HOME.x, 1.6, HOME.z-2.8); startSign.rotation.x = -0.15;
 root.add(startSign);
 
 // =====================================================================
-// ENVIRONMENT — terrain, weather, and robot-design presets, all
+// ENVIRONMENT - terrain, weather, and robot-design presets, all
 // switchable live from the toolbar.
 // =====================================================================
 const TERRAIN_THEMES = {
-  grass:  { tex:grassTex,  bump:0.035 },
+  grass: { tex:grassTex, bump:0.035 },
   desert: { tex:desertTex, bump:0.028 },
-  snow:   { tex:snowTex,   bump:0.02 },
-  urban:  { tex:urbanTex,  bump:0.012 },
+  snow: { tex:snowTex, bump:0.02 },
+  urban: { tex:urbanTex, bump:0.012 },
   autumn: { tex:autumnTex, bump:0.03 }
 };
 function setTerrain(themeKey){
@@ -444,12 +740,13 @@ function setTerrain(themeKey){
   ground.material.map = t.tex;
   ground.material.bumpScale = t.bump;
   ground.material.needsUpdate = true;
+  logEvent(`Terrain set to ${themeKey}.`);
 }
 
 function buildWeatherParticles(count, colorHex, size, opacity){
   const positions = new Float32Array(count*3);
   for (let i=0;i<count;i++){
-    positions[i*3]   = -20 + Math.random()*55;
+    positions[i*3] = -20 + Math.random()*55;
     positions[i*3+1] = Math.random()*30;
     positions[i*3+2] = -10 + Math.random()*30;
   }
@@ -465,11 +762,11 @@ const rainParticles = buildWeatherParticles(IS_MOBILE?220:480, 0xaac8ff, 0.5, 0.
 const snowParticles = buildWeatherParticles(IS_MOBILE?180:380, 0xffffff, 0.6, 0.85);
 
 const WEATHER_PRESETS = {
-  clear: { fogColor:0x262c4d, fogNear:55,  fogFar:135, sky:0xffffff, key:1.15, hemi:0.65 },
-  rain:  { fogColor:0x394157, fogNear:25,  fogFar:95,  sky:0x8f97ab, key:0.55, hemi:0.5  },
-  snow:  { fogColor:0xdfe6ef, fogNear:35,  fogFar:115, sky:0xdfe6ef, key:0.85, hemi:0.7  },
-  fog:   { fogColor:0xaab0bd, fogNear:8,   fogFar:48,  sky:0xaab0bd, key:0.6,  hemi:0.55 },
-  night: { fogColor:0x0a0d1c, fogNear:30,  fogFar:90,  sky:0x30355a, key:0.25, hemi:0.28 }
+  clear: { fogColor:0x262c4d, fogNear:55, fogFar:135, sky:0xffffff, key:1.15, hemi:0.65 },
+  rain: { fogColor:0x394157, fogNear:25, fogFar:95, sky:0x8f97ab, key:0.55, hemi:0.5 },
+  snow: { fogColor:0xdfe6ef, fogNear:35, fogFar:115, sky:0xdfe6ef, key:0.85, hemi:0.7 },
+  fog: { fogColor:0xaab0bd, fogNear:8, fogFar:48, sky:0xaab0bd, key:0.6, hemi:0.55 },
+  night: { fogColor:0x0a0d1c, fogNear:30, fogFar:90, sky:0x30355a, key:0.25, hemi:0.28 }
 };
 let currentWeather = 'clear';
 let currentTerrain = 'grass';
@@ -480,12 +777,13 @@ function setWeather(name){
   currentWeather = name;
   rainParticles.visible = (name === 'rain');
   snowParticles.visible = (name === 'snow');
-  scene.fog.color.set(w.fogColor);
-  scene.fog.near = w.fogNear;
-  scene.fog.far = w.fogFar;
+  savedFog.color.set(w.fogColor);
+  savedFog.near = w.fogNear;
+  savedFog.far = w.fogFar;
   skyDome.material.color.set(w.sky);
   key.intensity = w.key;
   hemi.intensity = w.hemi;
+  logEvent(`Weather set to ${name}.`);
 }
 function updateWeatherParticles(delta){
   if (rainParticles.visible){
@@ -509,10 +807,10 @@ function updateWeatherParticles(delta){
 }
 
 const ROBOT_DESIGNS = {
-  rescue:  { body:0xff7a1a, accent:0xc6e83a },
-  arctic:  { body:0xf2f5f7, accent:0x3ad1ff },
+  rescue: { body:0xff7a1a, accent:0xc6e83a },
+  arctic: { body:0xf2f5f7, accent:0x3ad1ff },
   stealth: { body:0x2b2b2e, accent:0xff3b30 },
-  safety:  { body:0xffd400, accent:0x1a1a1a },
+  safety: { body:0xffd400, accent:0x1a1a1a },
   crimson: { body:0xc0392b, accent:0xffd400 }
 };
 function setRobotDesign(designKey){
@@ -521,10 +819,11 @@ function setRobotDesign(designKey){
   currentRobotDesign = designKey;
   robot.materials.body.color.set(d.body);
   robot.materials.accent.color.set(d.accent);
+  logEvent(`Robot design set to ${designKey}.`);
 }
 
 // =====================================================================
-// PART BUILDERS — every buildable/movable object. Each returns an
+// PART BUILDERS - every buildable/movable object. Each returns an
 // unpositioned Object3D (position is applied by addPart).
 // =====================================================================
 function buildHouse(color){
@@ -678,9 +977,9 @@ for (let i=0;i<12;i++){
 function buildSpikeRobot(){
   const g = new THREE.Group();
   const orange = new THREE.MeshStandardMaterial({color:0xff7a1a, roughness:0.32, metalness:0.05});
-  const grey   = new THREE.MeshStandardMaterial({color:0xaeb4ba, roughness:0.4});
-  const dark   = new THREE.MeshStandardMaterial({color:0x232326, roughness:0.5});
-  const lime   = new THREE.MeshStandardMaterial({color:0xc6e83a, roughness:0.4});
+  const grey = new THREE.MeshStandardMaterial({color:0xaeb4ba, roughness:0.4});
+  const dark = new THREE.MeshStandardMaterial({color:0x232326, roughness:0.5});
+  const lime = new THREE.MeshStandardMaterial({color:0xc6e83a, roughness:0.4});
   const base = new THREE.Mesh(new THREE.BoxGeometry(1.9,0.22,1.35), grey); base.position.y=0.42; base.castShadow=true; base.receiveShadow=true; g.add(base);
   for (let i=-1;i<=1;i++){ const hole=new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.045,0.24,8), dark); hole.rotation.x=Math.PI/2; hole.position.set(i*0.6,0.42,0.6); g.add(hole); const hole2=hole.clone(); hole2.position.z=-0.6; g.add(hole2); }
   const hub = new THREE.Mesh(new THREE.BoxGeometry(1.05,0.5,0.85), dark); hub.position.set(0,0.78,0); hub.castShadow=true; g.add(hub);
@@ -750,7 +1049,7 @@ robot.fingerPivotL.rotation.y = 0.5;
 robot.fingerPivotR.rotation.y = -0.5;
 
 // =====================================================================
-// PARTS SYSTEM — data-driven scene objects (movable, addable, deletable)
+// PARTS SYSTEM - data-driven scene objects (movable, addable, deletable)
 // =====================================================================
 let nextPartId = 1;
 const parts = [];
@@ -869,8 +1168,133 @@ if (INITIAL_ENV){
 }
 
 // =====================================================================
-// CAMERA ORBIT + EDIT MODE (select / drag / add / delete / export)
+// DEV TOOLS - event log, path trail, planned-route preview, road-network
+// overlay, coordinate grid, wireframe/shadow toggles, quality presets.
 // =====================================================================
+const eventLogEl = document.getElementById('eventLog');
+function logEvent(msg){
+  if (!eventLogEl) return;
+  const t = new Date();
+  const stamp = t.toLocaleTimeString([], {hour12:false}) + '.' + String(t.getMilliseconds()).padStart(3,'0');
+  const line = document.createElement('div');
+  line.textContent = `[${stamp}] ${msg}`;
+  eventLogEl.appendChild(line);
+  while (eventLogEl.children.length > 80) eventLogEl.removeChild(eventLogEl.firstChild);
+  eventLogEl.scrollTop = eventLogEl.scrollHeight;
+}
+document.getElementById('clearLogBtn').onclick = ()=>{ eventLogEl.innerHTML = ''; };
+logEvent('Simulation loaded.');
+
+// ---- Robot path trail ----
+const MAX_TRAIL_POINTS = 400;
+let trailPoints = [];
+const trailGeo = new THREE.BufferGeometry();
+trailGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX_TRAIL_POINTS*3), 3));
+trailGeo.setDrawRange(0,0);
+const trailLine = new THREE.Line(trailGeo, new THREE.LineBasicMaterial({color:0x3ad1ff, transparent:true, opacity:0.65}));
+trailLine.visible = false;
+scene.add(trailLine);
+let lastTrailPos = null;
+function updateTrail(){
+  if (!trailLine.visible) return;
+  const p = robot.group.position;
+  if (!lastTrailPos || Math.hypot(p.x-lastTrailPos.x, p.z-lastTrailPos.z) > 0.15){
+    trailPoints.push(p.x, 0.08, p.z);
+    if (trailPoints.length > MAX_TRAIL_POINTS*3) trailPoints.splice(0, 3);
+    lastTrailPos = {x:p.x, z:p.z};
+    const arr = trailGeo.attributes.position.array;
+    arr.set(trailPoints);
+    trailGeo.attributes.position.needsUpdate = true;
+    trailGeo.setDrawRange(0, trailPoints.length/3);
+  }
+}
+
+// ---- Planned route preview ----
+const routeGeo = new THREE.BufferGeometry();
+const routeLine = new THREE.Line(routeGeo, new THREE.LineDashedMaterial({color:0xffcc33, dashSize:0.5, gapSize:0.3, transparent:true, opacity:0.9}));
+routeLine.visible = false;
+scene.add(routeLine);
+function updateRoutePreview(){
+  if (!routeLine.visible){ return; }
+  const pts = [ new THREE.Vector3(robot.group.position.x, 0.1, robot.group.position.z) ];
+  pathQueue.forEach(wp=> pts.push(new THREE.Vector3(wp.x, 0.1, wp.z)));
+  routeGeo.setFromPoints(pts);
+  routeLine.computeLineDistances();
+}
+
+// ---- Road network overlay ----
+const roadOverlayGroup = new THREE.Group();
+roadOverlayGroup.visible = false;
+root.add(roadOverlayGroup);
+function rebuildRoadOverlay(){
+  while (roadOverlayGroup.children.length) roadOverlayGroup.remove(roadOverlayGroup.children[0]);
+  const roads = parts.filter(p=>p.type==='road');
+  const nodeMat = new THREE.MeshBasicMaterial({color:0xff3ad1});
+  roads.forEach(r=>{
+    const node = new THREE.Mesh(new THREE.SphereGeometry(0.22,10,10), nodeMat);
+    node.position.set(r.obj3d.position.x, 0.5, r.obj3d.position.z);
+    roadOverlayGroup.add(node);
+  });
+  const linePts = [];
+  for (let i=0;i<roads.length;i++){
+    for (let j=i+1;j<roads.length;j++){
+      if (roadTilesConnected(roads[i], roads[j])){
+        linePts.push(new THREE.Vector3(roads[i].obj3d.position.x, 0.5, roads[i].obj3d.position.z));
+        linePts.push(new THREE.Vector3(roads[j].obj3d.position.x, 0.5, roads[j].obj3d.position.z));
+      }
+    }
+  }
+  const lineGeo = new THREE.BufferGeometry().setFromPoints(linePts);
+  const lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({color:0xff3ad1}));
+  roadOverlayGroup.add(lines);
+}
+
+// ---- Coordinate grid ----
+const coordGrid = new THREE.GridHelper(60, 60, 0x3ad1ff, 0x2a3550);
+coordGrid.position.set(6, 0.03, 5);
+coordGrid.visible = false;
+scene.add(coordGrid);
+const coordAxes = new THREE.AxesHelper(5);
+coordAxes.position.set(-24, 0.05, -9);
+coordAxes.visible = false;
+scene.add(coordAxes);
+
+// ---- Wireframe / shadows toggles ----
+function setWireframe(on){
+  scene.traverse(o=>{
+    const mats = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
+    mats.forEach(m=>{ if (m && 'wireframe' in m) m.wireframe = on; });
+  });
+}
+function setShadowsEnabled(on){
+  renderer.shadowMap.enabled = on;
+}
+
+// ---- Quality presets ----
+const QUALITY_PRESETS = {
+  low: { pixelRatio:1, shadow:false, shadowRes:1024 },
+  medium: { pixelRatio:1.5, shadow:true, shadowRes:1024 },
+  high: { pixelRatio:2, shadow:true, shadowRes:2048 },
+  auto: { pixelRatio:IS_MOBILE?1.5:2, shadow:true, shadowRes:IS_MOBILE?1024:2048 }
+};
+function setQuality(level){
+  const q = QUALITY_PRESETS[level] || QUALITY_PRESETS.auto;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, q.pixelRatio));
+  if (key.shadow.map){ key.shadow.map.dispose(); key.shadow.map = null; }
+  key.shadow.mapSize.set(q.shadowRes, q.shadowRes);
+  const shadowChk = document.getElementById('chkShadows');
+  shadowChk.disabled = !q.shadow;
+  if (!q.shadow) shadowChk.checked = false;
+  else if (level !== 'auto') shadowChk.checked = true;
+  renderer.shadowMap.enabled = q.shadow && shadowChk.checked;
+  logEvent(`Render quality set to ${level}.`);
+}
+
+// ---- Robot speed multiplier ----
+let robotSpeedMultiplier = 1.0;
+let gridSnapEnabled = false;
+
+
 let isOrbiting=false, isDraggingPart=false, editMode=false, selectedPart=null;
 let downX=0, downY=0, prevX=0, prevY=0, downTime=0;
 // Multi-touch pinch-to-zoom state
@@ -899,20 +1323,55 @@ function selectPart(entry){
   if (entry) selectionRing.position.set(entry.obj3d.position.x, 0.04, entry.obj3d.position.z);
   document.getElementById('deleteBtn').disabled = !entry;
   document.getElementById('rotateRoadBtn').disabled = !entry;
+  const dupBtn = document.getElementById('duplicateBtn'); if (dupBtn) dupBtn.disabled = !entry;
+  refreshInspector();
+}
+function refreshInspector(){
+  const box = document.getElementById('inspectorBox');
+  if (!selectedPart){ box.textContent = 'Nothing selected.'; return; }
+  const p = selectedPart;
+  box.innerHTML = `
+    <div><b>id:</b> ${p.id} &nbsp; <b>type:</b> ${p.type}</div>
+    <div style="margin-top:4px;">x: <input type="number" id="inspX" step="0.1" value="${p.obj3d.position.x.toFixed(2)}">
+    z: <input type="number" id="inspZ" step="0.1" value="${p.obj3d.position.z.toFixed(2)}"></div>
+    <div style="margin-top:4px;">rot° <input type="number" id="inspR" step="5" value="${(p.obj3d.rotation.y*180/Math.PI).toFixed(0)}"></div>
+  `;
+  const apply = ()=>{
+    if (!selectedPart) return;
+    const x = parseFloat(document.getElementById('inspX').value);
+    const z = parseFloat(document.getElementById('inspZ').value);
+    const rDeg = parseFloat(document.getElementById('inspR').value);
+    if (!isNaN(x)) selectedPart.obj3d.position.x = x;
+    if (!isNaN(z)) selectedPart.obj3d.position.z = z;
+    if (!isNaN(rDeg) && selectedPart.type !== 'road') selectedPart.obj3d.rotation.y = rDeg*Math.PI/180;
+    if (selectedPart.type.indexOf('debris')===0) selectedPart.obj3d.position.y = 0.19;
+    selectionRing.position.set(selectedPart.obj3d.position.x, 0.04, selectedPart.obj3d.position.z);
+  };
+  document.getElementById('inspX').oninput = apply;
+  document.getElementById('inspZ').oninput = apply;
+  document.getElementById('inspR').oninput = apply;
+  let snapshotted = false;
+  const snapOnce = ()=>{ if (!snapshotted){ snapshotState(); snapshotted = true; } };
+  document.getElementById('inspX').onfocus = snapOnce;
+  document.getElementById('inspZ').onfocus = snapOnce;
+  document.getElementById('inspR').onfocus = snapOnce;
 }
 
 function triggerPower(msg){
   if (poweredOn) return;
   poweredOn = true;
   const toast = document.getElementById('toast');
-  toast.textContent = msg || '⚡ Power Restored — City Lights ON';
+  toast.textContent = msg || 'Power Restored - City Lights ON';
   toast.classList.add('show');
   setTimeout(()=> toast.classList.remove('show'), 4000);
+  playChime();
+  logEvent('Power restored - city lights ON.');
 }
 function getAllButtons(){ return parts.filter(p=>p.type==='substation' && p.button).map(p=>p.button); }
 let poweredOn = false;
 let simPaused = true; // held paused until the disclaimer is acknowledged
 let robotView = false;
+let followCam = false;
 let isLooking = false;
 let povYaw = 0, povPitch = 0;
 
@@ -935,9 +1394,10 @@ renderer.domElement.addEventListener('pointerdown', e=>{
     if (hits.length){
       const pid = hits[0].object.userData.partId;
       const entry = pid ? partsById.get(pid) : null;
-      if (entry){ selectPart(entry); isDraggingPart = true; }
+      if (entry){ selectPart(entry); isDraggingPart = true; snapshotState(); }
     } else { selectPart(null); }
   } else if (robotView) { isLooking = true; }
+  else if (followCam) { /* camera is automatic in follow mode; ignore drag */ }
   else { isOrbiting = true; }
 });
 window.addEventListener('pointerup', e=>{
@@ -953,10 +1413,21 @@ window.addEventListener('pointerup', e=>{
   else {
     isOrbiting = false;
     if (moved < 6 && elapsed < 400){
+      if (teleportMode){
+        pointerNDC.x=(e.clientX/window.innerWidth)*2-1; pointerNDC.y=-(e.clientY/window.innerHeight)*2+1;
+        raycaster.setFromCamera(pointerNDC, camera);
+        const pt = new THREE.Vector3();
+        if (raycaster.ray.intersectPlane(groundPlane, pt)){
+          robot.group.position.set(pt.x, 0, pt.z);
+          pathQueue = []; chaseTarget = null;
+          logEvent(`Robot teleported to (${pt.x.toFixed(1)}, ${pt.z.toFixed(1)}).`);
+        }
+        return;
+      }
       pointerNDC.x=(e.clientX/window.innerWidth)*2-1; pointerNDC.y=-(e.clientY/window.innerHeight)*2+1;
       raycaster.setFromCamera(pointerNDC, camera);
       const hits = raycaster.intersectObjects(getAllButtons(), false);
-      if (hits.length){ hits[0].object.userData.pressed = true; triggerPower(); }
+      if (hits.length){ hits[0].object.userData.pressed = true; playButtonBeep(); triggerPower(); }
     }
   }
 });
@@ -979,12 +1450,16 @@ window.addEventListener('pointermove', e=>{
     raycaster.setFromCamera(pointerNDC, camera);
     const pt = new THREE.Vector3();
     if (raycaster.ray.intersectPlane(groundPlane, pt)){
-      const cx = Math.max(-22, Math.min(34, pt.x));
-      const cz = Math.max(-9, Math.min(17, pt.z));
+      let cx = Math.max(-22, Math.min(34, pt.x));
+      let cz = Math.max(-9, Math.min(17, pt.z));
+      if (gridSnapEnabled){ cx = Math.round(cx*2)/2; cz = Math.round(cz*2)/2; }
       selectedPart.obj3d.position.x = cx;
       selectedPart.obj3d.position.z = cz;
       if (selectedPart.type.indexOf('debris')===0) selectedPart.obj3d.position.y = 0.19;
       selectionRing.position.set(cx, 0.04, cz);
+      const ix = document.getElementById('inspX'), iz = document.getElementById('inspZ');
+      if (ix) ix.value = cx.toFixed(2);
+      if (iz) iz.value = cz.toFixed(2);
     }
     return;
   }
@@ -1004,9 +1479,18 @@ window.addEventListener('pointermove', e=>{
   }
 });
 renderer.domElement.addEventListener('wheel', e=>{
-  radius = Math.min(75, Math.max(16, radius + e.deltaY*0.03));
+  e.preventDefault(); // stops trackpad pinch (ctrl+wheel) from also zooming the whole page
+  if (e.ctrlKey){
+    // trackpad pinch-to-zoom gesture
+    radius = Math.min(75, Math.max(16, radius + e.deltaY*0.6));
+  } else {
+    // mouse wheel notch OR trackpad two-finger scroll
+    radius = Math.min(75, Math.max(16, radius + e.deltaY*0.03));
+    // horizontal two-finger swipe orbits the camera - mouse wheels report deltaX≈0, so this is a no-op for them
+    if (Math.abs(e.deltaX) > 0.4) theta -= e.deltaX*0.0035;
+  }
   updateCamera();
-}, {passive:true});
+}, {passive:false});
 window.addEventListener('resize', ()=>{
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
@@ -1016,11 +1500,14 @@ window.addEventListener('resize', ()=>{
 // ---- Toolbar wiring ----
 function spawnPoint(){ return {x: HOME.x + (Math.random()-0.5)*2.4, z: HOME.z - 3.2 + (Math.random()-0.5)*1.6}; }
 function addAndSelect(type, opts={}){
+  snapshotState();
   const p = spawnPoint();
   const entry = addPart(type, p.x, p.z, opts);
   selectPart(entry);
   editMode = true;
   updateEditModeUI();
+  if (bboxVisible) rebuildBoundingBoxes();
+  logEvent(`Added part: ${type} (id ${entry.id}).`);
 }
 document.getElementById('addHouse').onclick = ()=> addAndSelect('house');
 document.getElementById('addTree').onclick = ()=> addAndSelect('tree');
@@ -1039,6 +1526,7 @@ document.getElementById('addBinLandfill').onclick = ()=> addAndSelect('bin_landf
 document.getElementById('addRoad').onclick = ()=> addAndSelect('road', {length:6, width:3.2, rot:0});
 document.getElementById('rotateRoadBtn').onclick = ()=>{
   if (!selectedPart) return;
+  snapshotState();
   if (selectedPart.type==='road'){
     const {x,z} = selectedPart.obj3d.position;
     const newRot = selectedPart.rot ? 0 : 1;
@@ -1047,9 +1535,10 @@ document.getElementById('rotateRoadBtn').onclick = ()=>{
     selectPart(entry);
   } else {
     selectedPart.obj3d.rotation.y += Math.PI/2;
+    refreshInspector();
   }
 };
-document.getElementById('deleteBtn').onclick = ()=>{ if (selectedPart){ deletePart(selectedPart); selectPart(null); } };
+document.getElementById('deleteBtn').onclick = ()=>{ if (selectedPart){ snapshotState(); logEvent(`Deleted part: ${selectedPart.type} (id ${selectedPart.id}).`); deletePart(selectedPart); selectPart(null); if (bboxVisible) rebuildBoundingBoxes(); } };
 function updateEditModeUI(){
   const btn = document.getElementById('editToggle');
   btn.textContent = 'Edit Mode: ' + (editMode ? 'ON' : 'OFF');
@@ -1065,22 +1554,481 @@ document.getElementById('terrainSelect').onchange = e => setTerrain(e.target.val
 document.getElementById('weatherSelect').onchange = e => setWeather(e.target.value);
 document.getElementById('robotDesignSelect').onchange = e => setRobotDesign(e.target.value);
 
+// ---- Dev Tools panel wiring (password-gated) ----
+const devToggleBtn = document.getElementById('devToggle');
+const devPanelEl = document.getElementById('devPanel');
+const DEV_PASSWORD = "Archie is the best dog and that is true";
+let devUnlocked = false;
+const devAuthModal = document.getElementById('devAuthModal');
+const devAuthCard = document.getElementById('devAuthCard');
+const devPasswordInput = document.getElementById('devPasswordInput');
+const devAuthError = document.getElementById('devAuthError');
+
+function openDevAuth(){
+  devAuthError.textContent = '';
+  devPasswordInput.value = '';
+  devAuthModal.classList.add('show');
+  setTimeout(()=> devPasswordInput.focus(), 320);
+}
+function closeDevAuth(){
+  devAuthModal.classList.remove('show');
+}
+function openDevPanel(){
+  devPanelEl.classList.add('open');
+  devToggleBtn.classList.add('active');
+}
+function attemptDevUnlock(){
+  if (devPasswordInput.value === DEV_PASSWORD){
+    devUnlocked = true;
+    closeDevAuth();
+    logEvent('Developer tools unlocked.');
+    setTimeout(openDevPanel, 200);
+  } else {
+    devAuthError.textContent = 'Incorrect password.';
+    devAuthCard.classList.remove('shake');
+    void devAuthCard.offsetWidth; // restart the animation
+    devAuthCard.classList.add('shake');
+    devPasswordInput.value = '';
+    devPasswordInput.focus();
+  }
+}
+devToggleBtn.onclick = ()=>{
+  if (!devUnlocked){ openDevAuth(); return; }
+  const open = devPanelEl.classList.toggle('open');
+  devToggleBtn.classList.toggle('active', open);
+};
+document.getElementById('devAuthSubmit').onclick = attemptDevUnlock;
+document.getElementById('devAuthCancel').onclick = closeDevAuth;
+devPasswordInput.addEventListener('keydown', e=>{ if (e.key === 'Enter'){ e.preventDefault(); attemptDevUnlock(); } });
+devAuthModal.addEventListener('click', e=>{ if (e.target === devAuthModal) closeDevAuth(); });
+window.addEventListener('keydown', e=>{
+  if (e.key !== 'Escape') return;
+  if (devAuthModal.classList.contains('show')) closeDevAuth();
+  else if (tourModal.classList.contains('show')) closeTour();
+});
+
+document.getElementById('chkTrail').onchange = e=>{ trailLine.visible = e.target.checked; logEvent('Path trail ' + (e.target.checked?'shown':'hidden') + '.'); };
+document.getElementById('chkRoute').onchange = e=>{ routeLine.visible = e.target.checked; logEvent('Planned route preview ' + (e.target.checked?'shown':'hidden') + '.'); };
+document.getElementById('chkRoadNet').onchange = e=>{ if (e.target.checked) rebuildRoadOverlay(); roadOverlayGroup.visible = e.target.checked; logEvent('Road network overlay ' + (e.target.checked?'shown':'hidden') + '.'); };
+document.getElementById('chkGrid').onchange = e=>{ coordGrid.visible = e.target.checked; coordAxes.visible = e.target.checked; logEvent('Coordinate grid ' + (e.target.checked?'shown':'hidden') + '.'); };
+document.getElementById('chkWireframe').onchange = e=>{ setWireframe(e.target.checked); logEvent('Wireframe ' + (e.target.checked?'on':'off') + '.'); };
+document.getElementById('chkShadows').onchange = e=>{ setShadowsEnabled(e.target.checked); logEvent('Shadows ' + (e.target.checked?'on':'off') + '.'); };
+document.getElementById('chkSnap').onchange = e=>{ gridSnapEnabled = e.target.checked; logEvent('Grid snap ' + (e.target.checked?'on':'off') + '.'); };
+
+let minimapVisible = false;
+const minimapWrap = document.getElementById('minimapWrap');
+document.getElementById('chkMinimap').onchange = e=>{
+  minimapVisible = e.target.checked;
+  minimapWrap.classList.toggle('show', minimapVisible);
+  logEvent('Minimap ' + (minimapVisible?'shown':'hidden') + '.');
+};
+
+document.getElementById('speedSlider').oninput = e=>{
+  robotSpeedMultiplier = (+e.target.value)/100;
+  document.getElementById('speedVal').textContent = robotSpeedMultiplier.toFixed(2) + '×';
+};
+document.getElementById('qualitySelect').onchange = e=> setQuality(e.target.value);
+
+let forcedState = null;
+document.getElementById('forceStateSelect').onchange = e=>{
+  forcedState = e.target.value || null;
+  logEvent(forcedState ? `Robot state forced to "${forcedState}".` : 'Robot state released back to auto.');
+};
+
+// ---- Minimap ----
+const minimapCanvas = document.getElementById('minimap');
+const mmCtx = minimapCanvas.getContext('2d');
+const MM_BOUNDS = { minX:-25, maxX:35, minZ:-11, maxZ:19 };
+function mmProject(x,z){
+  return [
+    ((x - MM_BOUNDS.minX) / (MM_BOUNDS.maxX - MM_BOUNDS.minX)) * minimapCanvas.width,
+    ((z - MM_BOUNDS.minZ) / (MM_BOUNDS.maxZ - MM_BOUNDS.minZ)) * minimapCanvas.height
+  ];
+}
+const MM_COLORS = {
+  road:'#3a3a3a', house:'#c99a5b', tent:'#f2ece0', supply:'#c99a5b',
+  bin_hazardous:'#c0392b', bin_recyclable:'#2e8b57', bin_landfill:'#6b5a4a',
+  debris_red:'#e05a4a', debris_green:'#4ac26f', tree:'#3f6b3a', tree_fallen:'#3f6b3a',
+  tree_standing:'#4a7a44', substation:'#8a6a45', lamp:'#ffcc66', sunflower:'#f2c14e'
+};
+function drawMinimap(){
+  const w = minimapCanvas.width, h = minimapCanvas.height;
+  mmCtx.fillStyle = '#3f5c3a'; mmCtx.fillRect(0,0,w,h);
+  parts.forEach(p=>{
+    const [mx,mz] = mmProject(p.obj3d.position.x, p.obj3d.position.z);
+    mmCtx.fillStyle = MM_COLORS[p.type] || '#888';
+    if (p.type === 'road'){
+      mmCtx.fillRect(mx-2, mz-2, 4, 4);
+    } else {
+      mmCtx.beginPath(); mmCtx.arc(mx, mz, p.type.indexOf('debris')===0 ? 1.4 : 2.6, 0, Math.PI*2); mmCtx.fill();
+    }
+  });
+  const [rx,rz] = mmProject(robot.group.position.x, robot.group.position.z);
+  mmCtx.save();
+  mmCtx.translate(rx,rz);
+  mmCtx.rotate(robot.group.rotation.y);
+  mmCtx.fillStyle = '#3ad1ff';
+  mmCtx.beginPath();
+  mmCtx.moveTo(0,-4); mmCtx.lineTo(3,3); mmCtx.lineTo(-3,3); mmCtx.closePath(); mmCtx.fill();
+  mmCtx.restore();
+}
+
+// =====================================================================
+// MORE DEV TOOLS - undo/redo, layout utilities, bounding boxes,
+// click-to-teleport, time-of-day, command console, raw JSON editor.
+// =====================================================================
+
+// ---- Undo / Redo (full-state snapshots) ----
+let undoStack = [], redoStack = [];
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
+function refreshUndoButtons(){
+  undoBtn.disabled = undoStack.length === 0;
+  redoBtn.disabled = redoStack.length === 0;
+}
+function snapshotState(){
+  undoStack.push(serializeParts());
+  if (undoStack.length > 30) undoStack.shift();
+  redoStack = [];
+  refreshUndoButtons();
+}
+undoBtn.onclick = ()=>{
+  if (!undoStack.length) return;
+  redoStack.push(serializeParts());
+  const prev = undoStack.pop();
+  loadState(prev);
+  selectPart(null);
+  refreshUndoButtons();
+  logEvent('Undo.');
+};
+redoBtn.onclick = ()=>{
+  if (!redoStack.length) return;
+  undoStack.push(serializeParts());
+  const next = redoStack.pop();
+  loadState(next);
+  selectPart(null);
+  refreshUndoButtons();
+  logEvent('Redo.');
+};
+
+// ---- Duplicate selected part ----
+document.getElementById('duplicateBtn').onclick = ()=>{
+  if (!selectedPart) return;
+  snapshotState();
+  const p = selectedPart;
+  const opts = {};
+  if (p.color !== undefined) opts.color = p.color;
+  if (p.labels) opts.labels = p.labels;
+  if (p.type === 'road'){ opts.rot = p.rot; opts.length = p.length; opts.width = p.width; }
+  else { opts.rot = p.obj3d.rotation.y; }
+  const entry = addPart(p.type, p.obj3d.position.x + 1.2, p.obj3d.position.z + 1.2, opts);
+  selectPart(entry);
+  editMode = true; updateEditModeUI();
+  logEvent(`Duplicated ${p.type} (id ${entry.id}).`);
+};
+
+// ---- Randomize debris along existing roads ----
+document.getElementById('randomizeBtn').onclick = ()=>{
+  const roads = parts.filter(p=>p.type==='road');
+  if (!roads.length){ logEvent('Randomize skipped: no roads on the board.'); return; }
+  const requested = parseInt(document.getElementById('randomizeCount').value, 10);
+  const n = Math.max(1, Math.min(40, isNaN(requested) ? 8 : requested));
+  snapshotState();
+  let count = 0;
+  for (let i=0;i<n;i++){
+    const r = roads[Math.floor(Math.random()*roads.length)];
+    const half = r.length/2;
+    const t = (Math.random()-0.5) * half * 1.6;
+    const side = (Math.random() > 0.5 ? 1 : -1) * (r.width/2 + 1.2);
+    let x, z;
+    if (r.rot === 1){ x = r.obj3d.position.x + side; z = r.obj3d.position.z + t; }
+    else { x = r.obj3d.position.x + t; z = r.obj3d.position.z + side; }
+    addPart(Math.random() > 0.5 ? 'debris_red' : 'debris_green', x, z);
+    count++;
+  }
+  if (bboxVisible) rebuildBoundingBoxes();
+  logEvent(`Randomized ${count} debris pieces along the road network.`);
+};
+
+// ---- Reset to default layout ----
+document.getElementById('resetLayoutBtn').onclick = ()=>{
+  snapshotState();
+  loadState(DEFAULT_STATE);
+  setTerrain('grass'); setWeather('clear'); setRobotDesign('rescue');
+  document.getElementById('terrainSelect').value = 'grass';
+  document.getElementById('weatherSelect').value = 'clear';
+  document.getElementById('robotDesignSelect').value = 'rescue';
+  selectPart(null);
+  logEvent('Reset to default layout.');
+};
+
+// ---- Bounding box overlay ----
+const bboxGroup = new THREE.Group();
+scene.add(bboxGroup);
+let bboxVisible = false;
+function rebuildBoundingBoxes(){
+  while (bboxGroup.children.length) bboxGroup.remove(bboxGroup.children[0]);
+  if (!bboxVisible) return;
+  parts.forEach(p=>{
+    const helper = new THREE.BoxHelper(p.obj3d, 0xffcc33);
+    bboxGroup.add(helper);
+  });
+}
+document.getElementById('chkBBox').onchange = e=>{
+  bboxVisible = e.target.checked;
+  rebuildBoundingBoxes();
+  logEvent('Bounding boxes ' + (bboxVisible?'shown':'hidden') + '.');
+};
+
+// ---- Click-to-teleport robot ----
+let teleportMode = false;
+document.getElementById('chkTeleport').onchange = e=>{
+  teleportMode = e.target.checked;
+  logEvent('Click-to-teleport ' + (teleportMode?'enabled - click the board to warp the robot.':'disabled.'));
+};
+
+// ---- Time of day ----
+const timeSlider = document.getElementById('timeSlider');
+const timeVal = document.getElementById('timeVal');
+function formatHour(h){
+  const hh = Math.floor(h) % 24;
+  const mm = Math.round((h - Math.floor(h)) * 60);
+  const period = hh < 12 ? 'AM' : 'PM';
+  let h12 = hh % 12; if (h12 === 0) h12 = 12;
+  return `${h12}:${String(mm).padStart(2,'0')} ${period}`;
+}
+function setTimeOfDay(hours){
+  const angle = (hours/24) * Math.PI*2 - Math.PI/2;
+  const sunHeight = Math.sin(angle);
+  key.intensity = Math.max(0.12, sunHeight*1.05 + 0.25);
+  hemi.intensity = Math.max(0.12, sunHeight*0.5 + 0.35);
+  const warmth = Math.max(0, sunHeight);
+  key.color.setRGB(1, 0.72 + 0.22*warmth, 0.5 + 0.4*warmth);
+  const nightColor = new THREE.Color(0x0c1130), dayColor = new THREE.Color(0xffffff);
+  const t = Math.max(0, Math.min(1, (sunHeight+0.3)/1.3));
+  const skyColor = nightColor.clone().lerp(dayColor, t);
+  skyDome.material.color.copy(skyColor);
+  timeVal.textContent = formatHour(hours);
+}
+timeSlider.oninput = e=>{ setTimeOfDay(+e.target.value); };
+setTimeOfDay(+timeSlider.value);
+
+// ---- Command console ----
+const consoleOutputEl = document.getElementById('consoleOutput');
+function consolePrint(msg){
+  const line = document.createElement('div');
+  line.textContent = '> ' + msg;
+  consoleOutputEl.appendChild(line);
+  while (consoleOutputEl.children.length > 40) consoleOutputEl.removeChild(consoleOutputEl.firstChild);
+  consoleOutputEl.scrollTop = consoleOutputEl.scrollHeight;
+}
+const CONSOLE_PART_TYPES = ['house','tree','tent','supply','lamp','sunflower','substation',
+  'bin_hazardous','bin_recyclable','bin_landfill','debris_red','debris_green','tree_fallen','tree_standing','road'];
+function runConsoleCommand(raw){
+  const line = raw.trim();
+  if (!line) return;
+  consolePrint(line);
+  const tokens = line.split(/\s+/);
+  const cmd = tokens[0].toLowerCase();
+  try {
+    if (cmd === 'help'){
+      consolePrint('Commands: spawn <type> <x> <z> | delete <id> | goto <x> <z> | clear debris | weather <name> | terrain <name> | robot <design> | speed <n> | list');
+      consolePrint('Types: ' + CONSOLE_PART_TYPES.join(', '));
+    } else if (cmd === 'spawn'){
+      const type = tokens[1], x = parseFloat(tokens[2]), z = parseFloat(tokens[3]);
+      if (!CONSOLE_PART_TYPES.includes(type) || isNaN(x) || isNaN(z)){ consolePrint('Usage: spawn <type> <x> <z>'); return; }
+      snapshotState();
+      const entry = addPart(type, x, z);
+      consolePrint(`Spawned ${type} as id ${entry.id} at (${x}, ${z}).`);
+      logEvent(`Console: spawned ${type} (id ${entry.id}).`);
+    } else if (cmd === 'delete'){
+      const id = tokens[1];
+      const entry = partsById.get(id);
+      if (!entry){ consolePrint(`No part with id "${id}".`); return; }
+      snapshotState();
+      deletePart(entry);
+      if (selectedPart === entry) selectPart(null);
+      consolePrint(`Deleted ${id}.`);
+      logEvent(`Console: deleted part ${id}.`);
+    } else if (cmd === 'goto'){
+      const x = parseFloat(tokens[1]), z = parseFloat(tokens[2]);
+      if (isNaN(x) || isNaN(z)){ consolePrint('Usage: goto <x> <z>'); return; }
+      robot.group.position.set(x, 0, z);
+      pathQueue = []; chaseTarget = null;
+      consolePrint(`Robot teleported to (${x}, ${z}).`);
+      logEvent(`Console: robot teleported to (${x}, ${z}).`);
+    } else if (cmd === 'clear' && tokens[1] === 'debris'){
+      snapshotState();
+      const toRemove = parts.filter(p=>['debris_red','debris_green','tree_fallen','tree_standing'].includes(p.type));
+      toRemove.forEach(deletePart);
+      consolePrint(`Cleared ${toRemove.length} debris parts.`);
+      logEvent(`Console: cleared ${toRemove.length} debris parts.`);
+    } else if (cmd === 'weather'){
+      if (!WEATHER_PRESETS[tokens[1]]){ consolePrint('Unknown weather. Try: clear, rain, snow, fog, night.'); return; }
+      setWeather(tokens[1]); document.getElementById('weatherSelect').value = tokens[1];
+      consolePrint('Weather set to ' + tokens[1] + '.');
+    } else if (cmd === 'terrain'){
+      if (!TERRAIN_THEMES[tokens[1]]){ consolePrint('Unknown terrain. Try: grass, desert, snow, urban, autumn.'); return; }
+      setTerrain(tokens[1]); document.getElementById('terrainSelect').value = tokens[1];
+      consolePrint('Terrain set to ' + tokens[1] + '.');
+    } else if (cmd === 'robot'){
+      if (!ROBOT_DESIGNS[tokens[1]]){ consolePrint('Unknown design. Try: rescue, arctic, stealth, safety, crimson.'); return; }
+      setRobotDesign(tokens[1]); document.getElementById('robotDesignSelect').value = tokens[1];
+      consolePrint('Robot design set to ' + tokens[1] + '.');
+    } else if (cmd === 'speed'){
+      const n = parseFloat(tokens[1]);
+      if (isNaN(n) || n < 0 || n > 3){ consolePrint('Usage: speed <0-3>'); return; }
+      robotSpeedMultiplier = n;
+      document.getElementById('speedSlider').value = n*100;
+      document.getElementById('speedVal').textContent = n.toFixed(2) + '×';
+      consolePrint('Robot speed set to ' + n + '×.');
+    } else if (cmd === 'list'){
+      consolePrint(`${parts.length} parts on the board. Robot state: ${robotState}.`);
+    } else if (cmd === 'find'){
+      const id = tokens[1];
+      const entry = partsById.get(id);
+      if (!entry){ consolePrint(`No part with id "${id}".`); return; }
+      editMode = true; updateEditModeUI();
+      selectPart(entry);
+      setOrbitView(theta, phi, 16);
+      CAM_TARGET.set(entry.obj3d.position.x, 1, entry.obj3d.position.z);
+      updateCamera();
+      consolePrint(`Found ${entry.type} (${id}) - camera moved and selected it.`);
+    } else {
+      consolePrint(`Unknown command "${cmd}". Type "help" for a list.`);
+    }
+  } catch(err){
+    consolePrint('Error: ' + err.message);
+  }
+}
+document.getElementById('consoleRunBtn').onclick = ()=>{
+  const input = document.getElementById('consoleInput');
+  runConsoleCommand(input.value);
+  input.value = '';
+};
+document.getElementById('consoleInput').addEventListener('keydown', e=>{
+  if (e.key === 'Enter'){ document.getElementById('consoleRunBtn').click(); }
+});
+consolePrint('Type "help" for a list of commands.');
+
+// ---- Save / Load slots (browser storage) ----
+const SAVE_PREFIX = 'disaster_relief_board_slot_';
+document.getElementById('saveSlotBtn').onclick = ()=>{
+  const slot = document.getElementById('slotSelect').value;
+  const payload = { parts: serializeParts(), env: { terrain: currentTerrain, weather: currentWeather, robotDesign: currentRobotDesign } };
+  try {
+    localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(payload));
+    logEvent(`Saved layout to Slot ${slot}.`);
+  } catch(err){
+    logEvent(`Save failed (Slot ${slot}): ${err.message}. Browser storage may be blocked on this page.`);
+  }
+};
+document.getElementById('loadSlotBtn').onclick = ()=>{
+  const slot = document.getElementById('slotSelect').value;
+  try {
+    const raw = localStorage.getItem(SAVE_PREFIX + slot);
+    if (!raw){ logEvent(`Slot ${slot} is empty.`); return; }
+    const payload = JSON.parse(raw);
+    snapshotState();
+    loadState(payload.parts || payload);
+    if (payload.env){
+      setTerrain(payload.env.terrain || 'grass');
+      setWeather(payload.env.weather || 'clear');
+      setRobotDesign(payload.env.robotDesign || 'rescue');
+      document.getElementById('terrainSelect').value = currentTerrain;
+      document.getElementById('weatherSelect').value = currentWeather;
+      document.getElementById('robotDesignSelect').value = currentRobotDesign;
+    }
+    selectPart(null);
+    logEvent(`Loaded layout from Slot ${slot}.`);
+  } catch(err){
+    logEvent(`Load failed (Slot ${slot}): ${err.message}.`);
+  }
+};
+
+// ---- Light helpers ----
+const keyLightHelper = new THREE.DirectionalLightHelper(key, 3, 0xffcc33);
+keyLightHelper.visible = false;
+scene.add(keyLightHelper);
+const hemiLightHelper = new THREE.HemisphereLightHelper(hemi, 2.5);
+hemiLightHelper.visible = false;
+scene.add(hemiLightHelper);
+document.getElementById('chkLightHelpers').onchange = e=>{
+  keyLightHelper.visible = e.target.checked;
+  hemiLightHelper.visible = e.target.checked;
+  logEvent('Light helpers ' + (e.target.checked?'shown':'hidden') + '.');
+};
+
+// ---- Fog toggle ----
+document.getElementById('chkFog').onchange = e=>{
+  fogEnabled = e.target.checked;
+  scene.fog = fogEnabled ? savedFog : null;
+  logEvent('Fog ' + (fogEnabled?'enabled':'disabled') + '.');
+};
+
+// ---- Force city lights ON override ----
+let forceLightsOn = false;
+document.getElementById('chkForceLights').onchange = e=>{
+  forceLightsOn = e.target.checked;
+  logEvent('Force city lights ' + (forceLightsOn?'ON':'released back to normal') + '.');
+};
+
+// ---- Manual light intensity sliders ----
+const keySlider = document.getElementById('keySlider'), keyVal = document.getElementById('keyVal');
+const hemiSlider = document.getElementById('hemiSlider'), hemiVal = document.getElementById('hemiVal');
+keySlider.oninput = e=>{ key.intensity = +e.target.value; keyVal.textContent = (+e.target.value).toFixed(2); };
+hemiSlider.oninput = e=>{ hemi.intensity = +e.target.value; hemiVal.textContent = (+e.target.value).toFixed(2); };
+
+// ---- Randomize count wiring (uses the input added next to the button) ----
+// (randomizeCount value is read directly in randomizeBtn's click handler above)
+
+// ---- Keyboard shortcuts ----
+window.addEventListener('keydown', e=>{
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return; // don't hijack typing
+  if (manualControl && (e.code === 'Space' || e.key.indexOf('Arrow') === 0)) return; // manual-drive handler owns these while driving
+  if (e.code === 'Space'){
+    e.preventDefault();
+    pauseBtn.click();
+  } else if (e.key === 'Delete' || e.key === 'Backspace'){
+    if (selectedPart){ e.preventDefault(); document.getElementById('deleteBtn').click(); }
+  } else if (e.key === 'r' || e.key === 'R'){
+    if (selectedPart){ document.getElementById('rotateRoadBtn').click(); }
+  } else if (e.key.indexOf('Arrow') === 0){
+    if (selectedPart && editMode){
+      e.preventDefault();
+      snapshotState();
+      const step = 0.5;
+      if (e.key === 'ArrowUp') selectedPart.obj3d.position.z -= step;
+      else if (e.key === 'ArrowDown') selectedPart.obj3d.position.z += step;
+      else if (e.key === 'ArrowLeft') selectedPart.obj3d.position.x -= step;
+      else if (e.key === 'ArrowRight') selectedPart.obj3d.position.x += step;
+      selectionRing.position.set(selectedPart.obj3d.position.x, 0.04, selectedPart.obj3d.position.z);
+      refreshInspector();
+    }
+  } else if (e.ctrlKey && (e.key === 'z' || e.key === 'Z') && !e.shiftKey){
+    e.preventDefault(); undoBtn.click();
+  } else if (e.ctrlKey && (e.key === 'y' || e.key === 'Y' || (e.key === 'Z' && e.shiftKey))){
+    e.preventDefault(); redoBtn.click();
+  }
+});
+
 // ---- Mobile build-menu toggle ----
 const toolbarToggleBtn = document.getElementById('toolbarToggle');
 const toolbarEl = document.getElementById('toolbar');
 toolbarToggleBtn.onclick = ()=>{
   const open = toolbarEl.classList.toggle('open');
-  toolbarToggleBtn.textContent = open ? '✕ Close' : '☰ Build Menu';
+  toolbarToggleBtn.textContent = open ? 'Close' : 'Build Menu';
 };
 updateEditModeUI();
 
 // ---- Pause / Resume simulation ----
 const pauseBtn = document.getElementById('pauseToggle');
-pauseBtn.textContent = simPaused ? '▶ Resume' : '⏸ Pause';
+pauseBtn.textContent = simPaused ? 'Resume' : 'Pause';
 pauseBtn.classList.toggle('active', simPaused);
 pauseBtn.onclick = ()=>{
   simPaused = !simPaused;
-  pauseBtn.textContent = simPaused ? '▶ Resume' : '⏸ Pause';
+  pauseBtn.textContent = simPaused ? 'Resume' : 'Pause';
   pauseBtn.classList.toggle('active', simPaused);
 };
 
@@ -1090,9 +2038,11 @@ document.getElementById('disclaimerBtn').onclick = ()=>{
   disclaimerEl.classList.add('hidden');
   setTimeout(()=>{ disclaimerEl.style.display = 'none'; }, 400);
   simPaused = false;
-  pauseBtn.textContent = '⏸ Pause';
+  pauseBtn.textContent = 'Pause';
   pauseBtn.classList.remove('active');
   clock.getDelta(); // discard the time spent sitting on the disclaimer
+  initAudio();
+  maybeStartTour();
 };
 
 // ---- Robot POV camera ----
@@ -1100,24 +2050,238 @@ const povBtn = document.getElementById('povToggle');
 const robotStatusEl = document.getElementById('robotStatus');
 povBtn.onclick = ()=>{
   robotView = !robotView;
-  povBtn.textContent = robotView ? '🖥 Orbit View' : '🤖 Robot View';
+  if (robotView) { followCam = false; document.getElementById('camFollow').textContent = 'Follow-Cam: OFF'; document.getElementById('camFollow').classList.remove('active'); }
+  povBtn.textContent = robotView ? 'Orbit View' : 'Robot View';
   povBtn.classList.toggle('active', robotView);
-  robotStatusEl.style.display = robotView ? 'block' : 'none';
+  robotStatusEl.style.display = (robotView || followCam) ? 'block' : 'none';
   isOrbiting = false; isLooking = false;
   povYaw = 0; povPitch = 0;
-  if (!robotView) updateCamera();
-};
-const STATE_LABELS = {
-  seek:'🔍 Scanning for debris...', toDebris:'🚗 Driving to debris...', lowerArm:'🦾 Lowering arm...',
-  grab:'🤏 Picking up debris...', lift:'🦾 Lifting debris...', toBin:'🚗 Driving to drop-off point...',
-  lowerArm2:'🦾 Lowering arm...', release:'📦 Dropping off debris...', liftAfter:'🦾 Raising arm...',
-  toSubstation:'🚗 Heading to substation...', parkHome:'🏠 Returning to Start/Home...',
-  idle:'✅ Idle — all clear!'
+  if (!robotView && !followCam) updateCamera();
 };
 
+// ---- Camera bookmarks + follow-cam ----
+function setOrbitView(t, p, r){
+  robotView = false; followCam = false;
+  povBtn.textContent = 'Robot View'; povBtn.classList.remove('active');
+  document.getElementById('camFollow').textContent = 'Follow-Cam: OFF'; document.getElementById('camFollow').classList.remove('active');
+  robotStatusEl.style.display = 'none';
+  theta = t; phi = p; radius = r;
+  updateCamera();
+}
+document.getElementById('camTop').onclick = ()=>{ setOrbitView(0.6, 0.08, 55); logEvent('Camera: Top-Down view.'); };
+document.getElementById('camSide').onclick = ()=>{ setOrbitView(Math.PI/2, 1.3, 46); logEvent('Camera: Side view.'); };
+document.getElementById('camReset').onclick = ()=>{ setOrbitView(0.85, 1.05, 42); logEvent('Camera: Reset view.'); };
+const followBtn = document.getElementById('camFollow');
+followBtn.onclick = ()=>{
+  followCam = !followCam;
+  if (followCam){
+    robotView = false; povBtn.textContent = 'Robot View'; povBtn.classList.remove('active');
+    isOrbiting = false; isLooking = false;
+  }
+  followBtn.textContent = 'Follow-Cam: ' + (followCam ? 'ON' : 'OFF');
+  followBtn.classList.toggle('active', followCam);
+  robotStatusEl.style.display = (robotView || followCam) ? 'block' : 'none';
+  if (!followCam && !robotView) updateCamera();
+  logEvent('Follow-Cam ' + (followCam ? 'enabled' : 'disabled') + '.');
+};
+let followCamPos = null, followCamLook = null;
+
+// =====================================================================
+// AUDIO - small synthesized sound engine (no external files). Unlocked
+// on the disclaimer button (a real user gesture, which browsers require).
+// =====================================================================
+let audioCtx = null;
+let audioMuted = false;
+let motorOsc = null, motorGain = null;
+function initAudio(){
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    motorOsc = audioCtx.createOscillator();
+    motorGain = audioCtx.createGain();
+    motorOsc.type = 'sawtooth';
+    motorOsc.frequency.value = 85;
+    motorGain.gain.value = 0;
+    motorOsc.connect(motorGain);
+    motorGain.connect(audioCtx.destination);
+    motorOsc.start();
+  } catch(e){ audioCtx = null; }
+}
+function beep(freq, duration, type, volume, startDelay){
+  if (!audioCtx || audioMuted) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.value = freq;
+  const t0 = audioCtx.currentTime + (startDelay||0);
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(volume||0.15, t0+0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0+duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t0);
+  osc.stop(t0+duration+0.03);
+}
+function playClick(){ beep(950, 0.07, 'square', 0.12); }
+function playThud(){ beep(140, 0.14, 'sine', 0.16); }
+function playButtonBeep(){ beep(1300, 0.08, 'square', 0.1); }
+function playChime(){ [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=> beep(f, 0.3, 'sine', 0.13, i*0.09)); }
+function updateMotorSound(isMoving, speedFactor){
+  if (!audioCtx || !motorGain) return;
+  const targetGain = (isMoving && !audioMuted) ? 0.045 : 0;
+  motorGain.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.09);
+  motorOsc.frequency.setTargetAtTime(75 + Math.min(60, speedFactor*10), audioCtx.currentTime, 0.12);
+}
+const muteBtn = document.getElementById('muteToggle');
+muteBtn.onclick = ()=>{
+  audioMuted = !audioMuted;
+  muteBtn.textContent = audioMuted ? 'Unmute' : 'Mute';
+  logEvent('Sound ' + (audioMuted ? 'muted' : 'unmuted') + '.');
+};
+
+// =====================================================================
+// MANUAL / RC DRIVE MODE
+// =====================================================================
+let manualControl = false;
+const manualKeys = { up:false, down:false, left:false, right:false };
+let lastRobotPos = { x: robot.group.position.x, z: robot.group.position.z };
+function updateManualDrive(delta){
+  easeRobotAnimatronics(delta);
+  const turnSpeed = 2.4;
+  const moveSpeed = 4.6 * Math.max(0.25, robotSpeedMultiplier);
+  if (manualKeys.left) robot.group.rotation.y += turnSpeed*delta;
+  if (manualKeys.right) robot.group.rotation.y -= turnSpeed*delta;
+  let stepLen = 0;
+  if (manualKeys.up || manualKeys.down){
+    const dir = manualKeys.up ? 1 : -1;
+    const dx = Math.sin(robot.group.rotation.y) * moveSpeed*delta*dir;
+    const dz = Math.cos(robot.group.rotation.y) * moveSpeed*delta*dir;
+    robot.group.position.x = Math.max(-24, Math.min(36, robot.group.position.x + dx));
+    robot.group.position.z = Math.max(-11, Math.min(19, robot.group.position.z + dz));
+    stepLen = Math.hypot(dx,dz);
+    robot.wheels.forEach(w=> w.rotation.x -= (dir * stepLen) / 0.27);
+  }
+}
+function setManualControl(on){
+  manualControl = on;
+  manualToggleBtn.textContent = 'Manual Drive: ' + (on ? 'ON' : 'OFF');
+  manualToggleBtn.classList.toggle('active', on);
+  document.getElementById('rcPad').classList.toggle('show', on);
+  if (on){
+    pathQueue = []; chaseTarget = null;
+    manualKeys.up = manualKeys.down = manualKeys.left = manualKeys.right = false;
+    robotStatusEl.style.display = 'block';
+  } else if (!robotView && !followCam){
+    robotStatusEl.style.display = 'none';
+  }
+  logEvent('Manual drive ' + (on ? 'enabled - you have the wheel.' : 'disabled - resuming autonomous behavior.'));
+}
+const manualToggleBtn = document.getElementById('manualToggle');
+manualToggleBtn.onclick = ()=> setManualControl(!manualControl);
+
+// Keyboard driving (desktop) - only active while manual mode is on
+window.addEventListener('keydown', e=>{
+  if (!manualControl) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  let used = true;
+  if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') manualKeys.up = true;
+  else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') manualKeys.down = true;
+  else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') manualKeys.left = true;
+  else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') manualKeys.right = true;
+  else if (e.code === 'Space'){ gripOpen = !gripOpen; playClick(); }
+  else if (e.key === 'q' || e.key === 'Q') armTargetAngle = 0.75;
+  else if (e.key === 'e' || e.key === 'E') armTargetAngle = -0.15;
+  else used = false;
+  if (used) e.preventDefault();
+});
+window.addEventListener('keyup', e=>{
+  if (!manualControl) return;
+  if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') manualKeys.up = false;
+  else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') manualKeys.down = false;
+  else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') manualKeys.left = false;
+  else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') manualKeys.right = false;
+});
+
+// On-screen D-pad (touch + mouse, via Pointer Events)
+function wireHoldButton(id, onDown, onUp){
+  const el = document.getElementById(id);
+  const down = ev=>{ ev.preventDefault(); el.classList.add('pressed'); onDown(); };
+  const up = ev=>{ el.classList.remove('pressed'); onUp(); };
+  el.addEventListener('pointerdown', down);
+  el.addEventListener('pointerup', up);
+  el.addEventListener('pointerleave', up);
+  el.addEventListener('pointercancel', up);
+}
+wireHoldButton('rcUp', ()=> manualKeys.up=true, ()=> manualKeys.up=false);
+wireHoldButton('rcDown', ()=> manualKeys.down=true, ()=> manualKeys.down=false);
+wireHoldButton('rcLeft', ()=> manualKeys.left=true, ()=> manualKeys.left=false);
+wireHoldButton('rcRight', ()=> manualKeys.right=true, ()=> manualKeys.right=false);
+document.getElementById('rcGrip').addEventListener('pointerdown', e=>{ e.preventDefault(); gripOpen = !gripOpen; playClick(); });
+
+// =====================================================================
+// GUIDED FIRST-RUN TOUR
+// =====================================================================
+const TOUR_STEPS = [
+  { title:"Welcome!", body:"This is a 3D disaster-relief robotics simulation. An autonomous robot clears storm debris, sorts it into the right bins, and restores power to the city. Let's take a quick look around." },
+  { title:"Meet the Robot", body:"By default the robot drives itself - scanning for debris, picking it up, sorting red/green debris into the Hazardous/Recyclable bins, and clearing fallen trees to the Landfill bin or just off the road." },
+  { title:"Build Menu", body:'Tap "Build Menu" to add houses, roads, bins, trees, and more. Turn on Edit Mode to drag anything into place, rotate it, or delete it.' },
+  { title:"Camera & Controls", body:'Drag to orbit, scroll or pinch to zoom. Try "Robot View" for a first-person ride. "Pause" freezes the whole simulation anytime.' },
+  { title:"Take the Wheel", body:'Hit "Manual Drive" to take control yourself - arrow keys or WASD to drive, Space to open/close the gripper, Q/E to raise/lower the arm. On touch devices, a D-pad appears in the corner.' },
+  { title:"Dev Tools", body:"For the curious: a password-protected Dev Tools panel has path visualization and terminal controls. You shouldn't need it though - that's why it's password protected. Have fun!" }
+];
+let tourIndex = 0;
+const tourModal = document.getElementById('tourModal');
+function renderTourStep(){
+  const s = TOUR_STEPS[tourIndex];
+  document.getElementById('tourTitle').textContent = s.title;
+  document.getElementById('tourBody').textContent = s.body;
+  document.getElementById('tourBack').classList.toggle('hidden-btn', tourIndex === 0);
+  document.getElementById('tourNext').textContent = tourIndex === TOUR_STEPS.length-1 ? 'Get Started' : 'Next';
+  const dots = document.getElementById('tourDots');
+  dots.innerHTML = '';
+  TOUR_STEPS.forEach((_,i)=>{
+    const d = document.createElement('span');
+    d.className = 'tourDot' + (i === tourIndex ? ' active' : '');
+    dots.appendChild(d);
+  });
+}
+function openTour(){ tourIndex = 0; renderTourStep(); tourModal.classList.add('show'); }
+function closeTour(){
+  tourModal.classList.remove('show');
+  try { localStorage.setItem('disaster_relief_tour_seen', '1'); } catch(e){}
+}
+function maybeStartTour(){
+  let seen = false;
+  try { seen = localStorage.getItem('disaster_relief_tour_seen') === '1'; } catch(e){}
+  if (!seen) setTimeout(openTour, 500);
+}
+document.getElementById('tourNext').onclick = ()=>{
+  if (tourIndex >= TOUR_STEPS.length-1){ closeTour(); return; }
+  tourIndex++; renderTourStep();
+};
+document.getElementById('tourBack').onclick = ()=>{ if (tourIndex > 0){ tourIndex--; renderTourStep(); } };
+document.getElementById('tourSkip').onclick = closeTour;
+tourModal.addEventListener('click', e=>{ if (e.target === tourModal) closeTour(); });
+document.getElementById('replayTourLink').addEventListener('click', e=>{ e.preventDefault(); openTour(); });
+
+const STATE_LABELS = {
+  seek:'Scanning for debris...', toDebris:'Driving to debris...', lowerArm:'Lowering arm...',
+  grab:'Picking up debris...', lift:'Lifting debris...', toBin:'Driving to drop-off point...',
+  lowerArm2:'Lowering arm...', release:'Dropping off debris...', liftAfter:'Raising arm...',
+  toSubstation:'Heading to substation...', parkHome:'Returning to Start/Home...',
+  idle:'Idle - all clear!'
+};
+function robotStatusLabel(){
+  if (manualControl) return 'Manual Control - you\'re driving!';
+  if (simPaused) return 'Paused - ' + (STATE_LABELS[robotState] || robotState);
+  let label = STATE_LABELS[robotState] || robotState;
+  if (isClearingTree && (robotState==='toBin'||robotState==='lowerArm2'||robotState==='release'||robotState==='lift')) label = 'Clearing tree off the road...';
+  return 'Status: ' + label;
+}
+
 // ---- Export as standalone HTML ----
-document.getElementById('exportBtn').onclick = ()=>{
-  const serial = parts.map(p=>{
+function serializeParts(){
+  return parts.map(p=>{
     const o = {type:p.type, x:+p.obj3d.position.x.toFixed(2), z:+p.obj3d.position.z.toFixed(2)};
     if (p.color!==undefined) o.color = p.color;
     if (p.labels) o.labels = p.labels;
@@ -1125,8 +2289,10 @@ document.getElementById('exportBtn').onclick = ()=>{
     else { const ry = +p.obj3d.rotation.y.toFixed(3); if (ry) o.rot = ry; }
     return o;
   });
+}
+document.getElementById('exportBtn').onclick = ()=>{
   const exportPayload = {
-    parts: serial,
+    parts: serializeParts(),
     env: { terrain: currentTerrain, weather: currentWeather, robotDesign: currentRobotDesign }
   };
   const stateScript = document.getElementById('state-data');
@@ -1144,7 +2310,7 @@ document.getElementById('exportBtn').onclick = ()=>{
 };
 
 // =====================================================================
-// ROBOT NAVIGATION — always re-targets live part positions, so moved
+// ROBOT NAVIGATION - always re-targets live part positions, so moved
 // or newly added debris/bins/substations are automatically picked up.
 // =====================================================================
 let pathQueue = [];
@@ -1190,13 +2356,31 @@ function roadBFS(startTile, endTile){
   }
   return null;
 }
+function tileCenterlinePoint(tile, x, z){
+  // projects (x,z) onto this road tile's own centerline, clamped to its extent - // keeps travel aligned with the road instead of cutting diagonally to a raw tile center
+  const cx = tile.obj3d.position.x, cz = tile.obj3d.position.z;
+  const half = tile.length/2;
+  if (tile.rot === 1){ // vertical tile: centerline runs along z
+    return { x:cx, z: Math.max(cz-half, Math.min(cz+half, z)) };
+  }
+  return { x: Math.max(cx-half, Math.min(cx+half, x)), z:cz }; // horizontal: centerline runs along x
+}
 function startPath(toX,toZ){
   const fromX = robot.group.position.x, fromZ = robot.group.position.z;
   const startTile = nearestRoadTile(fromX,fromZ);
   const endTile = nearestRoadTile(toX,toZ);
   if (!startTile || !endTile){ pathQueue = [{x:toX,z:toZ}]; return; }
   const tilePath = roadBFS(startTile,endTile) || [startTile,endTile];
-  const pts = tilePath.map(t=>({x:t.obj3d.position.x, z:t.obj3d.position.z}));
+  const pts = [];
+  for (let i=0;i<tilePath.length;i++){
+    const tile = tilePath[i];
+    if (i === tilePath.length-1){
+      pts.push(tileCenterlinePoint(tile, toX, toZ));
+    } else {
+      const nextTile = tilePath[i+1];
+      pts.push(tileCenterlinePoint(tile, nextTile.obj3d.position.x, nextTile.obj3d.position.z));
+    }
+  }
   pts.push({x:toX,z:toZ});
   pathQueue = pts;
 }
@@ -1237,12 +2421,15 @@ let activeDebris = null, activeBin = null;
 let isClearingTree = false, activeClearTarget = null;
 let armTargetAngle = -0.15, gripOpen = true;
 
-function updateRobot(delta){
+function easeRobotAnimatronics(delta){
   robot.armPivot.rotation.x = ease(robot.armPivot.rotation.x, armTargetAngle, delta, 4);
   const fingerTarget = gripOpen ? 0.5 : 0.08;
   robot.fingerPivotL.rotation.y = ease(robot.fingerPivotL.rotation.y, fingerTarget, delta, 6);
   robot.fingerPivotR.rotation.y = ease(robot.fingerPivotR.rotation.y, -fingerTarget, delta, 6);
   robot.beacon.material.emissiveIntensity = 0.8 + Math.sin(performance.now()*0.006)*0.6;
+}
+function updateRobot(delta){
+  easeRobotAnimatronics(delta);
 
   switch(robotState){
     case 'seek': {
@@ -1274,6 +2461,8 @@ function updateRobot(delta){
         robot.gripperGroup.updateMatrixWorld();
         d.obj3d.position.copy(robot.gripperGroup.worldToLocal(worldPos.clone()));
         d.collected = true;
+        playClick();
+        logEvent(`Picked up ${d.type} at (${worldPos.x.toFixed(1)}, ${worldPos.z.toFixed(1)}).`);
         if (d.type === 'tree'){
           // a big storm-downed tree just gets muscled clear of the road, not hauled to a bin
           isClearingTree = true;
@@ -1314,11 +2503,14 @@ function updateRobot(delta){
         const d = activeDebris, bin = activeBin;
         if (d && partsById.has(d.id)){
           root.add(d.obj3d);
+          playThud();
           if (!isClearingTree && bin && partsById.has(bin.id)){
             const slot = bin.dropCount++;
             d.obj3d.position.set(bin.obj3d.position.x - 0.8 + (slot%3)*0.6, 0.65 + Math.floor(slot/3)*0.35, bin.obj3d.position.z - 0.9);
+            logEvent(`Delivered ${d.type} to ${bin.binType} bin.`);
           } else {
             d.obj3d.position.y = 0.19;
+            if (isClearingTree) logEvent('Tree cleared off the road.');
           }
           d.obj3d.rotation.set(0,0,0);
         }
@@ -1334,7 +2526,8 @@ function updateRobot(delta){
       const tx = sub.obj3d.position.x - 1.0, tz = ROAD_Z;
       if (chaseTo(tx,tz,delta)){
         if (sub.button) sub.button.userData.pressed = true;
-        triggerPower('🤖 Cleanup Complete — City Lights ON');
+        playButtonBeep();
+        triggerPower('Cleanup Complete - City Lights ON');
         chaseTarget = null; robotState = 'parkHome';
       }
       break;
@@ -1355,9 +2548,24 @@ function animate(){
   requestAnimationFrame(animate);
   const delta = Math.min(clock.getDelta(), 0.05);
 
-  if (!simPaused) updateRobot(delta);
+  if (manualControl){
+    updateManualDrive(delta);
+  } else if (!simPaused){
+    updateRobot(delta * robotSpeedMultiplier);
+    if (forcedState) robotState = forcedState;
+  }
+  const moveDist = Math.hypot(robot.group.position.x-lastRobotPos.x, robot.group.position.z-lastRobotPos.z);
+  updateMotorSound(moveDist > 0.0015, moveDist/Math.max(delta,0.0001));
+  lastRobotPos.x = robot.group.position.x; lastRobotPos.z = robot.group.position.z;
   updateWeatherParticles(delta);
+  updateTrail();
+  updateRoutePreview();
+  if (minimapVisible) drawMinimap();
+  if (bboxVisible) bboxGroup.children.forEach(h=> h.update && h.update());
 
+  if (manualControl && !robotView && !followCam){
+    robotStatusEl.style.display = 'block';
+  }
   if (robotView){
     robot.group.updateMatrixWorld();
     const eyeLocal = new THREE.Vector3(0, 1.0, 0.9);
@@ -1369,9 +2577,19 @@ function animate(){
     const look = robot.group.localToWorld(lookLocal);
     camera.position.copy(eye);
     camera.lookAt(look);
-    let label = STATE_LABELS[robotState] || robotState;
-    if (isClearingTree && (robotState==='toBin'||robotState==='lowerArm2'||robotState==='release'||robotState==='lift')) label = '🌳 Clearing tree off the road...';
-    robotStatusEl.textContent = (simPaused ? '⏸ Paused — ' : 'Status: ') + label;
+    robotStatusEl.textContent = robotStatusLabel();
+  } else if (followCam){
+    robot.group.updateMatrixWorld();
+    const eyeWorld = robot.group.localToWorld(new THREE.Vector3(0, 2.6, -4.2));
+    const lookWorld = robot.group.localToWorld(new THREE.Vector3(0, 0.8, 2.5));
+    if (!followCamPos){ followCamPos = eyeWorld.clone(); followCamLook = lookWorld.clone(); }
+    followCamPos.lerp(eyeWorld, Math.min(1, delta*3));
+    followCamLook.lerp(lookWorld, Math.min(1, delta*3));
+    camera.position.copy(followCamPos);
+    camera.lookAt(followCamLook);
+    robotStatusEl.textContent = robotStatusLabel();
+  } else if (manualControl){
+    robotStatusEl.textContent = robotStatusLabel();
   }
 
   if (!simPaused){
@@ -1384,7 +2602,7 @@ function animate(){
     }
   });
 
-  if (poweredOn){
+  if (poweredOn || forceLightsOn){
     bulbMat.emissiveIntensity = ease(bulbMat.emissiveIntensity, 2.6, delta, 1.2);
     bulbMat.color.lerp(new THREE.Color(0xffe08a), delta*1.0);
     bulbMat.emissive.lerp(new THREE.Color(0xffaa33), delta*1.0);
