@@ -57,6 +57,15 @@
   .tbtn.active { background:#3ad1ff; color:#0a1a22; font-weight:bold; }
   .tbtn:disabled { opacity:0.35; cursor:default; }
   .tbtn.wide { flex:1 1 100%; }
+  select.tbtn {
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    background-image:linear-gradient(#2a2f45,#2a2f45), linear-gradient(45deg, transparent 50%, #9fd 50%), linear-gradient(135deg, #9fd 50%, transparent 50%);
+    background-position: 0 0, calc(100% - 16px) center, calc(100% - 11px) center;
+    background-size: 100% 100%, 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right:22px;
+  }
+  select.tbtn option { background:#1c2036; color:#eee; }
   #toolbar hr { border:none; border-top:1px solid rgba(255,255,255,0.12); margin:8px 0; }
   #hint { font-size:11px; color:#bcd; line-height:1.4; min-height:28px; }
   #toolbarToggle {
@@ -84,6 +93,24 @@
   @media (max-width: 420px) {
     #info { display:none; }
   }
+  #disclaimer {
+    position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+    background:rgba(6,8,16,0.88); backdrop-filter:blur(2px); padding:20px;
+    opacity:1; transition:opacity 0.35s ease;
+  }
+  #disclaimer.hidden { opacity:0; pointer-events:none; }
+  #disclaimerCard {
+    max-width:440px; width:100%; background:#161a2c; border:1px solid rgba(255,255,255,0.14);
+    border-radius:14px; padding:26px 24px; color:#eee; box-shadow:0 12px 40px rgba(0,0,0,0.5);
+    text-align:center;
+  }
+  #disclaimerCard h2 { margin:0 0 12px 0; font-size:19px; color:#ffd27a; }
+  #disclaimerCard p { margin:0 0 10px 0; font-size:14px; line-height:1.55; color:#d3d8e6; text-align:left; }
+  #disclaimerCard button {
+    margin-top:14px; background:#3ad1ff; color:#0a1a22; border:none; border-radius:8px;
+    padding:13px 22px; font-size:14.5px; font-weight:bold; cursor:pointer; touch-action:manipulation;
+  }
+  #disclaimerCard button:hover { background:#63dcff; }
   canvas { display:block; cursor:grab; touch-action:none; }
 </style>
 </head>
@@ -91,6 +118,14 @@
 <div id="info"><b>Disaster Relief Robotics Board</b><br>Drag to rotate · Scroll to zoom<br>Click the red HIGH VOLTAGE button anytime<br>Build your own road network — the robot pathfinds across whatever roads you place<br>In Robot View, drag to look around</div>
 <div id="toast">⚡ Power Restored — City Lights ON</div>
 <div id="vignette"></div>
+<div id="disclaimer">
+  <div id="disclaimerCard">
+    <h2>⚠️ This Is Only a Simulation</h2>
+    <p>This 3D board and robot are an educational, illustrative simulation. It is not a physics-accurate model and does not reflect how a real robot, real terrain, real electrical equipment, or a real disaster-response scenario would actually behave.</p>
+    <p>Please don't use it to make real-world safety, engineering, or operational decisions.</p>
+    <button id="disclaimerBtn">I Understand — Enter Simulation</button>
+  </div>
+</div>
 <button id="pauseToggle">⏸ Pause</button>
 <button id="povToggle">🤖 Robot View</button>
 <div id="robotStatus">Status: —</div>
@@ -130,6 +165,35 @@
   </div>
   <div class="row">
     <button class="tbtn wide" id="deleteBtn" disabled>Delete Selected</button>
+  </div>
+  <hr>
+  <h4>ENVIRONMENT</h4>
+  <div class="row">
+    <select id="terrainSelect" class="tbtn wide">
+      <option value="grass">🌱 Terrain: Grass</option>
+      <option value="desert">🏜️ Terrain: Desert</option>
+      <option value="snow">❄️ Terrain: Snowy Ground</option>
+      <option value="urban">🏙️ Terrain: Urban Concrete</option>
+      <option value="autumn">🍂 Terrain: Autumn</option>
+    </select>
+  </div>
+  <div class="row">
+    <select id="weatherSelect" class="tbtn wide">
+      <option value="clear">☀️ Weather: Clear</option>
+      <option value="rain">🌧️ Weather: Rain</option>
+      <option value="snow">🌨️ Weather: Snow</option>
+      <option value="fog">🌫️ Weather: Heavy Fog</option>
+      <option value="night">🌙 Weather: Night</option>
+    </select>
+  </div>
+  <div class="row">
+    <select id="robotDesignSelect" class="tbtn wide">
+      <option value="rescue">🟧 Robot: Rescue Orange</option>
+      <option value="arctic">⬜ Robot: Arctic Rescue</option>
+      <option value="stealth">⬛ Robot: Stealth Ops</option>
+      <option value="safety">🟨 Robot: Safety Yellow</option>
+      <option value="crimson">🟥 Robot: Crimson Response</option>
+    </select>
   </div>
   <hr>
   <div class="row">
@@ -179,6 +243,31 @@ const grassTex = makeTexture(384,384,(ctx,w,h)=>{
   for(let i=0;i<26;i++){ const x=Math.random()*w,y=Math.random()*h,r=14+Math.random()*26; const g=ctx.createRadialGradient(x,y,0,x,y,r); const dark=Math.random()>0.5; g.addColorStop(0, dark?'rgba(60,90,50,0.32)':'rgba(150,185,110,0.28)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
   // worn dirt / bare patches
   for(let i=0;i<8;i++){ const x=Math.random()*w,y=Math.random()*h,r=8+Math.random()*16; const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba(120,95,60,0.35)'); g.addColorStop(1,'rgba(120,95,60,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+},11,6);
+const desertTex = makeTexture(384,384,(ctx,w,h)=>{
+  ctx.fillStyle='#c9a869'; ctx.fillRect(0,0,w,h);
+  for(let i=0;i<3200;i++){ const x=Math.random()*w,y=Math.random()*h; ctx.fillStyle=Math.random()>0.5?'rgba(170,140,90,0.4)':'rgba(225,200,150,0.35)'; ctx.fillRect(x,y,2,2); }
+  for(let i=0;i<20;i++){ const x=Math.random()*w,y=Math.random()*h,r=10+Math.random()*22; const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba(140,110,70,0.3)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+  for(let i=0;i<14;i++){ const x=Math.random()*w,y=Math.random()*h; ctx.fillStyle='rgba(120,90,55,0.5)'; ctx.beginPath(); ctx.ellipse(x,y,3+Math.random()*4,2+Math.random()*3,Math.random()*Math.PI,0,Math.PI*2); ctx.fill(); }
+},11,6);
+const snowTex = makeTexture(384,384,(ctx,w,h)=>{
+  ctx.fillStyle='#eef3f7'; ctx.fillRect(0,0,w,h);
+  for(let i=0;i<2600;i++){ const x=Math.random()*w,y=Math.random()*h; ctx.fillStyle=Math.random()>0.5?'rgba(210,222,235,0.5)':'rgba(255,255,255,0.5)'; ctx.fillRect(x,y,2,2); }
+  for(let i=0;i<22;i++){ const x=Math.random()*w,y=Math.random()*h,r=14+Math.random()*24; const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba(180,196,214,0.3)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+},11,6);
+const urbanTex = makeTexture(384,384,(ctx,w,h)=>{
+  ctx.fillStyle='#9a9a94'; ctx.fillRect(0,0,w,h);
+  for(let i=0;i<2400;i++){ const x=Math.random()*w,y=Math.random()*h; const v=130+Math.random()*40; ctx.fillStyle=`rgba(${v},${v},${v-4},0.35)`; ctx.fillRect(x,y,2,2); }
+  ctx.strokeStyle='rgba(60,60,58,0.5)'; ctx.lineWidth=2;
+  for(let x=0;x<w;x+=48){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+  for(let y=0;y<h;y+=48){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+  for(let i=0;i<10;i++){ const x=Math.random()*w,y=Math.random()*h; ctx.fillStyle='rgba(40,40,38,0.25)'; ctx.fillRect(x,y,20+Math.random()*20,4+Math.random()*4); }
+},11,6);
+const autumnTex = makeTexture(384,384,(ctx,w,h)=>{
+  ctx.fillStyle='#8a7a4a'; ctx.fillRect(0,0,w,h);
+  const leafColors = ['rgba(196,110,40,0.55)','rgba(214,160,40,0.5)','rgba(160,60,30,0.5)','rgba(120,90,40,0.4)'];
+  for(let i=0;i<1600;i++){ const x=Math.random()*w,y=Math.random()*h; ctx.fillStyle=leafColors[Math.floor(Math.random()*leafColors.length)]; ctx.fillRect(x,y,3,3); }
+  for(let i=0;i<18;i++){ const x=Math.random()*w,y=Math.random()*h,r=12+Math.random()*20; const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba(90,70,30,0.3)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
 },11,6);
 const roadTex = makeTexture(384,384,(ctx,w,h)=>{
   ctx.fillStyle='#171717'; ctx.fillRect(0,0,w,h);
@@ -248,7 +337,8 @@ const starGeo = new THREE.BufferGeometry();
 starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions,3));
 scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({color:0xffffff, size:1.1, sizeAttenuation:true, transparent:true, opacity:0.75, fog:false})));
 
-scene.add(new THREE.HemisphereLight(0x8fa3d8, 0x3a2f22, 0.65));
+const hemi = new THREE.HemisphereLight(0x8fa3d8, 0x3a2f22, 0.65);
+scene.add(hemi);
 scene.add(new THREE.AmbientLight(0xffffff, 0.18));
 const key = new THREE.DirectionalLight(0xffd9a0, 1.15);
 key.position.set(26, 20, 14);
@@ -335,6 +425,103 @@ root.add(startSquare);
 const startSign = makeLabel('Start / Home', 2.6, 0.8, '#e9d9b8');
 startSign.position.set(HOME.x, 1.6, HOME.z-2.8); startSign.rotation.x = -0.15;
 root.add(startSign);
+
+// =====================================================================
+// ENVIRONMENT — terrain, weather, and robot-design presets, all
+// switchable live from the toolbar.
+// =====================================================================
+const TERRAIN_THEMES = {
+  grass:  { tex:grassTex,  bump:0.035 },
+  desert: { tex:desertTex, bump:0.028 },
+  snow:   { tex:snowTex,   bump:0.02 },
+  urban:  { tex:urbanTex,  bump:0.012 },
+  autumn: { tex:autumnTex, bump:0.03 }
+};
+function setTerrain(themeKey){
+  const t = TERRAIN_THEMES[themeKey];
+  if (!t) return;
+  currentTerrain = themeKey;
+  ground.material.map = t.tex;
+  ground.material.bumpScale = t.bump;
+  ground.material.needsUpdate = true;
+}
+
+function buildWeatherParticles(count, colorHex, size, opacity){
+  const positions = new Float32Array(count*3);
+  for (let i=0;i<count;i++){
+    positions[i*3]   = -20 + Math.random()*55;
+    positions[i*3+1] = Math.random()*30;
+    positions[i*3+2] = -10 + Math.random()*30;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  const mat = new THREE.PointsMaterial({color:colorHex, size, transparent:true, opacity, fog:false, sizeAttenuation:true, depthWrite:false});
+  const pts = new THREE.Points(geo, mat);
+  pts.visible = false;
+  scene.add(pts);
+  return pts;
+}
+const rainParticles = buildWeatherParticles(IS_MOBILE?220:480, 0xaac8ff, 0.5, 0.55);
+const snowParticles = buildWeatherParticles(IS_MOBILE?180:380, 0xffffff, 0.6, 0.85);
+
+const WEATHER_PRESETS = {
+  clear: { fogColor:0x262c4d, fogNear:55,  fogFar:135, sky:0xffffff, key:1.15, hemi:0.65 },
+  rain:  { fogColor:0x394157, fogNear:25,  fogFar:95,  sky:0x8f97ab, key:0.55, hemi:0.5  },
+  snow:  { fogColor:0xdfe6ef, fogNear:35,  fogFar:115, sky:0xdfe6ef, key:0.85, hemi:0.7  },
+  fog:   { fogColor:0xaab0bd, fogNear:8,   fogFar:48,  sky:0xaab0bd, key:0.6,  hemi:0.55 },
+  night: { fogColor:0x0a0d1c, fogNear:30,  fogFar:90,  sky:0x30355a, key:0.25, hemi:0.28 }
+};
+let currentWeather = 'clear';
+let currentTerrain = 'grass';
+let currentRobotDesign = 'rescue';
+function setWeather(name){
+  const w = WEATHER_PRESETS[name];
+  if (!w) return;
+  currentWeather = name;
+  rainParticles.visible = (name === 'rain');
+  snowParticles.visible = (name === 'snow');
+  scene.fog.color.set(w.fogColor);
+  scene.fog.near = w.fogNear;
+  scene.fog.far = w.fogFar;
+  skyDome.material.color.set(w.sky);
+  key.intensity = w.key;
+  hemi.intensity = w.hemi;
+}
+function updateWeatherParticles(delta){
+  if (rainParticles.visible){
+    const pos = rainParticles.geometry.attributes.position.array;
+    for (let i=0;i<pos.length;i+=3){
+      pos[i+1] -= 40*delta;
+      if (pos[i+1] < 0){ pos[i+1] = 28+Math.random()*4; pos[i] = -20+Math.random()*55; pos[i+2] = -10+Math.random()*30; }
+    }
+    rainParticles.geometry.attributes.position.needsUpdate = true;
+  }
+  if (snowParticles.visible){
+    const pos = snowParticles.geometry.attributes.position.array;
+    const t = performance.now()*0.001;
+    for (let i=0;i<pos.length;i+=3){
+      pos[i+1] -= 4*delta;
+      pos[i] += Math.sin(t + i)*0.02;
+      if (pos[i+1] < 0){ pos[i+1] = 28+Math.random()*4; pos[i] = -20+Math.random()*55; pos[i+2] = -10+Math.random()*30; }
+    }
+    snowParticles.geometry.attributes.position.needsUpdate = true;
+  }
+}
+
+const ROBOT_DESIGNS = {
+  rescue:  { body:0xff7a1a, accent:0xc6e83a },
+  arctic:  { body:0xf2f5f7, accent:0x3ad1ff },
+  stealth: { body:0x2b2b2e, accent:0xff3b30 },
+  safety:  { body:0xffd400, accent:0x1a1a1a },
+  crimson: { body:0xc0392b, accent:0xffd400 }
+};
+function setRobotDesign(designKey){
+  const d = ROBOT_DESIGNS[designKey];
+  if (!d) return;
+  currentRobotDesign = designKey;
+  robot.materials.body.color.set(d.body);
+  robot.materials.accent.color.set(d.accent);
+}
 
 // =====================================================================
 // PART BUILDERS — every buildable/movable object. Each returns an
@@ -551,7 +738,8 @@ function buildSpikeRobot(){
   const pivotR = new THREE.Group(); pivotR.position.set(0.08,0,-0.16); pivotR.add(fingerR); fingerR.position.set(0.16,0,0); gripperGroup.add(pivotR);
   const ao = makeAO(1.7,1.3); ao.position.set(0,0.01,0);
   g.add(ao);
-  return { group:g, wheels, armPivot, gripperGroup, fingerPivotL:pivotL, fingerPivotR:pivotR, beacon, ao };
+  return { group:g, wheels, armPivot, gripperGroup, fingerPivotL:pivotL, fingerPivotR:pivotR, beacon, ao,
+    materials: { body:orange, accent:lime, chassis:grey, hub:dark } };
 }
 const robot = buildSpikeRobot();
 robot.group.scale.set(1.55, 1.55, 1.55);
@@ -657,11 +845,28 @@ const DEFAULT_STATE = [
   {type:'tree', x:2.0, z:5.19, rot:0.35},
 ];
 let INITIAL_STATE = DEFAULT_STATE;
+let INITIAL_ENV = null;
 const stateEl = document.getElementById('state-data');
 if (stateEl && stateEl.textContent.trim()){
-  try { const parsed = JSON.parse(stateEl.textContent); if (Array.isArray(parsed) && parsed.length) INITIAL_STATE = parsed; } catch(e){}
+  try {
+    const parsed = JSON.parse(stateEl.textContent);
+    if (Array.isArray(parsed) && parsed.length){
+      INITIAL_STATE = parsed; // legacy export format: a bare parts array
+    } else if (parsed && Array.isArray(parsed.parts) && parsed.parts.length){
+      INITIAL_STATE = parsed.parts;
+      INITIAL_ENV = parsed.env || null;
+    }
+  } catch(e){}
 }
 loadState(INITIAL_STATE);
+if (INITIAL_ENV){
+  setTerrain(INITIAL_ENV.terrain || 'grass');
+  setWeather(INITIAL_ENV.weather || 'clear');
+  setRobotDesign(INITIAL_ENV.robotDesign || 'rescue');
+  const tSel = document.getElementById('terrainSelect'); if (tSel) tSel.value = currentTerrain;
+  const wSel = document.getElementById('weatherSelect'); if (wSel) wSel.value = currentWeather;
+  const rSel = document.getElementById('robotDesignSelect'); if (rSel) rSel.value = currentRobotDesign;
+}
 
 // =====================================================================
 // CAMERA ORBIT + EDIT MODE (select / drag / add / delete / export)
@@ -706,7 +911,7 @@ function triggerPower(msg){
 }
 function getAllButtons(){ return parts.filter(p=>p.type==='substation' && p.button).map(p=>p.button); }
 let poweredOn = false;
-let simPaused = false;
+let simPaused = true; // held paused until the disclaimer is acknowledged
 let robotView = false;
 let isLooking = false;
 let povYaw = 0, povPitch = 0;
@@ -855,6 +1060,11 @@ function updateEditModeUI(){
 }
 document.getElementById('editToggle').onclick = ()=>{ editMode = !editMode; if(!editMode) selectPart(null); updateEditModeUI(); };
 
+// ---- Environment controls ----
+document.getElementById('terrainSelect').onchange = e => setTerrain(e.target.value);
+document.getElementById('weatherSelect').onchange = e => setWeather(e.target.value);
+document.getElementById('robotDesignSelect').onchange = e => setRobotDesign(e.target.value);
+
 // ---- Mobile build-menu toggle ----
 const toolbarToggleBtn = document.getElementById('toolbarToggle');
 const toolbarEl = document.getElementById('toolbar');
@@ -866,10 +1076,23 @@ updateEditModeUI();
 
 // ---- Pause / Resume simulation ----
 const pauseBtn = document.getElementById('pauseToggle');
+pauseBtn.textContent = simPaused ? '▶ Resume' : '⏸ Pause';
+pauseBtn.classList.toggle('active', simPaused);
 pauseBtn.onclick = ()=>{
   simPaused = !simPaused;
   pauseBtn.textContent = simPaused ? '▶ Resume' : '⏸ Pause';
   pauseBtn.classList.toggle('active', simPaused);
+};
+
+// ---- First-load disclaimer gate ----
+const disclaimerEl = document.getElementById('disclaimer');
+document.getElementById('disclaimerBtn').onclick = ()=>{
+  disclaimerEl.classList.add('hidden');
+  setTimeout(()=>{ disclaimerEl.style.display = 'none'; }, 400);
+  simPaused = false;
+  pauseBtn.textContent = '⏸ Pause';
+  pauseBtn.classList.remove('active');
+  clock.getDelta(); // discard the time spent sitting on the disclaimer
 };
 
 // ---- Robot POV camera ----
@@ -902,8 +1125,12 @@ document.getElementById('exportBtn').onclick = ()=>{
     else { const ry = +p.obj3d.rotation.y.toFixed(3); if (ry) o.rot = ry; }
     return o;
   });
+  const exportPayload = {
+    parts: serial,
+    env: { terrain: currentTerrain, weather: currentWeather, robotDesign: currentRobotDesign }
+  };
   const stateScript = document.getElementById('state-data');
-  stateScript.textContent = JSON.stringify(serial);
+  stateScript.textContent = JSON.stringify(exportPayload);
   const clone = document.documentElement.cloneNode(true);
   const canvasEl = clone.querySelector('canvas');
   if (canvasEl) canvasEl.remove();
@@ -1129,6 +1356,7 @@ function animate(){
   const delta = Math.min(clock.getDelta(), 0.05);
 
   if (!simPaused) updateRobot(delta);
+  updateWeatherParticles(delta);
 
   if (robotView){
     robot.group.updateMatrixWorld();
