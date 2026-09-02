@@ -4,322 +4,294 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Elf Box Preorder | iPrint Keychains</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%236366f1' width='100' height='100' rx='20'/><text x='50' y='65' font-size='60' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>K</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>K</text></svg>">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-    :root {
-        --primary: #6366f1;
-        --primary-dark: #4f46e5;
-        --primary-light: #a5b4fc;
-        --secondary: #e0e7ff;
-        --accent: #06b6d4;
-        --text-dark: #0f172a;
-        --text-light: #64748b;
-        --bg-light: #f8fafc;
-        --border-radius: 16px;
-        --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-        --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --common: #4C9A63;
+    --rare: #3E7CB1;
+    --epic: #8B5FBF;
+    --gold: #C9971F;
+    --xmas-green: #14532D;
+    --xmas-green-bright: #3FA96B;
+    --xmas-red: #C1272D;
+    --xmas-gold: #E0B94A;
+}
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
-    html {
-        scroll-behavior: smooth;
-    }
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--kraft);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 100%);
-        color: var(--text-dark);
-        line-height: 1.6;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+h1, h2, .display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+a { color: inherit; }
 
-    header {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #06b6d4 100%);
-        padding: 80px 20px 60px;
-        text-align: center;
-        color: white;
-        position: relative;
-        overflow: hidden;
-    }
+a:focus-visible, .btn:focus-visible, .navlink:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--rare);
+    outline-offset: 3px;
+}
 
-    header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 500px;
-        height: 500px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        animation: float 6s ease-in-out infinite;
-    }
+/* NAV */
+nav.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 26px 24px;
+    width: 100%;
+}
 
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) translateX(0px); }
-        50% { transform: translateY(-20px) translateX(-10px); }
-    }
+.wordmark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: inherit;
+}
 
-    header h1 {
-        font-family: 'Playfair Display', serif;
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 15px;
-        position: relative;
-        z-index: 1;
-        animation: slideDown 0.8s ease-out;
-        letter-spacing: -1px;
-    }
+.logo-dot {
+    width: 20px;
+    height: 26px;
+    border-radius: 4px;
+    background: var(--rare);
+    border: 2.5px solid var(--ink);
+}
 
-    header p {
-        font-size: 1.15rem;
-        font-weight: 300;
-        position: relative;
-        z-index: 1;
-        animation: slideUp 0.8s ease-out 0.2s both;
-        opacity: 0.95;
-    }
+.navlink {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 2px solid transparent;
+}
 
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+.navlink:hover { border-color: var(--ink); }
 
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+/* HERO */
+header.hero {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 24px 50px;
+    text-align: center;
+}
 
-    main {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        padding: 60px 20px 80px;
-    }
+header.hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
 
-    .container {
-        background: white;
-        width: 100%;
-        max-width: 540px;
-        padding: 40px;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-md);
-        animation: fadeInUp 0.6s ease-out backwards;
-        animation-delay: 0.1s;
-    }
+.xmas-word-red { color: var(--xmas-red); }
+.xmas-word-green { color: var(--xmas-green-bright); }
 
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+header.hero p {
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    max-width: 46ch;
+    margin: 0 auto;
+}
 
-    .container h2 {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.8rem;
-        font-weight: 600;
-        margin-bottom: 8px;
-        text-align: center;
-        color: var(--text-dark);
-    }
+/* MAIN / FORM CARD */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0 24px 90px;
+}
 
-    .container > p.subtitle {
-        text-align: center;
-        color: var(--text-light);
-        font-size: 0.95rem;
-        margin-bottom: 8px;
-    }
+.form-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--face);
+    border: 4px solid var(--xmas-red);
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    padding: 34px 30px 38px;
+}
 
-    .price-tag {
-        display: block;
-        text-align: center;
-        font-family: 'Playfair Display', serif;
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: var(--primary);
-        margin-bottom: 30px;
-    }
+.form-card h2 {
+    font-family: 'Anton', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 8px;
+}
 
-    .price-tag span {
-        font-size: 0.85rem;
-        font-weight: 400;
-        font-family: 'Poppins', sans-serif;
-        color: var(--text-light);
-        display: block;
-        margin-top: 2px;
-    }
+.form-card > p.subtitle {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    margin-bottom: 18px;
+}
 
-    label {
-        display: block;
-        margin-top: 18px;
-        margin-bottom: 6px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--text-dark);
-    }
+.price-tag {
+    display: block;
+    text-align: center;
+    font-family: 'Anton', sans-serif;
+    font-size: 2.2rem;
+    color: var(--xmas-red);
+    margin-bottom: 2px;
+}
 
-    input, select, textarea {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 1rem;
-        font-family: 'Poppins', sans-serif;
-        color: var(--text-dark);
-        background: var(--bg-light);
-        transition: var(--transition);
-    }
+.price-tag span {
+    font-size: 0.8rem;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink-soft);
+    display: block;
+    margin-top: 2px;
+}
 
-    input:focus, select:focus, textarea:focus {
-        outline: none;
-        border-color: var(--primary);
-        background: white;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-    }
+.shipping-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+}
 
-    textarea {
-        height: 100px;
-        resize: vertical;
-    }
+label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--ink);
+}
 
-    button {
-        width: 100%;
-        margin-top: 28px;
-        padding: 16px;
-        border: none;
-        border-radius: 999px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: white;
-        font-size: 1.05rem;
-        font-weight: 600;
-        font-family: 'Poppins', sans-serif;
-        cursor: pointer;
-        transition: var(--transition);
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
+.field-hint {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+    display: block;
+    margin-top: -2px;
+    margin-bottom: 6px;
+}
 
-    button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.2);
-        transition: left 0.5s ease;
-        z-index: -1;
-    }
+input, select, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--kraft-line);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background: var(--kraft);
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
 
-    button:hover::before {
-        left: 100%;
-    }
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232B2012' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+}
 
-    button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-    }
+input:focus, select:focus, textarea:focus {
+    border-color: var(--rare);
+    background: var(--face);
+}
 
-    button:active {
-        transform: translateY(-1px);
-    }
+textarea {
+    height: 80px;
+    resize: vertical;
+}
 
-    button:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-        transform: none;
-    }
+button {
+    display: block;
+    width: 100%;
+    margin-top: 28px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2.5px solid var(--ink);
+    background: var(--rare);
+    color: var(--face);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
 
-    #status {
-        margin-top: 18px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 0.95rem;
-        min-height: 1.2em;
-    }
+button:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+button:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
 
-    #status.success {
-        color: #16a34a;
-    }
+button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 4px 4px 0 var(--ink);
+}
 
-    #status.error {
-        color: #dc2626;
-    }
+#status {
+    margin-top: 16px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    min-height: 1.2em;
+}
 
-    #status.loading {
-        color: var(--text-light);
-    }
+#status.success { color: var(--xmas-green-bright); }
+#status.error { color: var(--xmas-red); }
+#status.loading { color: var(--ink-soft); }
 
-    footer {
-        text-align: center;
-        padding: 40px 20px;
-        color: var(--text-light);
-        font-size: 0.9rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
-        background: white;
-    }
+/* FOOTER */
+footer {
+    border-top: 3px solid var(--ink);
+    padding: 32px 24px 44px;
+    text-align: center;
+    font-size: 0.9rem;
+}
 
-    footer a {
-        color: var(--text-light);
-        text-decoration: none;
-        font-weight: 500;
-    }
+@media (max-width: 640px) {
+    .form-card { padding: 28px 22px 32px; }
+}
 
-    @media (max-width: 768px) {
-        header h1 {
-            font-size: 2.2rem;
-        }
-
-        header p {
-            font-size: 1rem;
-        }
-
-        header {
-            padding: 60px 20px 40px;
-        }
-
-        .container {
-            padding: 28px;
-        }
-
-        main {
-            padding: 40px 16px 60px;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        * {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-        }
-    }
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 </style>
 </head>
 <body>
 
-<header>
-    <h1>Elf Box</h1>
-    <p>Preorder your Elf Box! $35</p>
+<nav class="top">
+    <a class="wordmark" href="/"><span class="logo-dot"></span>iPrint Keychains</a>
+    <a class="navlink" href="/">Back to shop</a>
+</nav>
+
+<header class="hero">
+    <h1><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h1>
+    <p>Secure your preorder now and guarantee in time for your elf's return.</p>
 </header>
 
 <main>
-    <div class="container">
-        <h2>Place Your Preorder</h2>
+    <div class="form-card">
+        <h2>Place your preorder</h2>
         <p class="subtitle">Fill out the form below and we'll follow up by email to confirm.</p>
         <p class="price-tag">$35<span>price per Elf Box</span></p>
+        <p class="shipping-note">Shipping is an additional $7 for postage and a padded envelope.</p>
 
         <form id="preorderForm">
             <label for="name">Name</label>
@@ -331,8 +303,20 @@
             <label for="quantity">Quantity</label>
             <input type="number" id="quantity" min="1" value="1" required>
 
-            <label for="notes">Notes</label>
-            <textarea id="notes" placeholder="Any special requests or details for your Elf Box (optional)"></textarea>
+            <label for="payment">How would you like to pay?</label>
+            <select id="payment" required>
+                <option value="" disabled selected>Select a payment method</option>
+                <option value="Venmo (@JenniferNeal1982, last 4 of phone 8675)">Venmo (@JenniferNeal1982), last 4 of phone 8675</option>
+                <option value="Zelle (jks98765@gmail.com)">Zelle (jks98765@gmail.com)</option>
+                <option value="Cash when ready">Cash when ready</option>
+            </select>
+
+            <label for="pickupBy">I would like to pick this up by</label>
+            <input type="text" id="pickupBy" placeholder="Enter a date">
+
+            <label for="address">Address</label>
+            <span class="field-hint">Leave blank if not shipping</span>
+            <textarea id="address" placeholder="Only needed if you would like your Elf Box shipped"></textarea>
 
             <button type="submit" id="submitBtn">Place Preorder</button>
         </form>
@@ -341,7 +325,6 @@
 </main>
 
 <footer>
-    <a href="https://isaacneal.com" target="_blank">Our website</a> 
 </footer>
 
 <script>
@@ -366,7 +349,9 @@
         product: "Elf Box",
         price: "$35",
         quantity: document.getElementById("quantity").value,
-        notes: document.getElementById("notes").value
+        payment: document.getElementById("payment").value,
+        pickupBy: document.getElementById("pickupBy").value,
+        address: document.getElementById("address").value
       };
 
       try {
