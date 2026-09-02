@@ -311,9 +311,6 @@ footer {
                 <option value="Cash when ready">Cash when ready</option>
             </select>
 
-            <label for="pickupBy">I would like to pick this up by</label>
-            <input type="text" id="pickupBy" placeholder="Enter a date">
-
             <label for="address">Address</label>
             <span class="field-hint">Leave blank if not shipping</span>
             <textarea id="address" placeholder="Only needed if you would like your Elf Box shipped"></textarea>
@@ -350,7 +347,6 @@ footer {
         price: "$35",
         quantity: document.getElementById("quantity").value,
         payment: document.getElementById("payment").value,
-        pickupBy: document.getElementById("pickupBy").value,
         address: document.getElementById("address").value
       };
 
