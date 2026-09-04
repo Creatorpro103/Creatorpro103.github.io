@@ -93,6 +93,11 @@ header.hero {
     text-align: center;
 }
 
+.hero-inner {
+    position: relative;
+    z-index: 1;
+}
+
 header.hero h1 {
     font-size: clamp(2rem, 5vw, 3rem);
     line-height: 1.1;
@@ -257,6 +262,23 @@ button:disabled {
 #status.error { color: var(--xmas-red); }
 #status.loading { color: var(--ink-soft); }
 
+.confetti-bit {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    z-index: 65;
+    pointer-events: none;
+    animation: confetti-burst 1s ease-out forwards;
+}
+
+@keyframes confetti-burst {
+    to {
+        transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+        opacity: 0;
+    }
+}
+
 /* FOOTER */
 footer {
     border-top: 3px solid var(--ink);
@@ -265,12 +287,292 @@ footer {
     font-size: 0.9rem;
 }
 
+/* SUCCESS SEQUENCE OVERLAY */
+.success-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: none;
+}
+
+.success-overlay.show { display: block; }
+
+.fade-black {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.fade-black.hide { opacity: 0; }
+
+.night-scene {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: linear-gradient(#0B1B2B, #1C3A57);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 40px 20px 34px;
+    z-index: 5;
+    text-align: center;
+}
+
+.moon {
+    position: absolute;
+    top: 34px;
+    right: 12%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #F4EAD5;
+    box-shadow: 0 0 26px rgba(244,234,213,0.55);
+    z-index: 1;
+}
+
+.shooting-star {
+    position: absolute;
+    top: 16%;
+    left: 6%;
+    width: 64px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
+    border-radius: 2px;
+    opacity: 0;
+    transform: rotate(-28deg);
+    animation: shoot 7s ease-in infinite;
+    z-index: 1;
+}
+
+@keyframes shoot {
+    0% { opacity: 0; transform: translate(0,0) rotate(-28deg); }
+    4% { opacity: 1; }
+    14% { opacity: 0; transform: translate(210px,118px) rotate(-28deg); }
+    100% { opacity: 0; }
+}
+
+.window-glow {
+    animation: window-glow 2.6s ease-in-out infinite;
+}
+
+@keyframes window-glow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+}
+
+.heading-sparkle {
+    position: absolute;
+    top: -8px;
+    width: 14px;
+    height: 14px;
+    background: var(--xmas-gold);
+    clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+}
+
+.heading-sparkle.left { left: -6px; }
+.heading-sparkle.right { right: -6px; top: auto; bottom: -6px; }
+
+.confirmed-heading.show .heading-sparkle {
+    animation: sparkle-pop 0.7s ease-out forwards;
+}
+
+.confirmed-heading.show .heading-sparkle.right {
+    animation-delay: 0.15s;
+}
+
+@keyframes sparkle-pop {
+    0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+    55% { opacity: 1; transform: scale(1.2) rotate(90deg); }
+    100% { opacity: 0.85; transform: scale(0.9) rotate(180deg); }
+}
+
+.stars span {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: twinkle 2.6s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+}
+
+.scene-snow span {
+    position: absolute;
+    top: -10px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.85;
+    animation: scene-snow-fall linear infinite;
+}
+
+@keyframes scene-snow-fall {
+    to { transform: translateY(420px); }
+}
+
+.house-svg {
+    width: 165px;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 2px;
+}
+
+.smoke-puff {
+    animation: smoke-rise 3s ease-out infinite;
+}
+
+.smoke-puff:nth-child(2) { animation-delay: 1s; }
+.smoke-puff:nth-child(3) { animation-delay: 2s; }
+
+@keyframes smoke-rise {
+    0% { transform: translateY(0) scale(0.6); opacity: 0.5; }
+    100% { transform: translateY(-22px) scale(1.2); opacity: 0; }
+}
+
+.flying-elf {
+    width: 58px;
+    height: auto;
+    transform: translateY(-260px) rotate(-10deg);
+    transition: transform 1s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 3;
+    margin-bottom: -6px;
+}
+
+.flying-elf.landed {
+    transform: translateY(0) rotate(0deg);
+}
+
+.lights-row {
+    display: flex;
+    gap: 12px;
+    margin: 8px 0 4px;
+    opacity: 0.3;
+    transition: opacity 0.5s ease;
+    z-index: 4;
+    position: relative;
+}
+
+.lights-row.on { opacity: 1; }
+
+.bulb {
+    width: 11px;
+    height: 15px;
+    border-radius: 50%;
+    animation: bulb-twinkle 1.6s ease-in-out infinite;
+}
+
+.bulb:nth-child(odd) { background: var(--xmas-red); box-shadow: 0 0 9px var(--xmas-red); }
+.bulb:nth-child(even) { background: var(--xmas-green-bright); box-shadow: 0 0 9px var(--xmas-green-bright); }
+
+@keyframes bulb-twinkle {
+    0%, 100% { opacity: 0.65; }
+    50% { opacity: 1; }
+}
+
+.confirmed-heading {
+    font-family: 'Anton', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 1.35rem;
+    color: #FFFDF7;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    z-index: 4;
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.confirmed-heading.show { opacity: 1; transform: translateY(0); }
+
+.name-glow { color: var(--xmas-gold); }
+
+.success-summary-wrap {
+    width: 100%;
+    max-width: 340px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    z-index: 4;
+    position: relative;
+}
+
+.success-summary-wrap.show { opacity: 1; transform: translateY(0); }
+
+.success-summary {
+    background: var(--kraft);
+    border: 2px solid var(--kraft-line);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.ty-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.92rem;
+}
+
+.ty-row span { color: var(--ink-soft); }
+.ty-row strong { color: var(--ink); }
+
+.success-note {
+    font-size: 0.85rem;
+    color: rgba(255,253,247,0.75);
+    margin-bottom: 22px;
+}
+
+.success-note strong { color: #FFFDF7; }
+
+.btn-back {
+    display: inline-block;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px 26px;
+    border-radius: 8px;
+    border: 2.5px solid #FFFDF7;
+    background: var(--xmas-green-bright);
+    color: #0B1B2B;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-back:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.4); }
+.btn-back:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
+
+.success-overlay.instant .fade-black,
+.success-overlay.instant .flying-elf,
+.success-overlay.instant .lights-row,
+.success-overlay.instant .confirmed-heading,
+.success-overlay.instant .success-summary-wrap {
+    transition: none !important;
+}
+
 @media (max-width: 640px) {
     .form-card { padding: 28px 22px 32px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    .stars span, .scene-snow span, .bulb, .smoke-puff, .shooting-star, .window-glow { animation: none; }
 }
 </style>
 </head>
@@ -282,8 +584,10 @@ footer {
 </nav>
 
 <header class="hero">
-    <h1><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h1>
-    <p>Secure your preorder now and guarantee in time for your elf's return.</p>
+    <div class="hero-inner">
+        <h1><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h1>
+        <p>Secure your preorder now and guarantee in time for your elf's return.</p>
+    </div>
 </header>
 
 <main>
@@ -324,6 +628,69 @@ footer {
 <footer>
 </footer>
 
+<audio id="successAudio" src="christmas-is-coming.mp3" preload="auto"></audio>
+
+<div class="success-overlay" id="successOverlay" aria-live="polite">
+    <div class="fade-black" id="fadeBlack"></div>
+    <div class="night-scene">
+        <div class="stars" id="starsLayer"></div>
+        <div class="moon"></div>
+        <div class="shooting-star"></div>
+        <div class="scene-snow" id="sceneSnow"></div>
+
+        <svg class="flying-elf" id="flyingElf" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="6" y="38" width="26" height="10" rx="5" fill="var(--xmas-green-bright)" stroke="var(--ink)" stroke-width="2.5" transform="rotate(-18 19 43)"/>
+            <circle cx="10" cy="36" r="6" fill="#F4C29A" stroke="var(--ink)" stroke-width="2"/>
+            <rect x="58" y="38" width="26" height="10" rx="5" fill="var(--xmas-green-bright)" stroke="var(--ink)" stroke-width="2.5" transform="rotate(18 71 43)"/>
+            <circle cx="80" cy="36" r="6" fill="#F4C29A" stroke="var(--ink)" stroke-width="2"/>
+            <rect x="30" y="40" width="30" height="48" rx="13" fill="var(--xmas-green-bright)" stroke="var(--ink)" stroke-width="3"/>
+            <rect x="34" y="82" width="9" height="24" rx="4" fill="var(--xmas-green-bright)" stroke="var(--ink)" stroke-width="2.5"/>
+            <rect x="47" y="82" width="9" height="24" rx="4" fill="var(--xmas-green-bright)" stroke="var(--ink)" stroke-width="2.5"/>
+            <path d="M28 28 L18 22 L30 32Z" fill="#F4C29A" stroke="var(--ink)" stroke-width="2"/>
+            <path d="M62 28 L72 22 L60 32Z" fill="#F4C29A" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="45" cy="26" r="15" fill="#F4C29A" stroke="var(--ink)" stroke-width="3"/>
+            <path d="M31 20 Q45 -4 59 20 Q52 14 45 16 Q38 14 31 20Z" fill="var(--xmas-green-bright)" stroke="var(--ink)" stroke-width="2.5"/>
+            <circle cx="45" cy="-2" r="5" fill="var(--xmas-gold)" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="39" cy="25" r="2" fill="var(--ink)"/>
+            <circle cx="51" cy="25" r="2" fill="var(--ink)"/>
+            <path d="M38 32 Q45 37 52 32" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+
+        <svg class="house-svg" viewBox="0 0 220 170" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="110" cy="152" rx="100" ry="14" fill="#EAF3FF" stroke="var(--ink)" stroke-width="3"/>
+            <rect x="150" y="20" width="22" height="40" fill="#8B5A2B" stroke="var(--ink)" stroke-width="3"/>
+            <g class="smoke-puff"><circle cx="161" cy="14" r="5" fill="#EAF3FF" opacity="0.6"/></g>
+            <g class="smoke-puff"><circle cx="161" cy="14" r="5" fill="#EAF3FF" opacity="0.6"/></g>
+            <g class="smoke-puff"><circle cx="161" cy="14" r="5" fill="#EAF3FF" opacity="0.6"/></g>
+            <polygon points="10,70 110,10 210,70" fill="var(--xmas-red)" stroke="var(--ink)" stroke-width="4"/>
+            <path d="M14 70 Q60 58 110 62 Q160 58 206 70" fill="none" stroke="#FFFDF7" stroke-width="8" stroke-linecap="round"/>
+            <rect x="35" y="70" width="150" height="80" fill="#C98B4B" stroke="var(--ink)" stroke-width="4"/>
+            <rect x="52" y="88" width="26" height="26" rx="3" fill="var(--xmas-gold)" stroke="var(--ink)" stroke-width="3" class="window-glow"/>
+            <line x1="65" y1="88" x2="65" y2="114" stroke="var(--ink)" stroke-width="1.5"/>
+            <line x1="52" y1="101" x2="78" y2="101" stroke="var(--ink)" stroke-width="1.5"/>
+            <rect x="142" y="88" width="26" height="26" rx="3" fill="var(--xmas-gold)" stroke="var(--ink)" stroke-width="3" class="window-glow"/>
+            <line x1="155" y1="88" x2="155" y2="114" stroke="var(--ink)" stroke-width="1.5"/>
+            <line x1="142" y1="101" x2="168" y2="101" stroke="var(--ink)" stroke-width="1.5"/>
+            <rect x="95" y="110" width="30" height="40" rx="4" fill="var(--ink)"/>
+            <circle cx="118" cy="130" r="2.5" fill="var(--xmas-gold)"/>
+        </svg>
+
+        <div class="lights-row" id="lightsRow"></div>
+
+        <h2 class="confirmed-heading" id="confirmedHeading"><span class="heading-sparkle left"></span>Order confirmed, <span class="name-glow" id="successName">friend</span>!<span class="heading-sparkle right"></span></h2>
+
+        <div class="success-summary-wrap" id="successSummaryWrap">
+            <div class="success-summary">
+                <div class="ty-row"><span>Quantity</span><strong id="tySummaryQty">1</strong></div>
+                <div class="ty-row"><span>Payment</span><strong id="tySummaryPayment">-</strong></div>
+                <div class="ty-row"><span>Total</span><strong id="tySummaryTotal">$35</strong></div>
+            </div>
+            <p class="success-note">A confirmation email is on its way to <strong id="tyEmail"></strong>.</p>
+            <a class="btn-back" href="/">Back to the shop</a>
+        </div>
+    </div>
+</div>
+
 <script>
     const SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbzyL1nsc-K7huoHmWT_qmR_NZZpx_gJzxcA_0-DKNu_xjjQWhaCPdfgOrSjFe0t-PdA/exec";
@@ -332,21 +699,129 @@ footer {
     const status = document.getElementById("status");
     const submitBtn = document.getElementById("submitBtn");
 
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* success scene stars, snow, and lights, seeded once */
+    const starsLayer = document.getElementById("starsLayer");
+    const sceneSnow = document.getElementById("sceneSnow");
+    const lightsRow = document.getElementById("lightsRow");
+
+    for (let i = 0; i < 34; i++) {
+      const star = document.createElement("span");
+      star.style.left = Math.random() * 100 + "%";
+      star.style.top = Math.random() * 55 + "%";
+      star.style.animationDelay = (Math.random() * 2.6) + "s";
+      starsLayer.appendChild(star);
+    }
+
+    for (let i = 0; i < 20; i++) {
+      const flake = document.createElement("span");
+      flake.style.left = Math.random() * 100 + "%";
+      flake.style.animationDuration = (4 + Math.random() * 4) + "s";
+      flake.style.animationDelay = (Math.random() * 5) + "s";
+      sceneSnow.appendChild(flake);
+    }
+
+    for (let i = 0; i < 9; i++) {
+      const bulb = document.createElement("span");
+      bulb.className = "bulb";
+      bulb.style.animationDelay = (i * 0.12) + "s";
+      lightsRow.appendChild(bulb);
+    }
+
+    function fireConfetti() {
+      if (reducedMotion) return;
+      const colors = ["#C1272D", "#3FA96B", "#E0B94A", "#3E7CB1"];
+      const originX = window.innerWidth / 2;
+      const originY = window.innerHeight * 0.35;
+      for (let i = 0; i < 26; i++) {
+        const bit = document.createElement("div");
+        bit.className = "confetti-bit";
+        bit.style.left = originX + "px";
+        bit.style.top = originY + "px";
+        bit.style.background = colors[i % colors.length];
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 90 + Math.random() * 120;
+        bit.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+        bit.style.setProperty("--dy", Math.sin(angle) * dist + "px");
+        bit.style.setProperty("--rot", Math.floor(Math.random() * 360) + "deg");
+        document.body.appendChild(bit);
+        setTimeout(() => bit.remove(), 1050);
+      }
+    }
+
+    const successOverlay = document.getElementById("successOverlay");
+    const fadeBlack = document.getElementById("fadeBlack");
+    const flyingElf = document.getElementById("flyingElf");
+    const confirmedHeading = document.getElementById("confirmedHeading");
+    const successSummaryWrap = document.getElementById("successSummaryWrap");
+    const successAudio = document.getElementById("successAudio");
+
+    let sceneTimers = [];
+
+    function clearSceneTimers() {
+      sceneTimers.forEach(t => clearTimeout(t));
+      sceneTimers = [];
+    }
+
+    function revealFinalState() {
+      clearSceneTimers();
+      successOverlay.classList.add("instant");
+      fadeBlack.classList.add("hide");
+      flyingElf.classList.add("landed");
+      lightsRow.classList.add("on");
+      confirmedHeading.classList.add("show");
+      successSummaryWrap.classList.add("show");
+    }
+
+    function playSuccessSequence() {
+      successOverlay.classList.add("show");
+      successOverlay.classList.remove("instant");
+
+      fadeBlack.classList.remove("hide");
+      flyingElf.classList.remove("landed");
+      lightsRow.classList.remove("on");
+      confirmedHeading.classList.remove("show");
+      successSummaryWrap.classList.remove("show");
+
+      if (reducedMotion) {
+        revealFinalState();
+        return;
+      }
+
+      sceneTimers.push(setTimeout(() => fadeBlack.classList.add("hide"), 80));
+      sceneTimers.push(setTimeout(() => flyingElf.classList.add("landed"), 950));
+      sceneTimers.push(setTimeout(() => {
+        lightsRow.classList.add("on");
+        confirmedHeading.classList.add("show");
+        fireConfetti();
+      }, 1950));
+      sceneTimers.push(setTimeout(() => successSummaryWrap.classList.add("show"), 2350));
+    }
+
     form.addEventListener("submit", async function(event) {
 
       event.preventDefault();
+
+      successAudio.currentTime = 0;
+      successAudio.play().catch(() => {});
 
       status.className = "loading";
       status.textContent = "Submitting...";
       submitBtn.disabled = true;
 
+      const nameValue = document.getElementById("name").value;
+      const emailValue = document.getElementById("email").value;
+      const quantityValue = document.getElementById("quantity").value;
+      const paymentValue = document.getElementById("payment").value;
+
       const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
+        name: nameValue,
+        email: emailValue,
         product: "Elf Box",
         price: "$35",
-        quantity: document.getElementById("quantity").value,
-        payment: document.getElementById("payment").value,
+        quantity: quantityValue,
+        payment: paymentValue,
         address: document.getElementById("address").value
       };
 
@@ -361,10 +836,19 @@ footer {
           body: JSON.stringify(data)
         });
 
-        status.className = "success";
-        status.textContent = "Preorder submitted!";
+        status.className = "";
+        status.textContent = "";
+
+        const firstName = nameValue.trim().split(" ")[0] || "friend";
+        document.getElementById("successName").textContent = firstName;
+        document.getElementById("tySummaryQty").textContent = quantityValue;
+        document.getElementById("tySummaryPayment").textContent = paymentValue;
+        const total = 35 * (parseInt(quantityValue, 10) || 1);
+        document.getElementById("tySummaryTotal").textContent = "$" + total;
+        document.getElementById("tyEmail").textContent = emailValue;
 
         form.reset();
+        playSuccessSequence();
 
       } catch (error) {
 
