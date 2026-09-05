@@ -105,6 +105,41 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
 
 .filter-btn.active { background: var(--rare); color: var(--face); }
 
+.view-btn {
+    background: var(--face);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--ink);
+}
+
+.view-btn.active { background: var(--epic); color: var(--face); }
+
+.log-row {
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    background: var(--face);
+    font-size: 0.85rem;
+}
+
+.log-row .log-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.log-row .log-actor { font-weight: 700; }
+.log-row .log-time { color: var(--ink-soft); font-size: 0.78rem; }
+.log-row .log-action { color: var(--ink); }
+.log-row .log-details { color: var(--ink-soft); font-size: 0.8rem; margin-top: 4px; }
+
 .review-row {
     border: 2.5px solid var(--ink);
     border-radius: 12px;
@@ -217,6 +252,27 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
     color: var(--ink);
 }
 
+.account-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.account-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    background: var(--kraft);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.account-btn.active { background: var(--rare); color: var(--face); }
+
 .lock-error {
     display: none;
     background: #F8E3E1;
@@ -235,7 +291,8 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
 <div id="lock-screen">
     <div class="lock-card">
         <h1>Approvals</h1>
-        <p>Enter the password to manage testimonials.</p>
+        <p>Choose an account and enter its password.</p>
+        <div class="account-row" id="account-row"></div>
         <div class="lock-error" id="lock-error">Wrong password.</div>
         <input type="password" id="lock-input" placeholder="Password" autocomplete="off">
         <button class="btn" id="unlock-btn" style="width:100%;">Unlock</button>
@@ -249,40 +306,92 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
         <button class="btn" id="reload-btn">Reload</button>
     </header>
 
-    <div class="warning">This page's password lives in the page's own code, not on the server. Anyone who can view this file's source can read it. Keep this link private, this is a temporary setup.</div>
+    <div class="warning">Account passwords live in this page's own code, not on the server. Anyone who can view this file's source can read them. Keep this link private, this is a temporary setup.</div>
 
-    <div class="status-msg" id="status">Loading...</div>
-
-    <div class="filter-row">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="pending">Pending only</button>
-        <button class="filter-btn" data-filter="approved">Approved only</button>
+    <div class="filter-row" id="view-row" style="display:none;">
+        <button class="view-btn active" data-view="reviews">Reviews</button>
+        <button class="view-btn" data-view="logs">Activity Log</button>
     </div>
 
-    <div id="reviews-list"></div>
+    <div id="reviews-view">
+        <div class="status-msg" id="status">Loading...</div>
+
+        <div class="filter-row">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="pending">Pending only</button>
+            <button class="filter-btn" data-filter="approved">Approved only</button>
+        </div>
+
+        <div id="reviews-list"></div>
+    </div>
+
+    <div id="logs-view" style="display:none;">
+        <div class="status-msg" id="log-status">Loading...</div>
+        <div id="logs-list"></div>
+    </div>
 </div>
 </div>
 
 <script>
-const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycbzccZ998A_njmvcznnl_i18D6cS7hyQMgRq4lNGVvo0NLSL8j-KABAYYlov_q3ba4D8Ww/exec";
+const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycbzcoHwy3Hj8aDUB7fNRD3Ro_3k2GPXAtbTHmx2DZAWxzPFkyfOkw9f8TvYeLgN5TG24Cw/exec";
 
-// ---- Temporary client-side password gate ----
-// This check happens entirely in the browser. Anyone who views this
-// page's source can read the password below directly, so this only
-// stops casual/accidental access, not someone who actually looks.
-// Meant to be replaced with real protection later, not left this way.
-const SITE_PASSWORD = "94360";
+// Separate, standalone Apps Script whose only job is logging activity.
+// Paste in its /exec URL once you've deployed LoggerCode.gs.
+const LOG_URL = "https://script.google.com/macros/s/AKfycbwxNBr-qz2QXI4VrwMJCGAKLmlkVNI3ai3iUEGbarkh4rWsrq9Aa66ZSrkpmYrdlAKZOA/exec";
+
+// ---- Temporary client-side accounts ----
+// These checks happen entirely in the browser. Anyone who views this
+// page's source can read every password and role restriction below
+// directly, so this only stops casual/accidental access, not someone
+// who actually looks. Meant to be replaced with real protection later.
+const ACCOUNTS = [
+  {
+    id: "owner",
+    label: "Owner",
+    password: "Archie is the best dog and that is true",
+    role: "owner" // full access: approve, reply, pin, delete
+  },
+  {
+    id: "manager",
+    label: "Testimonials Manager",
+    password: "93560",
+    role: "manager" // can only approve / set pending
+  }
+];
+
+let selectedAccountId = ACCOUNTS[0].id;
+let currentRole = null;
+let currentActorLabel = null;
 
 const lockScreen = document.getElementById("lock-screen");
 const dashboard = document.getElementById("dashboard");
 const lockInput = document.getElementById("lock-input");
 const lockError = document.getElementById("lock-error");
+const accountRow = document.getElementById("account-row");
+
+accountRow.innerHTML = ACCOUNTS.map(acc =>
+  `<button type="button" class="account-btn${acc.id === selectedAccountId ? ' active' : ''}" data-account="${acc.id}">${acc.label}</button>`
+).join("");
+
+accountRow.querySelectorAll(".account-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedAccountId = btn.dataset.account;
+    accountRow.querySelectorAll(".account-btn").forEach(b => b.classList.toggle("active", b === btn));
+    lockError.style.display = "none";
+    lockInput.value = "";
+    lockInput.focus();
+  });
+});
 
 function unlock() {
-  if (lockInput.value === SITE_PASSWORD) {
+  const account = ACCOUNTS.find(a => a.id === selectedAccountId);
+  if (account && lockInput.value === account.password) {
+    currentRole = account.role;
+    currentActorLabel = account.label;
     lockError.style.display = "none";
     lockScreen.style.display = "none";
     dashboard.style.display = "block";
+    document.getElementById("view-row").style.display = currentRole === "owner" ? "flex" : "none";
     load();
   } else {
     lockError.style.display = "block";
@@ -291,6 +400,58 @@ function unlock() {
 
 document.getElementById("unlock-btn").addEventListener("click", unlock);
 lockInput.addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+
+// ---- View switcher (Reviews / Activity Log), owner only ----
+document.querySelectorAll(".view-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".view-btn").forEach(b => b.classList.toggle("active", b === btn));
+    const view = btn.dataset.view;
+    document.getElementById("reviews-view").style.display = view === "reviews" ? "block" : "none";
+    document.getElementById("logs-view").style.display = view === "logs" ? "block" : "none";
+    if (view === "logs") loadLogs();
+  });
+});
+
+function loadLogs() {
+  const logStatus = document.getElementById("log-status");
+  const logsList = document.getElementById("logs-list");
+
+  if (!LOG_URL || LOG_URL.indexOf("PASTE_YOUR") === 0) {
+    logStatus.textContent = "Logging script isn't configured yet (LOG_URL is still a placeholder).";
+    logsList.innerHTML = "";
+    return;
+  }
+
+  logStatus.textContent = "Loading...";
+
+  fetch(LOG_URL)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        logStatus.textContent = "Error: " + data.error;
+        return;
+      }
+      if (!data.entries.length) {
+        logStatus.textContent = "No activity logged yet.";
+        logsList.innerHTML = "";
+        return;
+      }
+      logStatus.textContent = data.entries.length + " entr" + (data.entries.length === 1 ? "y" : "ies") + ".";
+      logsList.innerHTML = data.entries.map(entry => `
+        <div class="log-row">
+          <div class="log-top">
+            <span class="log-actor">${escapeHtml(entry.actor)}</span>
+            <span class="log-time">${escapeHtml(entry.timestamp)}</span>
+          </div>
+          <div class="log-action">${escapeHtml(entry.action)}${entry.reviewId ? " &middot; review " + escapeHtml(entry.reviewId) : ""}</div>
+          ${entry.details ? `<div class="log-details">${escapeHtml(entry.details)}</div>` : ""}
+        </div>
+      `).join("");
+    })
+    .catch(() => {
+      logStatus.textContent = "Couldn't reach the script.";
+    });
+}
 
 let allReviews = [];
 let currentFilter = "all";
@@ -322,6 +483,8 @@ function render() {
     return;
   }
 
+  const isOwner = currentRole === "owner";
+
   listEl.innerHTML = reviews.map(r => `
     <div class="review-row" data-id="${r.id}">
       <div class="top-line">
@@ -335,12 +498,15 @@ function render() {
         </div>
       </div>
       <div class="text">${r.review === "Left Blank" ? "<em>No written comment.</em>" : escapeHtml(r.review)}</div>
-      <textarea class="reply-input" placeholder="Reply shown under this review...">${escapeHtml(r.reply || "")}</textarea>
+      ${isOwner
+        ? `<textarea class="reply-input" placeholder="Reply shown under this review...">${escapeHtml(r.reply || "")}</textarea>`
+        : (r.reply ? `<div class="text"><strong>Reply:</strong> ${escapeHtml(r.reply)}</div>` : '')
+      }
       <div class="row-actions">
         <button class="btn toggle-btn">${r.approved ? "Set Pending" : "Approve"}</button>
-        <button class="btn pin-btn">${r.pinned ? "Unpin" : "Pin"}</button>
-        <button class="btn save-reply-btn">Save Reply</button>
-        <button class="btn btn-danger delete-btn">Delete</button>
+        ${isOwner ? `<button class="btn pin-btn">${r.pinned ? "Unpin" : "Pin"}</button>` : ''}
+        ${isOwner ? `<button class="btn save-reply-btn">Save Reply</button>` : ''}
+        ${isOwner ? `<button class="btn btn-danger delete-btn">Delete</button>` : ''}
       </div>
     </div>
   `).join("");
@@ -355,47 +521,60 @@ function render() {
         if (res.success) {
           review.approved = newApproved;
           render();
+          logAction(newApproved ? "Approved" : "Set Pending", id, "");
         } else {
           alert("Couldn't update: " + res.error);
         }
       });
     });
 
-    row.querySelector(".pin-btn").addEventListener("click", () => {
-      const newPinned = !review.pinned;
-      apiCall({ action: "admin_pin", id, pinned: newPinned }).then(res => {
-        if (res.success) {
-          review.pinned = newPinned;
-          render();
-        } else {
-          alert("Couldn't update: " + res.error);
-        }
+    const pinBtn = row.querySelector(".pin-btn");
+    if (pinBtn) {
+      pinBtn.addEventListener("click", () => {
+        const newPinned = !review.pinned;
+        apiCall({ action: "admin_pin", id, pinned: newPinned }).then(res => {
+          if (res.success) {
+            review.pinned = newPinned;
+            render();
+            logAction(newPinned ? "Pinned" : "Unpinned", id, "");
+          } else {
+            alert("Couldn't update: " + res.error);
+          }
+        });
       });
-    });
+    }
 
-    row.querySelector(".save-reply-btn").addEventListener("click", () => {
-      const reply = row.querySelector(".reply-input").value;
-      apiCall({ action: "admin_reply", id, reply }).then(res => {
-        if (res.success) {
-          review.reply = reply;
-          alert("Reply saved.");
-        } else {
-          alert("Couldn't save: " + res.error);
-        }
+    const saveReplyBtn = row.querySelector(".save-reply-btn");
+    if (saveReplyBtn) {
+      saveReplyBtn.addEventListener("click", () => {
+        const reply = row.querySelector(".reply-input").value;
+        apiCall({ action: "admin_reply", id, reply }).then(res => {
+          if (res.success) {
+            review.reply = reply;
+            alert("Reply saved.");
+            logAction("Replied", id, reply.slice(0, 200));
+          } else {
+            alert("Couldn't save: " + res.error);
+          }
+        });
       });
-    });
+    }
 
-    row.querySelector(".delete-btn").addEventListener("click", () => {
-      if (!confirm("Delete this review permanently? This can't be undone.")) return;
-      apiCall({ action: "admin_delete", id }).then(res => {
-        if (res.success) {
-          allReviews = allReviews.filter(r => r.id !== id);
-          render();
-        } else {
-          alert("Couldn't delete: " + res.error);
-        }
+    const deleteBtn = row.querySelector(".delete-btn");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", () => {
+        if (!confirm("Delete this review permanently? This can't be undone.")) return;
+        apiCall({ action: "admin_delete", id }).then(res => {
+          if (res.success) {
+            allReviews = allReviews.filter(r => r.id !== id);
+            render();
+            logAction("Deleted", id, "");
+          } else {
+            alert("Couldn't delete: " + res.error);
+          }
+        });
       });
-    });
+    }
   });
 }
 
@@ -403,6 +582,23 @@ function apiCall(payload) {
   return fetch(TESTIMONIALS_URL, { method: "POST", body: JSON.stringify(payload) })
     .then(res => res.json())
     .catch(() => ({ success: false, error: "Network error." }));
+}
+
+function logAction(action, reviewId, details) {
+  if (!LOG_URL || LOG_URL.indexOf("PASTE_YOUR") === 0) return; // not configured yet
+  fetch(LOG_URL, {
+    method: "POST",
+    body: JSON.stringify({ actor: currentActorLabel, action, reviewId, details: details || "" })
+  })
+    .then(res => res.json())
+    .then(res => {
+      if (!res.success) {
+        alert("Action succeeded, but the log entry failed: " + res.error);
+      }
+    })
+    .catch(() => {
+      alert("Action succeeded, but couldn't reach the logging script.");
+    });
 }
 
 function load() {
