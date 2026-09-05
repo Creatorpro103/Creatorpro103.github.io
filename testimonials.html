@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testimonials - iPrint Keychains</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>K</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --common: #4C9A63;
+    --rare: #3E7CB1;
+    --epic: #8B5FBF;
+    --gold: #C9971F;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--kraft);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, .display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+a { color: inherit; }
+
+a:focus-visible, .btn:focus-visible, .navlink:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--rare);
+    outline-offset: 3px;
+}
+
+/* NAV */
+nav.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 26px 24px;
+}
+
+.wordmark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.logo-dot {
+    width: 20px;
+    height: 26px;
+    border-radius: 4px;
+    background: var(--rare);
+    border: 2.5px solid var(--ink);
+}
+
+.navlink {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 2px solid transparent;
+}
+
+.navlink:hover { border-color: var(--ink); }
+
+/* HERO */
+header.hero {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.hero-left { display: flex; flex-direction: column; gap: 24px; }
+
+.hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+    max-width: 16ch;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 40px;
+}
+
+.stat-num {
+    font-family: 'Anton', sans-serif;
+    font-size: 2.2rem;
+    color: var(--rare);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin-top: 4px;
+}
+
+.btn {
+    display: inline-block;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 15px 30px;
+    border-radius: 10px;
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-primary {
+    background: var(--rare);
+    color: var(--face);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+.btn-primary:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: 4px 4px 0 var(--ink); }
+
+/* SET GRID (reviews) */
+section.set {
+    padding: 20px 24px 90px;
+}
+
+.set-head {
+    max-width: 1120px;
+    margin: 0 auto 36px;
+}
+
+.set-head h2 {
+    font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.set-head p { color: var(--ink-soft); max-width: 52ch; }
+
+.grid {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px;
+}
+
+.rcard {
+    position: relative;
+    background: var(--face);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 4px solid var(--frame, var(--common));
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.rcard:hover {
+    transform: translateY(-6px);
+    box-shadow: 6px 8px 0 rgba(43,32,18,0.3);
+}
+
+.rcard .body {
+    padding: 18px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+.stars { font-size: 15px; letter-spacing: 1px; }
+.stars .filled { color: var(--gold); }
+.stars .empty { color: var(--kraft-line); }
+
+.rcard .review-text {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    flex-grow: 1;
+}
+
+.rcard .foot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 3px solid var(--ink);
+    margin-top: auto;
+}
+
+.chip {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--frame, var(--common));
+    border: 2.5px solid var(--ink);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--face);
+}
+
+.reviewer-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.empty-state {
+    max-width: 1120px;
+    margin: 0 auto;
+    border: 3px dashed var(--kraft-line);
+    border-radius: 16px;
+    padding: 44px 24px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+}
+
+/* SUBMIT PANEL */
+.submit-panel {
+    background: var(--face);
+    border-radius: 16px;
+    border: 4px solid var(--ink);
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    padding: 28px;
+}
+
+.submit-panel h2 {
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.submit-panel > p {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    margin-bottom: 26px;
+}
+
+.field { margin-bottom: 18px; }
+
+.field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+.field input[type="text"],
+.field textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--kraft);
+}
+
+.field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.anon-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+.anon-row input { width: 17px; height: 17px; }
+
+.star-picker {
+    display: flex;
+    gap: 4px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.star-picker span {
+    color: var(--kraft-line);
+    transition: color 0.1s;
+}
+
+.star-picker span.active { color: var(--gold); }
+
+.form-msg {
+    margin-top: 16px;
+    font-size: 0.88rem;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+    display: none;
+}
+
+.form-msg.success { display: block; background: #E4F2E8; color: #2E5B3E; }
+.form-msg.error { display: block; background: #F8E3E1; color: #7A2A21; }
+
+footer {
+    border-top: 3px solid var(--ink);
+    padding: 32px 24px 44px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 820px) {
+    header.hero { grid-template-columns: 1fr; }
+    .submit-panel { padding: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top">
+    <a class="wordmark" href="/"><span class="logo-dot" aria-hidden="true"></span>iPrint Keychains</a>
+    <a class="navlink" href="/">Back home</a>
+</nav>
+
+<header class="hero">
+    <div class="hero-left">
+        <h1>What people are saying</h1>
+        <div class="hero-stats">
+            <div>
+                <div class="stat-num" id="avg-rating">-</div>
+                <div class="stat-label">Average rating</div>
+            </div>
+            <div>
+                <div class="stat-num" id="review-count">-</div>
+                <div class="stat-label">Reviews</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="submit-panel">
+        <h2>Leave a review</h2>
+        <p>Takes a minute. It will show up below once it is checked.</p>
+
+        <form id="review-form">
+            <div class="field">
+                <label>Your rating</label>
+                <div class="star-picker" id="star-picker">
+                    <span data-val="1">&#9733;</span>
+                    <span data-val="2">&#9733;</span>
+                    <span data-val="3">&#9733;</span>
+                    <span data-val="4">&#9733;</span>
+                    <span data-val="5">&#9733;</span>
+                </div>
+            </div>
+
+            <div class="anon-row">
+                <input type="checkbox" id="anon-check">
+                <label for="anon-check" style="margin:0;">Post anonymously</label>
+            </div>
+
+            <div class="field" id="name-field">
+                <label for="name-input">Name</label>
+                <input type="text" id="name-input" placeholder="Your name" maxlength="100">
+            </div>
+
+            <div class="field">
+                <label for="review-input">Your review (optional)</label>
+                <textarea id="review-input" placeholder="What was your experience like?" maxlength="2000"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%; text-align:center;">Submit review</button>
+            <div class="form-msg" id="form-msg"></div>
+        </form>
+    </div>
+</header>
+
+<section class="set">
+    <div class="set-head">
+        <h2>Reviews</h2>
+    </div>
+    <div id="reviews-grid" class="grid"></div>
+    <div id="empty-state" class="empty-state" style="display:none;">
+        No reviews yet. Be the first to leave one below.
+    </div>
+</section>
+
+<footer>
+    iPrint Keychains &middot; isaacneal.com
+</footer>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyyV6YuHYlbfMLUm_hEsclz2zq4GY1tWMIeoQ3fwyq6P-WurDJMNpIQRalNwwwcIYE_Kg/exec";
+  const FRAMES = ['var(--common)', 'var(--rare)', 'var(--epic)'];
+
+  const grid = document.getElementById('reviews-grid');
+  const emptyState = document.getElementById('empty-state');
+  const avgRatingEl = document.getElementById('avg-rating');
+  const reviewCountEl = document.getElementById('review-count');
+
+  function initials(name) {
+    if (!name || name === 'Anonymous') return '?';
+    return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+  }
+
+  function starsHtml(rating) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += '<span class="' + (i <= rating ? 'filled' : 'empty') + '">&#9733;</span>';
+    }
+    return '<span class="stars">' + html + '</span>';
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderReviews(reviews) {
+    if (!reviews.length) {
+      grid.style.display = 'none';
+      emptyState.style.display = 'block';
+      avgRatingEl.textContent = '-';
+      reviewCountEl.textContent = '0';
+      return;
+    }
+
+    grid.style.display = 'grid';
+    emptyState.style.display = 'none';
+
+    const avg = reviews.reduce((sum, r) => sum + Number(r.rating), 0) / reviews.length;
+    avgRatingEl.textContent = avg.toFixed(1);
+    reviewCountEl.textContent = reviews.length;
+
+    grid.innerHTML = reviews.map((r, i) => {
+      const frame = FRAMES[i % FRAMES.length];
+      const textHtml = (r.review && r.review !== 'Left Blank') ? '<div class="review-text">' + escapeHtml(r.review) + '</div>' : '';
+      return '<div class="rcard" style="--frame:' + frame + '">' +
+        '<div class="body">' +
+          starsHtml(r.rating) +
+          textHtml +
+          '<div class="foot">' +
+            '<div class="chip">' + initials(r.name) + '</div>' +
+            '<span class="reviewer-name">' + escapeHtml(r.name) + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function loadReviews() {
+    fetch(API_URL + '?action=list')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) renderReviews(data.reviews);
+      })
+      .catch(() => {
+        emptyState.textContent = "Could not load reviews right now. Check back soon.";
+        emptyState.style.display = 'block';
+        grid.style.display = 'none';
+      });
+  }
+
+  loadReviews();
+
+  // Star picker
+  let selectedRating = 0;
+  const starPicker = document.getElementById('star-picker');
+  const stars = starPicker.querySelectorAll('span');
+
+  function paintStars(val) {
+    stars.forEach(s => s.classList.toggle('active', Number(s.dataset.val) <= val));
+  }
+
+  stars.forEach(s => {
+    s.addEventListener('mouseenter', () => paintStars(Number(s.dataset.val)));
+    s.addEventListener('click', () => {
+      selectedRating = Number(s.dataset.val);
+      paintStars(selectedRating);
+    });
+  });
+  starPicker.addEventListener('mouseleave', () => paintStars(selectedRating));
+
+  // Anonymous toggle
+  const anonCheck = document.getElementById('anon-check');
+  const nameField = document.getElementById('name-field');
+  anonCheck.addEventListener('change', () => {
+    nameField.style.display = anonCheck.checked ? 'none' : 'block';
+  });
+
+  // Submit
+  const form = document.getElementById('review-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const formMsg = document.getElementById('form-msg');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const anonymous = anonCheck.checked;
+    const name = document.getElementById('name-input').value.trim();
+    const review = document.getElementById('review-input').value.trim() || 'Left Blank';
+
+    formMsg.className = 'form-msg';
+
+    if (selectedRating < 1) {
+      formMsg.textContent = 'Pick a star rating first.';
+      formMsg.classList.add('error');
+      return;
+    }
+    if (!anonymous && !name) {
+      formMsg.textContent = 'Add your name, or check "Post anonymously."';
+      formMsg.classList.add('error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ name: name, anonymous: anonymous, rating: selectedRating, review: review })
+    })
+      .then(res => res.json())
+      .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit review';
+
+        if (data.success) {
+          formMsg.textContent = data.message || 'Thanks. Your review is pending approval.';
+          formMsg.classList.add('success');
+          form.reset();
+          selectedRating = 0;
+          paintStars(0);
+          nameField.style.display = 'block';
+        } else {
+          formMsg.textContent = data.error || 'Something went wrong. Try again.';
+          formMsg.classList.add('error');
+        }
+      })
+      .catch(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit review';
+        formMsg.textContent = "Could not reach the server. Check your connection and try again.";
+        formMsg.classList.add('error');
+      });
+  });
+</script>
+
+</body>
+</html>
