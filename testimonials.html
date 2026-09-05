@@ -437,6 +437,55 @@ footer {
   const API_URL = "https://script.google.com/macros/s/AKfycbwYae8n_Rxjfz9_ncjLBksgB6pE2QA9MQE7PieC-XZIx1zrH742WDdbbKuCn8FK8CUEgw/exec";
   const FRAMES = ['var(--common)', 'var(--rare)', 'var(--epic)'];
 
+  // ---- Spam prevention: limit submissions per browser using a cookie ----
+  // This is client-side only, so clearing cookies or using a different
+  // browser/incognito window bypasses it. It stops casual/accidental
+  // repeat spam, not a determined attacker, that would need a server-side
+  // check (e.g. inside the Apps Script itself) to be airtight.
+  const RATE_LIMIT_COOKIE = 'ipk_review_times';
+  const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+  const RATE_LIMIT_MAX = 1; // max reviews allowed per window
+
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function setCookie(name, value, maxAgeSeconds) {
+    document.cookie = name + '=' + encodeURIComponent(value) + '; max-age=' + maxAgeSeconds + '; path=/; samesite=lax';
+  }
+
+  function getRecentSubmissionTimes() {
+    const raw = getCookie(RATE_LIMIT_COOKIE);
+    if (!raw) return [];
+    let times;
+    try {
+      times = JSON.parse(raw);
+    } catch (e) {
+      return [];
+    }
+    if (!Array.isArray(times)) return [];
+    const cutoff = Date.now() - RATE_LIMIT_WINDOW_MS;
+    return times.filter(t => typeof t === 'number' && t > cutoff);
+  }
+
+  function recordSubmission() {
+    const times = getRecentSubmissionTimes();
+    times.push(Date.now());
+    setCookie(RATE_LIMIT_COOKIE, JSON.stringify(times), RATE_LIMIT_WINDOW_MS / 1000);
+  }
+
+  function rateLimitStatus() {
+    const times = getRecentSubmissionTimes();
+    if (times.length < RATE_LIMIT_MAX) {
+      return { allowed: true };
+    }
+    const oldest = Math.min(...times);
+    const msLeft = (oldest + RATE_LIMIT_WINDOW_MS) - Date.now();
+    const minutesLeft = Math.max(1, Math.ceil(msLeft / 60000));
+    return { allowed: false, minutesLeft: minutesLeft };
+  }
+
   const grid = document.getElementById('reviews-grid');
   const emptyState = document.getElementById('empty-state');
   const avgRatingEl = document.getElementById('avg-rating');
@@ -544,11 +593,19 @@ footer {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
+    formMsg.className = 'form-msg';
+
+    const rl = rateLimitStatus();
+    if (!rl.allowed) {
+      formMsg.textContent = 'You can only submit ' + RATE_LIMIT_MAX + ' review' + (RATE_LIMIT_MAX === 1 ? '' : 's') +
+        ' every 15 minutes. Try again in about ' + rl.minutesLeft + ' minute' + (rl.minutesLeft === 1 ? '' : 's') + '.';
+      formMsg.classList.add('error');
+      return;
+    }
+
     const anonymous = anonCheck.checked;
     const name = document.getElementById('name-input').value.trim();
     const review = document.getElementById('review-input').value.trim() || 'Left Blank';
-
-    formMsg.className = 'form-msg';
 
     if (selectedRating < 1) {
       formMsg.textContent = 'Pick a star rating first.';
@@ -574,6 +631,7 @@ footer {
         submitBtn.textContent = 'Submit review';
 
         if (data.success) {
+          recordSubmission();
           formMsg.textContent = data.message || 'Thanks. Your review is pending approval.';
           formMsg.classList.add('success');
           form.reset();
