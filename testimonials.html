@@ -229,6 +229,24 @@ section.set {
     font-weight: 700;
 }
 
+.reply {
+    background: var(--kraft);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.85rem;
+    color: var(--ink);
+    border-left: 4px solid var(--gold);
+}
+
+.reply strong {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+}
+
 .empty-state {
     max-width: 1120px;
     margin: 0 auto;
@@ -416,7 +434,7 @@ footer {
 </footer>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbyyV6YuHYlbfMLUm_hEsclz2zq4GY1tWMIeoQ3fwyq6P-WurDJMNpIQRalNwwwcIYE_Kg/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbwYae8n_Rxjfz9_ncjLBksgB6pE2QA9MQE7PieC-XZIx1zrH742WDdbbKuCn8FK8CUEgw/exec";
   const FRAMES = ['var(--common)', 'var(--rare)', 'var(--epic)'];
 
   const grid = document.getElementById('reviews-grid');
@@ -463,10 +481,12 @@ footer {
     grid.innerHTML = reviews.map((r, i) => {
       const frame = FRAMES[i % FRAMES.length];
       const textHtml = (r.review && r.review !== 'Left Blank') ? '<div class="review-text">' + escapeHtml(r.review) + '</div>' : '';
+      const replyHtml = r.reply ? '<div class="reply"><strong>Reply from Isaac</strong>' + escapeHtml(r.reply) + '</div>' : '';
       return '<div class="rcard" style="--frame:' + frame + '">' +
         '<div class="body">' +
           starsHtml(r.rating) +
           textHtml +
+          replyHtml +
           '<div class="foot">' +
             '<div class="chip">' + initials(r.name) + '</div>' +
             '<span class="reviewer-name">' + escapeHtml(r.name) + '</span>' +
