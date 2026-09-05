@@ -406,8 +406,8 @@ footer {
         <h2>Reviews</h2>
     </div>
     <div id="reviews-grid" class="grid"></div>
-    <div id="empty-state" class="empty-state" style="display:none;">
-        No reviews yet. Be the first to leave one below.
+    <div id="empty-state" class="empty-state">
+        Loading reviews...
     </div>
 </section>
 
@@ -446,6 +446,7 @@ footer {
   function renderReviews(reviews) {
     if (!reviews.length) {
       grid.style.display = 'none';
+      emptyState.textContent = 'No reviews yet. Be the first to leave one below.';
       emptyState.style.display = 'block';
       avgRatingEl.textContent = '-';
       reviewCountEl.textContent = '0';
