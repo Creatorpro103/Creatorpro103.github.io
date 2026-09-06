@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Testimonials - iPrint Keychains</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>K</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,6 +177,21 @@ section.set {
     flex-direction: column;
 }
 
+.pin-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-bottom-left-radius: 10px;
+    border-left: 3px solid var(--ink);
+    border-bottom: 3px solid var(--ink);
+    z-index: 1;
+}
+
 .rcard:hover {
     transform: translateY(-6px);
     box-shadow: 6px 8px 0 rgba(43,32,18,0.3);
@@ -245,6 +260,104 @@ section.set {
     letter-spacing: 0.03em;
     color: var(--ink-soft);
     margin-bottom: 4px;
+}
+
+/* ---------- Public comments ---------- */
+.comments-section {
+    border-top: 2px solid var(--kraft-line);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-item {
+    background: var(--kraft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    color: var(--ink);
+}
+
+.comment-item strong {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+}
+
+.comment-toggle {
+    background: none;
+    border: none;
+    color: var(--rare);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+}
+
+.comment-form {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.comment-form.open { display: flex; }
+
+.comment-form input[type="text"],
+.comment-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid var(--kraft-line);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    background: var(--face);
+    color: var(--ink);
+}
+
+.comment-form textarea { min-height: 56px; resize: vertical; }
+
+.comment-anon-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+}
+
+.comment-anon-row input { width: 14px; height: 14px; }
+
+.comment-submit-btn {
+    align-self: flex-start;
+    background: var(--rare);
+    color: var(--face);
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.comment-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.comment-msg {
+    font-size: 0.78rem;
+    display: none;
+}
+
+.comment-msg.error { display: block; color: #7A2A21; }
+.comment-msg.success { display: block; color: #2E5B3E; }
+
+.comments-paused-note {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-style: italic;
 }
 
 .empty-state {
@@ -434,7 +547,7 @@ footer {
 </footer>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbwYae8n_Rxjfz9_ncjLBksgB6pE2QA9MQE7PieC-XZIx1zrH742WDdbbKuCn8FK8CUEgw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycby8D1X4ZRe1Qy7bs6till7NAlIo2S4T7wucSSchw7FbBxkxu3Rms_f2eFAQ84sf2_r64A/exec";
   const FRAMES = ['var(--common)', 'var(--rare)', 'var(--epic)'];
 
   // ---- Spam prevention: limit submissions per browser using a cookie ----
@@ -510,6 +623,9 @@ footer {
     return div.innerHTML;
   }
 
+  let engagementData = { comments: {} };
+  let publicConfig = { commentsPaused: false, commentsPausedMessage: 'Comments are turned off right now.' };
+
   function renderReviews(reviews) {
     if (!reviews.length) {
       grid.style.display = 'none';
@@ -531,7 +647,34 @@ footer {
       const frame = FRAMES[i % FRAMES.length];
       const textHtml = (r.review && r.review !== 'Left Blank') ? '<div class="review-text">' + escapeHtml(r.review) + '</div>' : '';
       const replyHtml = r.reply ? '<div class="reply"><strong>Reply from Isaac</strong>' + escapeHtml(r.reply) + '</div>' : '';
+      const pinHtml = r.pinned ? '<div class="pin-badge">&#128204; Pinned</div>' : '';
+
+      const comments = engagementData.comments[r.id] || [];
+      const commentsListHtml = comments.map(c =>
+        '<div class="comment-item"><strong>' + escapeHtml(c.name) + '</strong>' + escapeHtml(c.text) + '</div>'
+      ).join('');
+
+      const commentsSectionHtml = publicConfig.commentsPaused
+        ? '<div class="comments-section">' +
+            commentsListHtml +
+            '<p class="comments-paused-note">' + escapeHtml(publicConfig.commentsPausedMessage) + '</p>' +
+          '</div>'
+        : '<div class="comments-section">' +
+            commentsListHtml +
+            '<button type="button" class="comment-toggle" data-review-id="' + r.id + '">' +
+              (comments.length ? 'Reply' : 'Be the first to reply') +
+            '</button>' +
+            '<form class="comment-form" data-review-id="' + r.id + '">' +
+              '<input type="text" class="comment-name-input" placeholder="Your name" maxlength="100">' +
+              '<label class="comment-anon-row"><input type="checkbox" class="comment-anon-check"> Post anonymously</label>' +
+              '<textarea class="comment-text-input" placeholder="Write a reply..." maxlength="1000"></textarea>' +
+              '<button type="submit" class="comment-submit-btn">Post reply</button>' +
+              '<div class="comment-msg"></div>' +
+            '</form>' +
+          '</div>';
+
       return '<div class="rcard" style="--frame:' + frame + '">' +
+        pinHtml +
         '<div class="body">' +
           starsHtml(r.rating) +
           textHtml +
@@ -540,16 +683,132 @@ footer {
             '<div class="chip">' + initials(r.name) + '</div>' +
             '<span class="reviewer-name">' + escapeHtml(r.name) + '</span>' +
           '</div>' +
+          commentsSectionHtml +
         '</div>' +
       '</div>';
     }).join('');
+
+    wireCommentForms_();
   }
 
-  function loadReviews() {
-    fetch(API_URL + '?action=list')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) renderReviews(data.reviews);
+  function wireCommentForms_() {
+    grid.querySelectorAll('.comment-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const form = grid.querySelector('.comment-form[data-review-id="' + btn.dataset.reviewId + '"]');
+        form.classList.toggle('open');
+      });
+    });
+
+    grid.querySelectorAll('.comment-form').forEach(form => {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        const reviewId = form.dataset.reviewId;
+        const msg = form.querySelector('.comment-msg');
+        const submitBtn = form.querySelector('.comment-submit-btn');
+        msg.className = 'comment-msg';
+
+        const rl = commentRateLimitStatus_();
+        if (!rl.allowed) {
+          msg.textContent = 'Too many replies from this browser recently. Try again in ' + rl.minutesLeft + ' minute(s).';
+          msg.classList.add('error');
+          return;
+        }
+
+        const anonymous = form.querySelector('.comment-anon-check').checked;
+        const name = form.querySelector('.comment-name-input').value.trim();
+        const text = form.querySelector('.comment-text-input').value.trim();
+
+        if (!anonymous && !name) {
+          msg.textContent = 'Add your name, or check "Post anonymously."';
+          msg.classList.add('error');
+          return;
+        }
+        if (!text) {
+          msg.textContent = 'Write something before posting.';
+          msg.classList.add('error');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'add_comment', reviewId: reviewId, anonymous: anonymous, name: name, text: text })
+        })
+          .then(res => res.json())
+          .then(data => {
+            submitBtn.disabled = false;
+            if (data.success) {
+              recordCommentSubmission_();
+              if (!engagementData.comments[reviewId]) engagementData.comments[reviewId] = [];
+              engagementData.comments[reviewId].push(data.comment);
+              form.reset();
+              form.classList.remove('open');
+              renderReviews(lastReviews_);
+            } else {
+              msg.textContent = data.error || 'Something went wrong. Try again.';
+              msg.classList.add('error');
+            }
+          })
+          .catch(() => {
+            submitBtn.disabled = false;
+            msg.textContent = "Could not reach the server.";
+            msg.classList.add('error');
+          });
+      });
+    });
+  }
+
+  // ---- Comment rate limiting: same cookie approach as reviews, its own window ----
+  const COMMENT_RATE_LIMIT_COOKIE = 'ipk_comment_times';
+  const COMMENT_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+  const COMMENT_RATE_LIMIT_MAX = 5;
+
+  function getRecentCommentTimes_() {
+    const raw = getCookie(COMMENT_RATE_LIMIT_COOKIE);
+    if (!raw) return [];
+    let times;
+    try { times = JSON.parse(raw); } catch (e) { return []; }
+    if (!Array.isArray(times)) return [];
+    const cutoff = Date.now() - COMMENT_RATE_LIMIT_WINDOW_MS;
+    return times.filter(t => typeof t === 'number' && t > cutoff);
+  }
+
+  function recordCommentSubmission_() {
+    const times = getRecentCommentTimes_();
+    times.push(Date.now());
+    setCookie(COMMENT_RATE_LIMIT_COOKIE, JSON.stringify(times), COMMENT_RATE_LIMIT_WINDOW_MS / 1000);
+  }
+
+  function commentRateLimitStatus_() {
+    const times = getRecentCommentTimes_();
+    if (times.length < COMMENT_RATE_LIMIT_MAX) return { allowed: true };
+    const oldest = Math.min(...times);
+    const msLeft = (oldest + COMMENT_RATE_LIMIT_WINDOW_MS) - Date.now();
+    return { allowed: false, minutesLeft: Math.max(1, Math.ceil(msLeft / 60000)) };
+  }
+
+  let lastReviews_ = [];
+
+  function loadReviews(skipEngagementRefetch) {
+    const reviewsPromise = fetch(API_URL + '?action=list').then(res => res.json());
+    const engagementPromise = skipEngagementRefetch
+      ? Promise.resolve({ success: true, comments: engagementData.comments })
+      : fetch(API_URL + '?action=list_engagement').then(res => res.json());
+    const configPromise = fetch(API_URL + '?action=get_public_settings').then(res => res.json());
+
+    Promise.all([reviewsPromise, engagementPromise, configPromise])
+      .then(([reviewsData, engagement, configData]) => {
+        if (engagement.success) {
+          engagementData = { comments: engagement.comments || {} };
+        }
+        if (configData.success) {
+          publicConfig = configData.config;
+        }
+        if (reviewsData.success) {
+          lastReviews_ = reviewsData.reviews;
+          renderReviews(reviewsData.reviews);
+        }
       })
       .catch(() => {
         emptyState.textContent = "Could not load reviews right now. Check back soon.";
