@@ -194,6 +194,39 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
 .log-row .log-action { color: var(--ink); }
 .log-row .log-details { color: var(--ink-soft); font-size: 0.8rem; margin-top: 4px; }
 
+.comment-group {
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+    background: var(--face);
+    box-shadow: 3px 3px 0 rgba(43,32,18,0.2);
+}
+
+.comment-group .group-review {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--kraft-line);
+}
+
+.comment-group .group-review strong { color: var(--ink); }
+
+.mod-comment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--kraft-line);
+    font-size: 0.85rem;
+}
+
+.mod-comment-row:last-of-type { border-bottom: none; }
+.mod-comment-row .mc-name { font-weight: 700; }
+.mod-comment-row .mc-meta { color: var(--ink-soft); font-size: 0.75rem; }
+
 .settings-card {
     background: var(--face);
     border: 3px solid var(--ink);
@@ -453,6 +486,7 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
 
     <div class="filter-row" id="view-row" style="display:none;">
         <button class="view-btn active" data-view="reviews">Reviews</button>
+        <button class="view-btn" data-view="comments" id="comments-tab-btn">Comments</button>
         <button class="view-btn" data-view="logs" id="logs-tab-btn">Activity Log</button>
         <button class="view-btn" data-view="settings" id="settings-tab-btn">Manager Settings</button>
     </div>
@@ -467,6 +501,11 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
         </div>
 
         <div id="reviews-list"></div>
+    </div>
+
+    <div id="comments-view" style="display:none;">
+        <div class="status-msg" id="comments-status">Loading...</div>
+        <div id="comments-groups"></div>
     </div>
 
     <div id="logs-view" style="display:none;">
@@ -568,6 +607,17 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
                 </div>
             </div>
 
+            <hr class="settings-divider">
+            <p class="settings-note">Public comments (visitor replies on the testimonials page), site-wide, applies to everyone, not just the Manager:</p>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-commentsPaused">
+                <span><strong>Pause all public comments.</strong> Hides the reply form on every review and blocks new replies from anyone.</span>
+            </label>
+            <div class="field">
+                <label for="setting-commentsPausedMessage">Message shown instead of the reply form while paused</label>
+                <input type="text" id="setting-commentsPausedMessage" placeholder="Comments are turned off right now.">
+            </div>
+
             <button class="btn" id="save-settings-btn" style="margin-top:14px;">Save Settings</button>
         </div>
     </div>
@@ -596,7 +646,7 @@ function showToast(message, type) {
   toastContainer.appendChild(toast);
   setTimeout(() => toast.remove(), 5000);
 }
-const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycbzcoHwy3Hj8aDUB7fNRD3Ro_3k2GPXAtbTHmx2DZAWxzPFkyfOkw9f8TvYeLgN5TG24Cw/exec";
+const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycby8D1X4ZRe1Qy7bs6till7NAlIo2S4T7wucSSchw7FbBxkxu3Rms_f2eFAQ84sf2_r64A/exec";
 
 // Separate, standalone Apps Script whose only job is logging activity.
 // Paste in its /exec URL once you've deployed LoggerCode.gs.
@@ -743,9 +793,11 @@ function completeUnlock_(account) {
   const isOwnerNow = currentRole === "owner";
   const showLogTab = isOwnerNow || managerPermissions.canViewLog;
   const showSettingsTab = isOwnerNow || managerPermissions.canViewSettings;
-  document.getElementById("view-row").style.display = (showLogTab || showSettingsTab) ? "flex" : "none";
+  const showCommentsTab = isOwnerNow || managerPermissions.canDelete;
+  document.getElementById("view-row").style.display = (showLogTab || showSettingsTab || showCommentsTab) ? "flex" : "none";
   document.getElementById("logs-tab-btn").style.display = showLogTab ? "inline-block" : "none";
   document.getElementById("settings-tab-btn").style.display = showSettingsTab ? "inline-block" : "none";
+  document.getElementById("comments-tab-btn").style.display = showCommentsTab ? "inline-block" : "none";
 
   // A restricted Manager only ever sees All/Pending/Approved filters
   // if that's allowed; otherwise force the pending-only queue.
@@ -823,10 +875,12 @@ document.querySelectorAll(".view-btn").forEach(btn => {
     document.querySelectorAll(".view-btn").forEach(b => b.classList.toggle("active", b === btn));
     const view = btn.dataset.view;
     document.getElementById("reviews-view").style.display = view === "reviews" ? "block" : "none";
+    document.getElementById("comments-view").style.display = view === "comments" ? "block" : "none";
     document.getElementById("logs-view").style.display = view === "logs" ? "block" : "none";
     document.getElementById("settings-view").style.display = view === "settings" ? "block" : "none";
     if (view === "logs") loadLogs();
     if (view === "settings") loadSettingsPanel();
+    if (view === "comments") loadCommentsPanel();
   });
 });
 
@@ -834,9 +888,11 @@ function loadSettingsPanel() {
   const status = document.getElementById("settings-status");
   status.textContent = "Loading...";
 
-  fetch(LOG_URL + "?action=get_settings")
-    .then(res => res.json())
-    .then(data => {
+  const managerSettingsPromise = fetch(LOG_URL + "?action=get_settings").then(res => res.json());
+  const publicSettingsPromise = fetch(TESTIMONIALS_URL + "?action=get_public_settings").then(res => res.json());
+
+  Promise.all([managerSettingsPromise, publicSettingsPromise])
+    .then(([data, publicData]) => {
       if (!data.success) {
         status.textContent = "Error: " + data.error;
         return;
@@ -862,6 +918,11 @@ function loadSettingsPanel() {
       document.getElementById("setting-loginStartHour").value = s.loginStartHour;
       document.getElementById("setting-loginEndHour").value = s.loginEndHour;
       document.getElementById("setting-canViewSettings").checked = s.canViewSettings;
+
+      if (publicData.success) {
+        document.getElementById("setting-commentsPaused").checked = publicData.config.commentsPaused;
+        document.getElementById("setting-commentsPausedMessage").value = publicData.config.commentsPausedMessage || "";
+      }
 
       const card = document.getElementById("settings-card");
       const notice = document.getElementById("settings-locked-notice");
@@ -903,16 +964,25 @@ document.getElementById("save-settings-btn").addEventListener("click", () => {
     loginEndHour: document.getElementById("setting-loginEndHour").value
   };
 
-  fetch(LOG_URL, { method: "POST", body: JSON.stringify(payload) })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
+  const publicPayload = {
+    action: "update_public_settings",
+    commentsPaused: document.getElementById("setting-commentsPaused").checked,
+    commentsPausedMessage: document.getElementById("setting-commentsPausedMessage").value
+  };
+
+  const managerSave = fetch(LOG_URL, { method: "POST", body: JSON.stringify(payload) }).then(res => res.json());
+  const publicSave = fetch(TESTIMONIALS_URL, { method: "POST", body: JSON.stringify(publicPayload) }).then(res => res.json());
+
+  Promise.all([managerSave, publicSave])
+    .then(([data, publicData]) => {
+      if (data.success && publicData.success) {
         showToast("Settings saved.", "success");
       } else {
-        showToast("Couldn't save: " + data.error, "error");
+        const err = !data.success ? data.error : publicData.error;
+        showToast("Couldn't save everything: " + err, "error");
       }
     })
-    .catch(() => showToast("Couldn't reach the logging script.", "error"));
+    .catch(() => showToast("Couldn't reach one of the scripts.", "error"));
 });
 
 function loadLogs() {
@@ -956,6 +1026,89 @@ function loadLogs() {
     });
 }
 
+function loadCommentsPanel() {
+  const status = document.getElementById("comments-status");
+  const groupsEl = document.getElementById("comments-groups");
+  status.textContent = "Loading...";
+
+  fetch(TESTIMONIALS_URL + "?action=admin_list_comments")
+    .then(res => res.json())
+    .then(commentsData => {
+      if (!commentsData.success) {
+        status.textContent = "Error: " + commentsData.error;
+        return;
+      }
+
+      const comments = commentsData.comments || [];
+
+      const reviewMap = {};
+      allReviews.forEach(r => { reviewMap[r.id] = r; });
+
+      const reviewIds = new Set();
+      comments.forEach(c => reviewIds.add(c.reviewId));
+
+      if (!reviewIds.size) {
+        status.textContent = "No comments yet.";
+        groupsEl.innerHTML = "";
+        return;
+      }
+
+      status.textContent = comments.length + " comment(s) across " + reviewIds.size + " review(s).";
+
+      groupsEl.innerHTML = Array.from(reviewIds).map(reviewId => {
+        const review = reviewMap[reviewId];
+        const reviewLine = review
+          ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating) + " " +
+            (review.review === "Left Blank" ? "<em>no written review</em>" : escapeHtml(String(review.review).slice(0, 80)))
+          : "(review not found, may have been deleted)";
+
+        const reviewComments = comments.filter(c => c.reviewId === reviewId);
+
+        const commentsHtml = reviewComments.length
+          ? reviewComments.map(c => `
+              <div class="mod-comment-row" data-comment-id="${c.id}">
+                <div>
+                  <div class="mc-name">${c.anonymous ? "Anonymous" : escapeHtml(c.name)}</div>
+                  <div>${escapeHtml(c.text)}</div>
+                  <div class="mc-meta">${escapeHtml(c.timestamp)}</div>
+                </div>
+                <button class="btn btn-danger delete-comment-btn" data-comment-id="${c.id}">Delete</button>
+              </div>
+            `).join("")
+          : '<p class="settings-note" style="margin:0;">No comments on this review.</p>';
+
+        return `
+          <div class="comment-group" data-review-id="${reviewId}">
+            <div class="group-review"><strong>Review:</strong> ${reviewLine}</div>
+            ${commentsHtml}
+          </div>
+        `;
+      }).join("");
+
+      groupsEl.querySelectorAll(".delete-comment-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (!confirm("Delete this comment permanently?")) return;
+          fetch(TESTIMONIALS_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "admin_delete_comment", commentId: btn.dataset.commentId })
+          })
+            .then(res => res.json())
+            .then(res => {
+              if (res.success) {
+                showToast("Comment deleted.", "success");
+                logAction("Deleted comment", btn.dataset.commentId, "");
+                loadCommentsPanel();
+              } else {
+                showToast("Couldn't delete: " + res.error, "error");
+              }
+            });
+        });
+      });
+    })
+    .catch(() => {
+      status.textContent = "Couldn't reach the testimonials script.";
+    });
+}
 let allReviews = [];
 let currentFilter = "all";
 
