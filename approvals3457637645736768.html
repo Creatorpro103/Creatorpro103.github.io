@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=lock_person" />
 
 <style>
 :root {
@@ -31,6 +32,59 @@ body {
     color: var(--ink);
     line-height: 1.6;
     min-height: 100vh;
+}
+
+/* ---------- In-page notifications (replaces browser alert()) ---------- */
+#toast-container {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 420px;
+    padding: 0 16px;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    background: var(--face);
+    border: 3px solid var(--ink);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    animation: toast-in 0.18s ease-out;
+}
+
+.toast.success { border-color: var(--common); }
+.toast.error { border-color: var(--danger); background: #F8E3E1; }
+.toast.info { border-color: var(--rare); }
+
+.toast .toast-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 h1, h2 { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
@@ -139,6 +193,91 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
 .log-row .log-time { color: var(--ink-soft); font-size: 0.78rem; }
 .log-row .log-action { color: var(--ink); }
 .log-row .log-details { color: var(--ink-soft); font-size: 0.8rem; margin-top: 4px; }
+
+.settings-card {
+    background: var(--face);
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 480px;
+}
+
+.settings-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 14px;
+    cursor: pointer;
+}
+
+.settings-row input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+
+.settings-divider {
+    border: none;
+    border-top: 2px solid var(--kraft-line);
+    margin: 16px 0;
+}
+
+.settings-note {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+}
+
+.settings-card .field { margin-bottom: 16px; }
+
+.settings-card .field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+.settings-card .field .hint { font-weight: 400; color: var(--ink-soft); }
+
+.managed-icon {
+    display: none;
+    font-size: 18px;
+    color: var(--ink-soft);
+    vertical-align: middle;
+    margin-left: 6px;
+    cursor: help;
+    position: relative;
+}
+
+.settings-card.locked .managed-icon { display: inline-block; }
+
+.settings-card.locked input {
+    pointer-events: none;
+    opacity: 0.55;
+}
+
+.settings-card.locked #save-settings-btn { display: none; }
+
+.locked-notice {
+    display: none;
+    background: var(--kraft);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+}
+
+.settings-card .field input[type="text"] {
+    width: 100%;
+    padding: 9px 11px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    background: var(--kraft);
+    color: var(--ink);
+}
 
 .review-row {
     border: 2.5px solid var(--ink);
@@ -288,6 +427,8 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
 </head>
 <body>
 
+<div id="toast-container"></div>
+
 <div id="lock-screen">
     <div class="lock-card">
         <h1>Approvals</h1>
@@ -306,11 +447,14 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
         <button class="btn" id="reload-btn">Reload</button>
     </header>
 
+    <div class="warning" id="manager-banner" style="display:none; background:#EFE3FF; border-color:var(--epic);"></div>
+
     <div class="warning">Account passwords live in this page's own code, not on the server. Anyone who can view this file's source can read them. Keep this link private, this is a temporary setup.</div>
 
     <div class="filter-row" id="view-row" style="display:none;">
         <button class="view-btn active" data-view="reviews">Reviews</button>
-        <button class="view-btn" data-view="logs">Activity Log</button>
+        <button class="view-btn" data-view="logs" id="logs-tab-btn">Activity Log</button>
+        <button class="view-btn" data-view="settings" id="settings-tab-btn">Manager Settings</button>
     </div>
 
     <div id="reviews-view">
@@ -329,15 +473,134 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
         <div class="status-msg" id="log-status">Loading...</div>
         <div id="logs-list"></div>
     </div>
+
+    <div id="settings-view" style="display:none;">
+        <div class="status-msg" id="settings-status">Loading...</div>
+        <div class="locked-notice" id="settings-locked-notice">You're viewing these settings read-only. Only the Owner can change them.</div>
+        <div class="settings-card" id="settings-card">
+            <label class="settings-row">
+                <input type="checkbox" id="setting-paused">
+                <span><strong>Pause the Testimonials Manager account.</strong> While paused, that account can't log in at all.</span>
+            </label>
+            <div class="field">
+                <label for="setting-pauseMessage">Message shown when paused</label>
+                <input type="text" id="setting-pauseMessage" placeholder="This account is paused right now.">
+            </div>
+            <div class="field">
+                <label for="setting-welcomeMessage">Message shown right after the Manager logs in <span class="hint">(optional, blank = none)</span></label>
+                <input type="text" id="setting-welcomeMessage" placeholder="e.g. Remember to check pending reviews daily!">
+            </div>
+
+            <hr class="settings-divider">
+            <label class="settings-row">
+                <input type="checkbox" id="setting-readOnly">
+                <span><strong>Read-only mode.</strong> Disables Approve/Set Pending too, the Manager can only look, not act on anything.</span>
+            </label>
+
+            <hr class="settings-divider">
+            <p class="settings-note">The Manager can always Approve or Set Pending (unless Read-only is on above). These extra abilities are off by default:</p>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-canPin">
+                <span>Allow pinning/unpinning reviews</span>
+            </label>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-canReply">
+                <span>Allow writing/editing replies</span>
+            </label>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-canDelete">
+                <span>Allow deleting reviews</span>
+            </label>
+
+            <hr class="settings-divider">
+            <label class="settings-row">
+                <input type="checkbox" id="setting-hideReviewerNames">
+                <span>Hide reviewer names from the Manager (shows "Reviewer" instead)</span>
+            </label>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-canViewLog">
+                <span>Let the Manager see the Activity Log tab (Manager Settings stays Owner-only regardless)</span>
+            </label>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-canViewSettings">
+                <span>Let the Manager see this Settings tab, read-only, they can look but never change anything here</span>
+            </label>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-pendingOnlyView">
+                <span>Restrict the Manager's view to pending reviews only (hides the All/Approved filters)</span>
+            </label>
+
+            <hr class="settings-divider">
+            <div class="field">
+                <label for="setting-maxApprovalsPerDay">Max Approve/Set Pending actions per day <span class="hint">(0 = unlimited)</span></label>
+                <input type="text" id="setting-maxApprovalsPerDay" inputmode="numeric" placeholder="0">
+            </div>
+            <label class="settings-row">
+                <input type="checkbox" id="setting-requireDeleteReason">
+                <span>Require the Manager to type a reason before deleting a review</span>
+            </label>
+            <div class="field">
+                <label for="setting-sessionTimeoutMinutes">Auto-lock the Manager after this many idle minutes <span class="hint">(0 = never)</span></label>
+                <input type="text" id="setting-sessionTimeoutMinutes" inputmode="numeric" placeholder="0">
+            </div>
+            <div class="field">
+                <label for="setting-bannerMessage">Persistent reminder banner for the Manager <span class="hint">(shown the whole session, blank = none)</span></label>
+                <input type="text" id="setting-bannerMessage" placeholder="e.g. Remember: no deleting without asking first">
+            </div>
+            <div class="field">
+                <label for="setting-managerDisplayName">Name shown for the Manager in the Activity Log</label>
+                <input type="text" id="setting-managerDisplayName" placeholder="Testimonials Manager">
+            </div>
+
+            <hr class="settings-divider">
+            <label class="settings-row">
+                <input type="checkbox" id="setting-loginWindowEnabled">
+                <span>Only allow the Manager to log in during specific hours (based on their device's local time)</span>
+            </label>
+            <div class="field" style="display:flex; gap:12px;">
+                <div style="flex:1;">
+                    <label for="setting-loginStartHour">Start hour <span class="hint">(0-23)</span></label>
+                    <input type="text" id="setting-loginStartHour" inputmode="numeric" placeholder="0">
+                </div>
+                <div style="flex:1;">
+                    <label for="setting-loginEndHour">End hour <span class="hint">(0-23)</span></label>
+                    <input type="text" id="setting-loginEndHour" inputmode="numeric" placeholder="23">
+                </div>
+            </div>
+
+            <button class="btn" id="save-settings-btn" style="margin-top:14px;">Save Settings</button>
+        </div>
+    </div>
 </div>
 </div>
 
 <script>
+const toastContainer = document.getElementById("toast-container");
+
+function showToast(message, type) {
+  type = type || "info";
+  const toast = document.createElement("div");
+  toast.className = "toast " + type;
+
+  const text = document.createElement("span");
+  text.textContent = message;
+  toast.appendChild(text);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "toast-close";
+  closeBtn.setAttribute("aria-label", "Dismiss");
+  closeBtn.textContent = "\u00d7";
+  closeBtn.addEventListener("click", () => toast.remove());
+  toast.appendChild(closeBtn);
+
+  toastContainer.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
 const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycbzcoHwy3Hj8aDUB7fNRD3Ro_3k2GPXAtbTHmx2DZAWxzPFkyfOkw9f8TvYeLgN5TG24Cw/exec";
 
 // Separate, standalone Apps Script whose only job is logging activity.
 // Paste in its /exec URL once you've deployed LoggerCode.gs.
-const LOG_URL = "https://script.google.com/macros/s/AKfycbwxNBr-qz2QXI4VrwMJCGAKLmlkVNI3ai3iUEGbarkh4rWsrq9Aa66ZSrkpmYrdlAKZOA/exec";
+const LOG_URL = "https://script.google.com/macros/s/AKfycbzcOIBYduy0x-BkwjUPE2tLrtwmE2OaobvquFNAbRuwrV9Iy3A4dEtj9g7ZcTpk6c9kmQ/exec";
 
 // ---- Temporary client-side accounts ----
 // These checks happen entirely in the browser. Anyone who views this
@@ -362,6 +625,7 @@ const ACCOUNTS = [
 let selectedAccountId = ACCOUNTS[0].id;
 let currentRole = null;
 let currentActorLabel = null;
+let approvalsUsedToday = 0;
 
 const lockScreen = document.getElementById("lock-screen");
 const dashboard = document.getElementById("dashboard");
@@ -383,33 +647,272 @@ accountRow.querySelectorAll(".account-btn").forEach(btn => {
   });
 });
 
+let managerPermissions = {
+  paused: false, canDelete: false, canPin: false, canReply: false,
+  pauseMessage: "This account is paused right now.", welcomeMessage: "",
+  hideReviewerNames: false, canViewLog: false, canViewSettings: false, readOnly: false, pendingOnlyView: false,
+  maxApprovalsPerDay: 0, requireDeleteReason: false, sessionTimeoutMinutes: 0,
+  bannerMessage: "", loginWindowEnabled: false, loginStartHour: 0, loginEndHour: 23,
+  managerDisplayName: "Testimonials Manager"
+};
+
+// Add a "Managed by your admin" lock icon to every settings row/field.
+// Purely cosmetic until the card gets the "locked" class (see
+// completeUnlock_ and loadSettingsPanel), which is what actually makes
+// these icons visible and disables the inputs.
+document.querySelectorAll("#settings-card .settings-row span, #settings-card .field label").forEach(el => {
+  const icon = document.createElement("span");
+  icon.className = "material-symbols-outlined managed-icon";
+  icon.title = "Managed by your admin";
+  icon.textContent = "lock_person";
+  el.appendChild(icon);
+});
+
+function isWithinLoginWindow_(settings) {
+  if (!settings.loginWindowEnabled) return true;
+  const hour = new Date().getHours();
+  const start = settings.loginStartHour;
+  const end = settings.loginEndHour;
+  if (start <= end) return hour >= start && hour <= end;
+  return hour >= start || hour <= end; // overnight window, e.g. 22 to 6
+}
+
 function unlock() {
   const account = ACCOUNTS.find(a => a.id === selectedAccountId);
-  if (account && lockInput.value === account.password) {
-    currentRole = account.role;
-    currentActorLabel = account.label;
-    lockError.style.display = "none";
-    lockScreen.style.display = "none";
-    dashboard.style.display = "block";
-    document.getElementById("view-row").style.display = currentRole === "owner" ? "flex" : "none";
-    load();
-  } else {
+  if (!account || lockInput.value !== account.password) {
+    lockError.textContent = "Wrong password.";
     lockError.style.display = "block";
+    return;
   }
+
+  if (account.role === "manager") {
+    document.getElementById("unlock-btn").disabled = true;
+    fetch(LOG_URL + "?action=get_settings")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("unlock-btn").disabled = false;
+        const settings = data.success ? data.settings : managerPermissions;
+
+        if (settings.paused) {
+          lockError.textContent = settings.pauseMessage || "This account is paused right now.";
+          lockError.style.display = "block";
+          return;
+        }
+
+        if (!isWithinLoginWindow_(settings)) {
+          const pad = n => n.toString().padStart(2, "0");
+          lockError.textContent = `Login is only allowed between ${pad(settings.loginStartHour)}:00 and ${pad(settings.loginEndHour)}:00 (your device's local time).`;
+          lockError.style.display = "block";
+          return;
+        }
+
+        managerPermissions = settings;
+        completeUnlock_(account);
+        if (settings.welcomeMessage) {
+          showToast(settings.welcomeMessage, "info");
+        }
+
+        if (settings.maxApprovalsPerDay > 0) {
+          fetch(LOG_URL + "?action=get_approval_count&actor=" + encodeURIComponent(currentActorLabel))
+            .then(res => res.json())
+            .then(countData => {
+              approvalsUsedToday = countData.success ? countData.count : 0;
+            })
+            .catch(() => { approvalsUsedToday = 0; });
+        }
+      })
+      .catch(() => {
+        document.getElementById("unlock-btn").disabled = false;
+        lockError.textContent = "Couldn't check account status. Try again.";
+        lockError.style.display = "block";
+      });
+  } else {
+    completeUnlock_(account);
+  }
+}
+
+function completeUnlock_(account) {
+  currentRole = account.role;
+  currentActorLabel = account.role === "manager"
+    ? (managerPermissions.managerDisplayName || account.label)
+    : account.label;
+  lockError.style.display = "none";
+  lockScreen.style.display = "none";
+  dashboard.style.display = "block";
+
+  const isOwnerNow = currentRole === "owner";
+  const showLogTab = isOwnerNow || managerPermissions.canViewLog;
+  const showSettingsTab = isOwnerNow || managerPermissions.canViewSettings;
+  document.getElementById("view-row").style.display = (showLogTab || showSettingsTab) ? "flex" : "none";
+  document.getElementById("logs-tab-btn").style.display = showLogTab ? "inline-block" : "none";
+  document.getElementById("settings-tab-btn").style.display = showSettingsTab ? "inline-block" : "none";
+
+  // A restricted Manager only ever sees All/Pending/Approved filters
+  // if that's allowed; otherwise force the pending-only queue.
+  const filterRow = document.querySelector("#reviews-view .filter-row");
+  if (!isOwnerNow && managerPermissions.pendingOnlyView) {
+    filterRow.style.display = "none";
+    currentFilter = "pending";
+  } else {
+    filterRow.style.display = "flex";
+  }
+
+  // Persistent reminder banner, shown for the Manager's whole session.
+  const banner = document.getElementById("manager-banner");
+  if (!isOwnerNow && managerPermissions.bannerMessage) {
+    banner.textContent = managerPermissions.bannerMessage;
+    banner.style.display = "block";
+  } else {
+    banner.style.display = "none";
+  }
+
+  // Auto-lock after N idle minutes, Manager only.
+  if (!isOwnerNow && managerPermissions.sessionTimeoutMinutes > 0) {
+    startIdleTimer_(managerPermissions.sessionTimeoutMinutes);
+  } else {
+    stopIdleTimer_();
+  }
+
+  load();
+}
+
+let idleTimerId = null;
+let idleActivityHandler = null;
+
+function startIdleTimer_(minutes) {
+  stopIdleTimer_();
+  const resetTimer = () => {
+    clearTimeout(idleTimerId);
+    idleTimerId = setTimeout(() => {
+      showToast("Locked after " + minutes + " minute(s) of inactivity.", "info");
+      relock_();
+    }, minutes * 60 * 1000);
+  };
+  idleActivityHandler = resetTimer;
+  ["mousemove", "keydown", "click", "scroll"].forEach(evt =>
+    document.addEventListener(evt, idleActivityHandler)
+  );
+  resetTimer();
+}
+
+function stopIdleTimer_() {
+  clearTimeout(idleTimerId);
+  if (idleActivityHandler) {
+    ["mousemove", "keydown", "click", "scroll"].forEach(evt =>
+      document.removeEventListener(evt, idleActivityHandler)
+    );
+    idleActivityHandler = null;
+  }
+}
+
+function relock_() {
+  stopIdleTimer_();
+  dashboard.style.display = "none";
+  lockScreen.style.display = "flex";
+  lockInput.value = "";
+  currentRole = null;
+  approvalsUsedToday = 0;
 }
 
 document.getElementById("unlock-btn").addEventListener("click", unlock);
 lockInput.addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
 
-// ---- View switcher (Reviews / Activity Log), owner only ----
+// ---- View switcher (Reviews / Activity Log / Manager Settings), owner only ----
 document.querySelectorAll(".view-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".view-btn").forEach(b => b.classList.toggle("active", b === btn));
     const view = btn.dataset.view;
     document.getElementById("reviews-view").style.display = view === "reviews" ? "block" : "none";
     document.getElementById("logs-view").style.display = view === "logs" ? "block" : "none";
+    document.getElementById("settings-view").style.display = view === "settings" ? "block" : "none";
     if (view === "logs") loadLogs();
+    if (view === "settings") loadSettingsPanel();
   });
+});
+
+function loadSettingsPanel() {
+  const status = document.getElementById("settings-status");
+  status.textContent = "Loading...";
+
+  fetch(LOG_URL + "?action=get_settings")
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        status.textContent = "Error: " + data.error;
+        return;
+      }
+      status.textContent = "";
+      const s = data.settings;
+      document.getElementById("setting-paused").checked = s.paused;
+      document.getElementById("setting-pauseMessage").value = s.pauseMessage || "";
+      document.getElementById("setting-welcomeMessage").value = s.welcomeMessage || "";
+      document.getElementById("setting-readOnly").checked = s.readOnly;
+      document.getElementById("setting-canPin").checked = s.canPin;
+      document.getElementById("setting-canReply").checked = s.canReply;
+      document.getElementById("setting-canDelete").checked = s.canDelete;
+      document.getElementById("setting-hideReviewerNames").checked = s.hideReviewerNames;
+      document.getElementById("setting-canViewLog").checked = s.canViewLog;
+      document.getElementById("setting-pendingOnlyView").checked = s.pendingOnlyView;
+      document.getElementById("setting-maxApprovalsPerDay").value = s.maxApprovalsPerDay;
+      document.getElementById("setting-requireDeleteReason").checked = s.requireDeleteReason;
+      document.getElementById("setting-sessionTimeoutMinutes").value = s.sessionTimeoutMinutes;
+      document.getElementById("setting-bannerMessage").value = s.bannerMessage || "";
+      document.getElementById("setting-managerDisplayName").value = s.managerDisplayName || "";
+      document.getElementById("setting-loginWindowEnabled").checked = s.loginWindowEnabled;
+      document.getElementById("setting-loginStartHour").value = s.loginStartHour;
+      document.getElementById("setting-loginEndHour").value = s.loginEndHour;
+      document.getElementById("setting-canViewSettings").checked = s.canViewSettings;
+
+      const card = document.getElementById("settings-card");
+      const notice = document.getElementById("settings-locked-notice");
+      const isOwnerViewing = currentRole === "owner";
+      card.classList.toggle("locked", !isOwnerViewing);
+      notice.style.display = isOwnerViewing ? "none" : "block";
+    })
+    .catch(() => {
+      status.textContent = "Couldn't reach the logging script.";
+    });
+}
+
+document.getElementById("save-settings-btn").addEventListener("click", () => {
+  if (currentRole !== "owner") {
+    showToast("Only the Owner can change these settings.", "error");
+    return;
+  }
+
+  const payload = {
+    requestType: "update_settings",
+    paused: document.getElementById("setting-paused").checked,
+    pauseMessage: document.getElementById("setting-pauseMessage").value,
+    welcomeMessage: document.getElementById("setting-welcomeMessage").value,
+    readOnly: document.getElementById("setting-readOnly").checked,
+    canPin: document.getElementById("setting-canPin").checked,
+    canReply: document.getElementById("setting-canReply").checked,
+    canDelete: document.getElementById("setting-canDelete").checked,
+    hideReviewerNames: document.getElementById("setting-hideReviewerNames").checked,
+    canViewLog: document.getElementById("setting-canViewLog").checked,
+    canViewSettings: document.getElementById("setting-canViewSettings").checked,
+    pendingOnlyView: document.getElementById("setting-pendingOnlyView").checked,
+    maxApprovalsPerDay: document.getElementById("setting-maxApprovalsPerDay").value,
+    requireDeleteReason: document.getElementById("setting-requireDeleteReason").checked,
+    sessionTimeoutMinutes: document.getElementById("setting-sessionTimeoutMinutes").value,
+    bannerMessage: document.getElementById("setting-bannerMessage").value,
+    managerDisplayName: document.getElementById("setting-managerDisplayName").value,
+    loginWindowEnabled: document.getElementById("setting-loginWindowEnabled").checked,
+    loginStartHour: document.getElementById("setting-loginStartHour").value,
+    loginEndHour: document.getElementById("setting-loginEndHour").value
+  };
+
+  fetch(LOG_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast("Settings saved.", "success");
+      } else {
+        showToast("Couldn't save: " + data.error, "error");
+      }
+    })
+    .catch(() => showToast("Couldn't reach the logging script.", "error"));
 });
 
 function loadLogs() {
@@ -484,13 +987,19 @@ function render() {
   }
 
   const isOwner = currentRole === "owner";
+  const isReadOnly = !isOwner && managerPermissions.readOnly;
+  const canReply = !isReadOnly && (isOwner || managerPermissions.canReply);
+  const canPin = !isReadOnly && (isOwner || managerPermissions.canPin);
+  const canDelete = !isReadOnly && (isOwner || managerPermissions.canDelete);
+  const canToggleApprove = isOwner || !isReadOnly;
+  const hideNames = !isOwner && managerPermissions.hideReviewerNames;
 
   listEl.innerHTML = reviews.map(r => `
     <div class="review-row" data-id="${r.id}">
       <div class="top-line">
         <div>
           <div class="stars">${starsHtml(r.rating)}</div>
-          <div class="meta">${r.anonymous ? "Anonymous" : escapeHtml(r.name)} &middot; ${escapeHtml(r.timestamp)}</div>
+          <div class="meta">${hideNames ? "Reviewer" : (r.anonymous ? "Anonymous" : escapeHtml(r.name))} &middot; ${escapeHtml(r.timestamp)}</div>
         </div>
         <div class="top-line-tags">
           <span class="approved-tag ${r.approved ? "yes" : "no"}">${r.approved ? "APPROVED" : "PENDING"}</span>
@@ -498,15 +1007,15 @@ function render() {
         </div>
       </div>
       <div class="text">${r.review === "Left Blank" ? "<em>No written comment.</em>" : escapeHtml(r.review)}</div>
-      ${isOwner
+      ${canReply
         ? `<textarea class="reply-input" placeholder="Reply shown under this review...">${escapeHtml(r.reply || "")}</textarea>`
         : (r.reply ? `<div class="text"><strong>Reply:</strong> ${escapeHtml(r.reply)}</div>` : '')
       }
       <div class="row-actions">
-        <button class="btn toggle-btn">${r.approved ? "Set Pending" : "Approve"}</button>
-        ${isOwner ? `<button class="btn pin-btn">${r.pinned ? "Unpin" : "Pin"}</button>` : ''}
-        ${isOwner ? `<button class="btn save-reply-btn">Save Reply</button>` : ''}
-        ${isOwner ? `<button class="btn btn-danger delete-btn">Delete</button>` : ''}
+        ${canToggleApprove ? `<button class="btn toggle-btn">${r.approved ? "Set Pending" : "Approve"}</button>` : ''}
+        ${canPin ? `<button class="btn pin-btn">${r.pinned ? "Unpin" : "Pin"}</button>` : ''}
+        ${canReply ? `<button class="btn save-reply-btn">Save Reply</button>` : ''}
+        ${canDelete ? `<button class="btn btn-danger delete-btn">Delete</button>` : ''}
       </div>
     </div>
   `).join("");
@@ -515,18 +1024,27 @@ function render() {
     const id = row.dataset.id;
     const review = allReviews.find(r => r.id === id);
 
-    row.querySelector(".toggle-btn").addEventListener("click", () => {
-      const newApproved = !review.approved;
-      apiCall({ action: "admin_approve", id, approved: newApproved }).then(res => {
-        if (res.success) {
-          review.approved = newApproved;
-          render();
-          logAction(newApproved ? "Approved" : "Set Pending", id, "");
-        } else {
-          alert("Couldn't update: " + res.error);
+    const toggleBtn = row.querySelector(".toggle-btn");
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        if (currentRole === "manager" && managerPermissions.maxApprovalsPerDay > 0 &&
+            approvalsUsedToday >= managerPermissions.maxApprovalsPerDay) {
+          showToast("Daily limit reached (" + managerPermissions.maxApprovalsPerDay + "/day). Try again tomorrow.", "error");
+          return;
         }
+        const newApproved = !review.approved;
+        apiCall({ action: "admin_approve", id, approved: newApproved }).then(res => {
+          if (res.success) {
+            review.approved = newApproved;
+            if (currentRole === "manager") approvalsUsedToday++;
+            render();
+            logAction(newApproved ? "Approved" : "Set Pending", id, "");
+          } else {
+            showToast("Couldn't update: " + res.error, "error");
+          }
+        });
       });
-    });
+    }
 
     const pinBtn = row.querySelector(".pin-btn");
     if (pinBtn) {
@@ -538,7 +1056,7 @@ function render() {
             render();
             logAction(newPinned ? "Pinned" : "Unpinned", id, "");
           } else {
-            alert("Couldn't update: " + res.error);
+            showToast("Couldn't update: " + res.error, "error");
           }
         });
       });
@@ -551,10 +1069,10 @@ function render() {
         apiCall({ action: "admin_reply", id, reply }).then(res => {
           if (res.success) {
             review.reply = reply;
-            alert("Reply saved.");
+            showToast("Reply saved.", "success");
             logAction("Replied", id, reply.slice(0, 200));
           } else {
-            alert("Couldn't save: " + res.error);
+            showToast("Couldn't save: " + res.error, "error");
           }
         });
       });
@@ -564,13 +1082,23 @@ function render() {
     if (deleteBtn) {
       deleteBtn.addEventListener("click", () => {
         if (!confirm("Delete this review permanently? This can't be undone.")) return;
+
+        let reason = "";
+        if (currentRole === "manager" && managerPermissions.requireDeleteReason) {
+          reason = prompt("Reason for deleting this review:") || "";
+          if (!reason.trim()) {
+            showToast("Delete cancelled, a reason is required.", "error");
+            return;
+          }
+        }
+
         apiCall({ action: "admin_delete", id }).then(res => {
           if (res.success) {
             allReviews = allReviews.filter(r => r.id !== id);
             render();
-            logAction("Deleted", id, "");
+            logAction("Deleted", id, reason);
           } else {
-            alert("Couldn't delete: " + res.error);
+            showToast("Couldn't delete: " + res.error, "error");
           }
         });
       });
@@ -593,11 +1121,11 @@ function logAction(action, reviewId, details) {
     .then(res => res.json())
     .then(res => {
       if (!res.success) {
-        alert("Action succeeded, but the log entry failed: " + res.error);
+        showToast("Action succeeded, but the log entry failed: " + res.error, "error");
       }
     })
     .catch(() => {
-      alert("Action succeeded, but couldn't reach the logging script.");
+      showToast("Action succeeded, but couldn't reach the logging script.", "error");
     });
 }
 
