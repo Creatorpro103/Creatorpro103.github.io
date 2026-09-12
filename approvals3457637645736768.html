@@ -646,7 +646,7 @@ function showToast(message, type) {
   toastContainer.appendChild(toast);
   setTimeout(() => toast.remove(), 5000);
 }
-const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycby8D1X4ZRe1Qy7bs6till7NAlIo2S4T7wucSSchw7FbBxkxu3Rms_f2eFAQ84sf2_r64A/exec";
+const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycbytzpfy9-pTugLhpKcNb__GicgF5V4bToao1GXG-AeVMMqS3Mbhvk9MUIwSuM5H6yrVeg/exec";
 
 // Separate, standalone Apps Script whose only job is logging activity.
 // Paste in its /exec URL once you've deployed LoggerCode.gs.
@@ -812,7 +812,7 @@ function completeUnlock_(account) {
   // Persistent reminder banner, shown for the Manager's whole session.
   const banner = document.getElementById("manager-banner");
   if (!isOwnerNow && managerPermissions.bannerMessage) {
-    banner.textContent = managerPermissions.bannerMessage;
+    banner.innerHTML = managerPermissions.bannerMessage;
     banner.style.display = "block";
   } else {
     banner.style.display = "none";
