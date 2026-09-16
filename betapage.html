@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iPrint Keychains</title>
+<meta name="description" content="Custom 3D printed keychains made to order in Prairieville, Louisiana. Baseball, Disney, custom name tags, team spirit designs, and more, five dollars each in the colors you choose.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+button, a { -webkit-tap-highlight-color: transparent; }
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --common: #4C9A63;
+    --rare: #3E7CB1;
+    --epic: #8B5FBF;
+    --gold: #C9971F;
+    --xmas-green: #14532D;
+    --xmas-green-bright: #3FA96B;
+    --xmas-red: #C1272D;
+    --xmas-gold: #E0B94A;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--kraft);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, .display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+a { color: inherit; }
+
+a:focus-visible, .btn:focus-visible, .navlink:focus-visible, .secret:focus-visible {
+    outline: 3px solid var(--rare);
+    outline-offset: 3px;
+}
+
+/* NAV */
+nav.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 26px 24px;
+}
+
+.wordmark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.logo-dot {
+    width: 20px;
+    height: 26px;
+    border-radius: 4px;
+    background: var(--rare);
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    position: relative;
+}
+
+.navlink {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 2px solid transparent;
+}
+
+.navlink:hover { border-color: var(--ink); }
+
+/* HERO */
+header.hero {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 40px 24px 90px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.hero p.lede {
+    color: var(--ink-soft);
+    font-size: 1.08rem;
+    max-width: 46ch;
+    margin-bottom: 30px;
+}
+
+.btn {
+    display: inline-block;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 15px 30px;
+    border-radius: 10px;
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary {
+    background: var(--rare);
+    color: var(--face);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+.btn-primary:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
+
+.btn-light {
+    background: var(--face);
+    color: var(--ink);
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.5);
+}
+
+.btn-light:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(43,32,18,0.5); }
+
+/* hero card fan */
+.fan {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.fan-stack {
+    position: relative;
+    width: 170px;
+    height: 230px;
+    transition: transform 0.3s ease;
+}
+
+.mini-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 170px;
+    height: 230px;
+    border-radius: 14px;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.35);
+    transition: transform 0.35s ease;
+}
+
+.mini-card.c1 { background: var(--common); transform: rotate(-9deg) translate(-14px, 6px); z-index: 1; }
+.mini-card.c2 { background: var(--epic); transform: rotate(7deg) translate(12px, 10px); z-index: 2; }
+.mini-card.c3 {
+    background: var(--face);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fan:hover .mini-card.c1 { transform: rotate(-20deg) translate(-46px, 10px); }
+.fan:hover .mini-card.c2 { transform: rotate(16deg) translate(40px, 14px); }
+
+.mini-card.c3 .chip {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--rare);
+    border: 3px solid var(--ink);
+}
+
+.mini-card.c3 strong { font-size: 1.05rem; }
+.mini-card.c3 span { font-size: 0.72rem; color: var(--ink-soft); }
+
+/* SET GRID */
+section.set {
+    padding: 20px 24px 90px;
+}
+
+.set-head {
+    max-width: 1120px;
+    margin: 0 auto 44px;
+}
+
+.set-head h2 {
+    font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.set-head p { color: var(--ink-soft); max-width: 52ch; }
+
+.grid {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 26px;
+}
+
+.tcard {
+    position: relative;
+    background: var(--face);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 4px solid var(--frame, var(--common));
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tcard:hover {
+    transform: translateY(-6px);
+    box-shadow: 6px 8px 0 rgba(43,32,18,0.3);
+}
+
+.tcard .photo {
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    background: var(--kraft);
+}
+
+.tcard .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.tcard .body {
+    padding: 16px 18px 20px;
+    border-top: 3px solid var(--ink);
+}
+
+.tcard .body h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.tcard .foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.value-tag {
+    background: var(--gold);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 2px solid var(--ink);
+}
+
+/* ELF BOX CARD (special preorder styling, sized to match product cards) */
+.elf-card {
+    display: block;
+    text-decoration: none;
+    background: var(--ink);
+    color: var(--face);
+    position: relative;
+}
+
+.elf-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.16) 45%, transparent 60%);
+    transform: translateX(-120%);
+    transition: transform 0.9s ease;
+    z-index: 0;
+}
+
+.elf-card:hover::before { transform: translateX(120%); }
+
+.elf-card-inner {
+    padding: 24px 18px 22px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.elf-badge {
+    display: inline-block;
+    background: var(--xmas-green-bright);
+    color: var(--face);
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+}
+
+.elf-card-inner h3 {
+    font-family: 'Anton', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.xmas-word-red { color: var(--xmas-red); }
+.xmas-word-green { color: var(--xmas-green-bright); }
+
+.elf-desc {
+    font-size: 0.75rem;
+    color: rgba(255,253,247,0.75);
+    margin-bottom: 14px;
+}
+
+.elf-price {
+    font-family: 'Anton', sans-serif;
+    font-size: 2.4rem;
+    color: var(--xmas-red);
+    margin-bottom: 14px;
+}
+
+.elf-btn {
+    display: inline-block;
+    background: var(--face);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 9px 20px;
+    border-radius: 8px;
+}
+
+/* CTA */
+section.cta {
+    text-align: center;
+    padding: 90px 24px 110px;
+}
+
+section.cta h2 {
+    font-size: clamp(2rem, 4vw, 2.7rem);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+section.cta p {
+    max-width: 50ch;
+    margin: 0 auto 32px;
+    color: var(--ink-soft);
+}
+
+/* FOOTER */
+footer {
+    border-top: 3px solid var(--ink);
+    padding: 32px 24px 44px;
+    text-align: center;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.footer-link {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+}
+
+.footer-link:hover { border-color: var(--ink-soft); }
+
+@media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; }
+    .fan { margin-top: 20px; }
+}
+
+@media (max-width: 480px) {
+    nav.top { padding: 16px; }
+    .wordmark { font-size: 1.05rem; }
+    .navlink { font-size: 0.85rem; }
+    header.hero { padding: 24px 16px 60px; }
+    .hero p.lede { font-size: 1rem; }
+    .btn { padding: 13px 22px; font-size: 0.92rem; }
+    .fan-stack { transform: scale(0.85); }
+    section.set, section.cta { padding-left: 16px; padding-right: 16px; }
+    .grid { gap: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ===================== Chat widget ===================== */
+#chat-launcher {
+    position: fixed;
+    bottom: 26px;
+    right: 26px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--rare);
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 0 var(--ink);
+    z-index: 1000;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#chat-launcher:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+#chat-launcher:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
+#chat-launcher svg { width: 24px; height: 24px; }
+
+#chat-panel {
+    position: fixed;
+    bottom: 96px;
+    right: 26px;
+    width: 340px;
+    max-width: calc(100vw - 40px);
+    height: 460px;
+    max-height: calc(100vh - 140px);
+    background: var(--face);
+    border-radius: 16px;
+    border: 3px solid var(--ink);
+    box-shadow: 6px 6px 0 rgba(43,32,18,0.35);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+#chat-panel.open { display: flex; }
+
+.chat-header {
+    background: var(--rare);
+    color: var(--face);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--ink);
+}
+
+.chat-header .who { display: flex; align-items: center; gap: 9px; }
+.chat-header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--common); }
+.chat-header h4 { font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; font-size: 0.95rem; letter-spacing: 0.02em; }
+.chat-header span { font-size: 0.72rem; opacity: 0.9; display: block; font-family: 'Inter', sans-serif; }
+.chat-header button { background: none; border: none; color: var(--face); cursor: pointer; font-size: 1.1rem; line-height: 1; }
+
+#chat-setup { padding: 20px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+#chat-setup p { font-size: 0.85rem; color: var(--ink-soft); }
+#chat-setup .note, #chat-consent .note { font-size: 0.76rem; background: var(--kraft); border: 1.5px solid var(--kraft-line); color: var(--ink); padding: 9px 11px; border-radius: 8px; }
+#chat-consent { padding: 20px 18px; display: none; flex-direction: column; gap: 13px; flex: 1; }
+#chat-consent p { font-size: 0.85rem; color: var(--ink-soft); }
+#chat-setup input {
+    padding: 10px 11px;
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+}
+#chat-setup input:focus { outline: none; border-color: var(--rare); }
+#chat-setup button {
+    margin-top: 2px;
+    padding: 11px;
+    border-radius: 8px;
+    border: 2.5px solid var(--ink);
+    background: var(--rare);
+    color: var(--face);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.88rem;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#chat-setup button:hover, #chat-consent button:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
+#chat-consent button {
+    margin-top: 2px;
+    padding: 11px;
+    border-radius: 8px;
+    border: 2.5px solid var(--ink);
+    background: var(--rare);
+    color: var(--face);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.88rem;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#chat-setup .error { font-size: 0.78rem; color: var(--xmas-red); display: none; }
+
+#chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--kraft);
+}
+#chat-body.open { display: flex; }
+
+.msg { max-width: 82%; padding: 9px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.45; font-family: 'Inter', sans-serif; }
+.msg.bot { background: var(--face); border: 2px solid var(--ink); align-self: flex-start; border-bottom-left-radius: 3px; }
+.msg.user { background: var(--rare); border: 2px solid var(--ink); color: var(--face); align-self: flex-end; border-bottom-right-radius: 3px; }
+.msg.typing { color: var(--ink-soft); font-style: italic; border-style: dashed; }
+.msg p { margin: 0 0 6px; }
+.msg p:last-child { margin-bottom: 0; }
+.msg ul { margin: 0 0 6px 18px; padding: 0; }
+.msg ul:last-child { margin-bottom: 0; }
+.msg li { margin-bottom: 2px; }
+.msg a { color: var(--rare); font-weight: 600; text-decoration: underline; }
+.msg.user a { color: var(--face); }
+.msg strong { font-weight: 700; }
+
+.choice-row { display: flex; flex-wrap: wrap; gap: 7px; margin: -2px 0 2px; }
+.choice-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 7px 13px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: var(--face);
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 rgba(43,32,18,0.3);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.choice-btn:hover:not(:disabled) { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(43,32,18,0.3); background: var(--kraft); }
+.choice-row.used .choice-btn { opacity: 0.5; cursor: default; box-shadow: none; }
+.choice-btn:disabled { cursor: default; }
+
+.beta-banner {
+    background: var(--gold, #C9962C);
+    color: var(--ink);
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 8px 14px;
+    border-bottom: 2.5px solid var(--ink);
+}
+
+@media (max-width: 480px) {
+    #chat-launcher { bottom: 16px; right: 16px; width: 52px; height: 52px; }
+    #chat-launcher svg { width: 21px; height: 21px; }
+    #chat-panel {
+        bottom: 78px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-width: none;
+        height: min(72vh, 480px);
+    }
+    .beta-banner { font-size: 0.74rem; padding: 7px 10px; }
+}
+
+
+#chat-input-row { display: none; flex-direction: column; border-top: 3px solid var(--ink); padding: 10px; gap: 8px; background: var(--face); }
+#chat-input-row.open { display: flex; }
+.input-row-main { display: flex; align-items: center; gap: 8px; }
+.input-row-main input {
+    flex: 1;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 9px 13px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+}
+.input-row-main input:focus { outline: none; border-color: var(--rare); }
+.input-row-main button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: var(--rare);
+    color: var(--face);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+#attach-btn { background: var(--face); color: var(--ink); }
+#attach-btn:hover { background: var(--kraft); }
+
+#image-preview-chip {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: var(--kraft);
+    border: 1.5px solid var(--kraft-line);
+    border-radius: 10px;
+    padding: 6px 8px;
+}
+#image-preview-chip.open { display: flex; }
+#image-preview-chip img { width: 34px; height: 34px; object-fit: cover; border-radius: 6px; border: 1.5px solid var(--ink); }
+#image-preview-chip span { flex: 1; font-size: 0.78rem; color: var(--ink-soft); }
+#remove-image-btn {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1;
+    padding: 4px;
+}
+
+.msg-image { max-width: 180px; display: block; border-radius: 10px; border: 2px solid var(--ink); }
+.msg-image + .msg-text { margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div class="beta-banner">This page is in development. You're viewing the beta version.</div>
+
+<nav class="top">
+    <div class="wordmark"><span class="logo-dot" role="button" tabindex="0" aria-label="iPrint logo"></span>iPrint Keychains</div>
+    <a class="navlink" href="#lineup">See what we print</a>
+</nav>
+
+<header class="hero">
+    <div>
+        <h1>Custom Printed</h1>
+        <a class="btn btn-primary" href="#lineup">See what we print</a>
+    </div>
+    <div class="fan">
+        <div class="fan-stack">
+            <div class="mini-card c1"></div>
+            <div class="mini-card c2"></div>
+            <div class="mini-card c3">
+                <div class="chip"></div>
+                <strong>iPrint</strong>
+                <span>made to order</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="set" id="lineup">
+    <div class="set-head">
+        <h2>What we print</h2>
+        <p>Five dollars each, printed in the colors you choose.</p>
+    </div>
+
+    <div class="grid">
+
+        <article class="tcard" style="--frame: var(--common)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCvFHMTfp1xsh1oQVM8Jei32t1wr7GOeaNEyaTfBq6gbcT2rTYGJdEC5s_u4ycwBfP6Ozd6fxl_Ozje0GowFKe4x9Y8KVAfKWL4nr-heo1tHDh-zak7-Or513A2Mhm7o_bEHFBp37fqsEs92nfdPcGRQnhnzXgKNTTxg19DBBHwpWKcXBfWM5Q8mvj8waQ9qVupnpO1pY-uzjB-=w2048?key=YtUivrP-NlKTleUP6T1zBw" alt="Baseball keychain"></div>
+            <div class="body">
+                <h3>Baseball</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--rare)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVBNtIcihG4JkIrEC7KCJxuHRLuoGJNlj7SIEXYOtMd_-gyvgR2P6J2bWy0ty0Ix-wzbnAR1c6TJQBvbF16ZoYvea4zJd6CfShJc_wlxIbToKygkLe1TDnbKicRPVoW3qrr4epZsdJqATc5biyaefTRTjjVvqOuzYaXlFuFz9lw-SenzmL4iuEd_QOq6ifHaV1HGSrAOXq08LVIv=w3101?key=YtUivrP-NlKTleUP6T1zBw" alt="Disney keychain"></div>
+            <div class="body">
+                <h3>Disney</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--epic)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVB4aFFZSX7cViUNxsG3ejG_7KqUKGP8DpBYXgoK0by8afkk11JHRLUBTrmJIBhwIX70bxqYxi7g7VuRGpa_t3DrYeWRdqJHLbdhXLK-8l87aBiFvGRkMjBBTVmtfR6mw4mWtABFJqu8-rKjqzQL1XL-zd3qSbA3aWeuD4B1Fey17_2TNNbbdPgPdmEFcMNrEWUY2ERQBl9CMvs=w2048?key=YtUivrP-NlKTleUP6T1zBw" alt="Custom name keychain"></div>
+            <div class="body">
+                <h3>Custom name</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--common)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVDr5_kkCngFcQkhrB0Bw4uE1ueVsqGQZbHbVb2MzWI4bmD0sIZ2GrLjLXOJSJ7apss-6HJZbhZZqmbrT_8WuUcxBpNPrHftp8Z0O5-PFMBhCRXMgwbCVyv2Zrnz-jIiEWuu7r0ImfCsdmlOzdSgIZ7HvX5HfCpf406qQn5Y6rfc6FVaZmL_CU-wEp1nhedizO-35gYy72v2BPM=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Cheer megaphone keychain"></div>
+            <div class="body">
+                <h3>Cheer megaphone</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--common)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCoV2Wn0fvvHzxf6M17odWQbPIWiXNw3zMVUz7y3Bel4x7qNgYUW2cXtmePxk_gD-ZWG0Oo1BGjWG0jKMGkTrD45HBSdGBrb7prxjyUwfNUhaiWPeVyibxSDdNbMIHauthnmcm1xw9CG99HZUtQpirudrngD9qwFb61N_MOcAnLtmGFVmGVo39YnU-pRqFGT_xlROiHXVKXi-s=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Soccer keychain"></div>
+            <div class="body">
+                <h3>Soccer</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--epic)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVBW_rT-V37CWZijVazo8NWoNQlBgZhFb63t7QogZVo691_A8PFkaZysaObThBNsMNEAJGz_RWpXFvLVDBdFXOZ0Ad6g3-I2i0D2_plAhwGw-6ONWNlLCKYkKO8PDEVDUaMBXErqOdhpeH4YTYa5rQ-CWEpbD6m9V2n-rOAH-eXUn71ht-BIMHzstU4tk6HxQhL1rpj50WkR_HXK=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Backpack keychain"></div>
+            <div class="body">
+                <h3>Backpack charm</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--common)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCKKB_oYSm3MkqZsR70ry4sQ86By9NXZMifU1LYyu3QMqm1Nhpcokfsi8g_UIuVsEIWK4Q0MTCtIotdUqYdQvUz2BEzHYGwa-qBI3rl2pAagQ_VmAshJEfOU1HYWWh9poWxVKfVdrOM7u_8kWXS4DBF0dv9D2Z8yJWT12MDG3VzOvlBhPpq_1x_mFV4dkq8OrUIBboYmsAzjrD9=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Football keychain"></div>
+            <div class="body">
+                <h3>Football</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--epic)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVDTg3iB9DtlQ6X9fXTGSHHanpeBK-ZtyEBeIjEI8rJ4pfSzF6csciADWQolxJaIT_IZe5slnDpZgf4TsYwrXvqdqso_ITEuTH7i7QxuDvclTl-_NWrWcP3eYy1zZ-WVlSaj2qM4Q2Q8mwaxSQ4vwQJpeBIiq-D4Sm5Tn_rSM6nzULVspRYKV4vBBZXn2pmSXJMtstMI43BqHgoA=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="School spirit custom keychain"></div>
+            <div class="body">
+                <h3>School spirit</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <article class="tcard" style="--frame: var(--rare)">
+            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVATLpQHghrTmymRun39Qqgqdgg1xKiRbBIIzqifR2lb0vjGD69XDGLNnH7iCuybztYxEWX7TrRgBYN3us3eCC7ZOKvBKFmKfxvQiyzQ9hfxKrLEaanbvYKi3-tSXUe4w6i94WrAoKTzr10aD6C2V22j2pxFsYuqxPACaESZPxr_Yx58jwLmzDPzyEVIHYW-rG5EOGsV2AIu-9_x=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Custom bow keychain"></div>
+            <div class="body">
+                <h3>Custom bow</h3>
+                <div class="foot"><span class="value-tag">$5</span></div>
+            </div>
+        </article>
+
+        <a class="tcard elf-card" style="--frame: var(--xmas-red)" href="preorder">
+            <div class="elf-card-inner">
+                <span class="elf-badge">Limited availability</span>
+                <h3><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h3>
+                <p class="elf-desc">Secure your preorder now and guarantee in time for your elf's return.</p>
+                <div class="elf-price">$35</div>
+                <span class="elf-btn">Reserve mine</span>
+            </div>
+        </a>
+
+    </div>
+</section>
+
+<section class="cta">
+    <h2>Ready to order</h2>
+    <p>Fill out the form with your design, color, and name, and we will start printing.</p>
+    <a class="btn btn-primary" href="https://forms.gle/4RqgULYWgq9ZEH6K6" target="_blank">Start my order</a>
+</section>
+
+<footer>
+    <a class="footer-link" href="testimonials.html">Testimonials</a>
+</footer>
+
+<!-- ===================== Chat widget ===================== -->
+<button id="chat-launcher" aria-label="Open support chat">
+    <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 12a8 8 0 1 1 3.2 6.4L4 20l1.3-3.6A7.96 7.96 0 0 1 4 12Z" stroke="#FFFDF7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+</button>
+
+<div id="chat-panel">
+    <div class="chat-header">
+        <div class="who">
+            <span class="dot"></span>
+            <div>
+                <h4>iPrint Support</h4>
+                <span id="chat-subtitle">Dev mode: API key required</span>
+            </div>
+        </div>
+        <button id="chat-close" aria-label="Close chat">✕</button>
+    </div>
+
+    <div id="chat-setup">
+        <p>This runs on an AI API straight from your browser, so it needs a key to work.</p>
+        <div class="note">This page is in development, you're looking at the beta version. Dev only: the key stays in memory for this tab and is never saved or sent anywhere but the API. Don't ship this pattern live, proxy the key through a backend first.</div>
+        <input id="api-key-input" type="password" placeholder="Enter API key..." autocomplete="off" />
+        <input id="model-id-input" type="text" placeholder="Model ID (e.g. qwen/qwen3.8-27b)" autocomplete="off" value="qwen/qwen3.8-27b" />
+        <p style="font-size:0.72rem; color: var(--ink-soft); margin: -6px 0 0;">Needs a model your key can access that also supports image input. Check console.groq.com/docs/models if this one errors.</p>
+        <span class="error" id="key-error">Please enter a key to continue.</span>
+        <button id="connect-btn">Connect</button>
+    </div>
+
+    <div id="chat-consent">
+        <p>One quick thing before we start:</p>
+        <div class="note">This chat is <strong>powered by AI</strong>, not a real person, and it can get things wrong. Please double-check anything important, like pricing, availability, or order details, rather than taking its answers at face value.</div>
+        <button id="consent-btn">I understand, continue</button>
+    </div>
+
+    <div id="chat-body"></div>
+    <div id="chat-input-row">
+        <div id="image-preview-chip">
+            <img id="image-preview-thumb" alt="Attached photo preview" />
+            <span>Photo attached</span>
+            <button id="remove-image-btn" type="button" aria-label="Remove attached image">✕</button>
+        </div>
+        <div class="input-row-main">
+            <input type="file" id="image-file-input" accept="image/*" style="display:none" />
+            <button id="attach-btn" type="button" aria-label="Upload a photo">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4l-4.5 4.5M12 4l4.5 4.5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <input id="chat-text-input" type="text" placeholder="Ask a question or attach a photo..." />
+            <button id="chat-send-btn" aria-label="Send">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 3l5 5-5 5" stroke="#FFFDF7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const launcher = document.getElementById('chat-launcher');
+    const panel = document.getElementById('chat-panel');
+    const closeBtn = document.getElementById('chat-close');
+    const setupView = document.getElementById('chat-setup');
+    const consentView = document.getElementById('chat-consent');
+    const consentBtn = document.getElementById('consent-btn');
+    const bodyView = document.getElementById('chat-body');
+    const inputRow = document.getElementById('chat-input-row');
+    const keyInput = document.getElementById('api-key-input');
+    const modelInput = document.getElementById('model-id-input');
+    const keyError = document.getElementById('key-error');
+    const connectBtn = document.getElementById('connect-btn');
+    const textInput = document.getElementById('chat-text-input');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const subtitle = document.getElementById('chat-subtitle');
+    const attachBtn = document.getElementById('attach-btn');
+    const imageFileInput = document.getElementById('image-file-input');
+    const imagePreviewChip = document.getElementById('image-preview-chip');
+    const imagePreviewThumb = document.getElementById('image-preview-thumb');
+    const removeImageBtn = document.getElementById('remove-image-btn');
+
+    // Kept only in memory for this tab, never persisted.
+    let apiKey = null;
+    let modelId = 'qwen/qwen3.8-27b';
+    let pendingImage = null;
+
+    const SYSTEM_PROMPT = `
+You are the friendly support assistant embedded on isaacneal.com, the site for Isaac's small business, iPrint Keychains.
+
+About the business:
+- Isaac designs and 3D prints custom keychains himself, based in Prairieville, Louisiana. He handles the design, printing, website, and order emails.
+- All standard keychains are $5 each, printed in the colors the customer chooses.
+- Current lineup: Baseball, Disney (classic characters), Custom name (your name or word in any color you pick), Cheer megaphone, Soccer, Backpack charm, Football, School spirit (school colors & mascots), and Custom bow designs.
+- During the winter season there's also a limited-edition Elf Box ($35) with its own holiday-themed designs.
+- Customers can leave reviews on the testimonials page.
+
+How ordering works: customers fill out the order form (linked from the homepage as "Start my order") with their design choice, color, and name, and Isaac starts printing after that.
+
+Photo attachments: customers can attach a photo, for example a character, logo, color scheme, or an existing keychain they like. When a photo comes in, look at it and give friendly, specific feedback on how it could translate into one of the keychain products (closest matching design, which colors would work, whether it fits Custom name, Custom design, or another item). Never invent an exact price beyond the standard $5 or the $35 Elf Box, and don't claim you can guarantee an exact reproduction, since Isaac does the actual modeling by hand.
+
+Formatting:
+- Reply using light markdown: **bold** for product names or prices, and "- " bullet lists when listing multiple keychains or options.
+- Link to real pages on the site with markdown links when relevant: the keychain lineup is [on the homepage](index.html#lineup), the Elf Box preorder is at [preorder.html](preorder.html), reviews are on [testimonials.html](testimonials.html), and orders go through the [order form](https://forms.gle/4RqgULYWgq9ZEH6K6).
+- Keep replies short and easy to scan, a few sentences or a short list, not a wall of text.
+- Do not use em dashes anywhere in your replies. Use commas, periods, or parentheses instead.
+
+Follow-up choices:
+- When a customer's request is broad or you need one more detail to help them well (e.g. they say "I want to buy something" and you'd want to know which design, or you're checking whether they want pricing vs. how to order), ask a short clarifying question and offer up to 4 short quick-reply options.
+- To offer options, end your reply with one line formatted exactly like this: [[choices: Option one | Option two | Option three]]. Keep each option to just a few words, and only include this line when it genuinely narrows things down, not on every message.
+- That bracket line is a control signal, not something to explain or mention to the customer.
+
+Your job:
+- Answer questions about the business, the keychain lineup, pricing, and how ordering works in a warm, friendly, upbeat tone.
+- You don't have access to live order status or guaranteed turnaround time. For anything order-specific, point the customer to the order form or suggest they email isaacneal225@gmail.com.
+- Stay strictly on topic: iPrint Keychains and this site. If asked something unrelated, briefly and kindly steer back to how you can help with their order.
+`.trim();
+
+    let history = [{ role: 'system', content: SYSTEM_PROMPT }];
+
+    function togglePanel() { panel.classList.toggle('open'); }
+    launcher.addEventListener('click', togglePanel);
+    closeBtn.addEventListener('click', togglePanel);
+
+    connectBtn.addEventListener('click', () => {
+        const val = keyInput.value.trim();
+        if (!val) { keyError.style.display = 'block'; return; }
+        apiKey = val;
+        const modelVal = modelInput.value.trim();
+        if (modelVal) modelId = modelVal;
+        setupView.style.display = 'none';
+        consentView.style.display = 'flex';
+        subtitle.textContent = 'One quick step before we start';
+    });
+
+    keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') connectBtn.click(); });
+
+    consentBtn.addEventListener('click', () => {
+        consentView.style.display = 'none';
+        bodyView.classList.add('open');
+        inputRow.classList.add('open');
+        subtitle.textContent = 'Usually replies in a few seconds';
+        addMessage('bot', "Hey! I'm Isaac's keychain support bot 👋 Ask me about the lineup, pricing, or how ordering works. You can also attach a photo of a design idea.");
+        textInput.focus();
+    });
+
+    // Shrinks a chosen image to a reasonable size and returns it as a JPEG data URL,
+    // so photos from a phone camera don't balloon the request payload.
+    function resizeImageFile(file, maxDim = 1024, quality = 0.82) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Could not read that file.'));
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = () => reject(new Error('Could not read that image.'));
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+                        else { width = Math.round(width * maxDim / height); height = maxDim; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function clearPendingImage() {
+        pendingImage = null;
+        imagePreviewChip.classList.remove('open');
+        imagePreviewThumb.src = '';
+    }
+
+    attachBtn.addEventListener('click', () => imageFileInput.click());
+
+    imageFileInput.addEventListener('change', async () => {
+        const file = imageFileInput.files[0];
+        imageFileInput.value = '';
+        if (!file || !file.type.startsWith('image/')) return;
+        try {
+            pendingImage = await resizeImageFile(file);
+            imagePreviewThumb.src = pendingImage;
+            imagePreviewChip.classList.add('open');
+        } catch (err) {
+            addMessage('bot', "I couldn't read that image, mind trying a different file?");
+        }
+    });
+
+    removeImageBtn.addEventListener('click', clearPendingImage);
+
+    // Turns a small subset of markdown (**bold**, "- " lists, [text](url) links)
+    // into safe HTML. Input is escaped first, so raw HTML in a reply can't leak through.
+    function renderMarkdown(text) {
+        const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        const withInline = escaped
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+        const lines = withInline.split('\n');
+        let html = '';
+        let inList = false;
+        for (const raw of lines) {
+            const line = raw.trim();
+            if (line.startsWith('- ')) {
+                if (!inList) { html += '<ul>'; inList = true; }
+                html += '<li>' + line.slice(2) + '</li>';
+            } else {
+                if (inList) { html += '</ul>'; inList = false; }
+                if (line.length) html += '<p>' + line + '</p>';
+            }
+        }
+        if (inList) html += '</ul>';
+        return html;
+    }
+
+    function addMessage(role, text, imageDataUrl) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + role;
+        if (role.startsWith('bot')) {
+            div.innerHTML = renderMarkdown(text);
+        } else {
+            if (imageDataUrl) {
+                const img = document.createElement('img');
+                img.src = imageDataUrl;
+                img.className = 'msg-image';
+                div.appendChild(img);
+            }
+            if (text) {
+                const p = document.createElement('div');
+                p.className = 'msg-text';
+                p.textContent = text;
+                div.appendChild(p);
+            }
+        }
+        bodyView.appendChild(div);
+        bodyView.scrollTop = bodyView.scrollHeight;
+        return div;
+    }
+
+    // Pulls a trailing "[[choices: A | B | C]]" control line out of a reply,
+    // returning the cleaned text plus up to 4 short option strings (or none).
+    function extractChoices(text) {
+        const match = text.match(/\[\[choices:\s*([^\]]+)\]\]/i);
+        if (!match) return { text: text, choices: null };
+        const choices = match[1].split('|').map(s => s.trim()).filter(Boolean).slice(0, 4);
+        const cleanText = text.replace(match[0], '').trim();
+        return { text: cleanText, choices: choices.length ? choices : null };
+    }
+
+    function addChoiceButtons(choices) {
+        const row = document.createElement('div');
+        row.className = 'choice-row';
+        choices.forEach((choice) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = choice;
+            btn.addEventListener('click', () => {
+                row.querySelectorAll('button').forEach((b) => (b.disabled = true));
+                row.classList.add('used');
+                textInput.value = choice;
+                sendMessage();
+            });
+            row.appendChild(btn);
+        });
+        bodyView.appendChild(row);
+        bodyView.scrollTop = bodyView.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const text = textInput.value.trim();
+        const image = pendingImage;
+        if ((!text && !image) || !apiKey) return;
+
+        addMessage('user', text, image);
+
+        const userContent = image
+            ? [
+                  { type: 'text', text: text || "Here's a photo, what do you think?" },
+                  { type: 'image_url', image_url: { url: image } }
+              ]
+            : text;
+        history.push({ role: 'user', content: userContent });
+
+        textInput.value = '';
+        clearPendingImage();
+
+        const typingEl = addMessage('bot typing', 'Typing...');
+
+        try {
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey
+                },
+                body: JSON.stringify({
+                    model: modelId,
+                    messages: history,
+                    temperature: 0.6,
+                    max_tokens: 300
+                })
+            });
+
+            if (!res.ok) {
+                const errBody = await res.json().catch(() => null);
+                const msg = errBody?.error?.message || ('Request failed (' + res.status + ')');
+                typingEl.remove();
+                const hint = /model/i.test(msg) ? " Try a different Model ID on the setup screen (reload the chat to see it again)." : '';
+                addMessage('bot', "Hmm, I couldn't reach the AI service: " + msg + hint);
+                return;
+            }
+
+            const data = await res.json();
+            const reply = data.choices?.[0]?.message?.content?.trim() || "Sorry, I didn't catch that, could you rephrase?";
+            typingEl.remove();
+            const { text: cleanReply, choices } = extractChoices(reply);
+            addMessage('bot', cleanReply);
+            if (choices) addChoiceButtons(choices);
+            history.push({ role: 'assistant', content: reply });
+        } catch (err) {
+            typingEl.remove();
+            addMessage('bot', 'Something went wrong reaching the AI service. Check your connection and API key and try again.');
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    textInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+})();
+</script>
+
+</body>
+</html>
