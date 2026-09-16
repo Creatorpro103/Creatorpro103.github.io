@@ -780,8 +780,6 @@ footer {
         <p>This runs on an AI API straight from your browser, so it needs a key to work.</p>
         <div class="note">This page is in development, you're looking at the beta version. Dev only: the key stays in memory for this tab and is never saved or sent anywhere but the API. Don't ship this pattern live, proxy the key through a backend first.</div>
         <input id="api-key-input" type="password" placeholder="Enter API key..." autocomplete="off" />
-        <input id="model-id-input" type="text" placeholder="Model ID (e.g. qwen/qwen3.8-27b)" autocomplete="off" value="qwen/qwen3.8-27b" />
-        <p style="font-size:0.72rem; color: var(--ink-soft); margin: -6px 0 0;">Needs a model your key can access that also supports image input. Check console.groq.com/docs/models if this one errors.</p>
         <span class="error" id="key-error">Please enter a key to continue.</span>
         <button id="connect-btn">Connect</button>
     </div>
@@ -823,7 +821,6 @@ footer {
     const bodyView = document.getElementById('chat-body');
     const inputRow = document.getElementById('chat-input-row');
     const keyInput = document.getElementById('api-key-input');
-    const modelInput = document.getElementById('model-id-input');
     const keyError = document.getElementById('key-error');
     const connectBtn = document.getElementById('connect-btn');
     const textInput = document.getElementById('chat-text-input');
@@ -837,7 +834,7 @@ footer {
 
     // Kept only in memory for this tab, never persisted.
     let apiKey = null;
-    let modelId = 'qwen/qwen3.8-27b';
+    const modelId = 'qwen/qwen3.8-27b';
     let pendingImage = null;
 
     const SYSTEM_PROMPT = `
@@ -881,8 +878,6 @@ Your job:
         const val = keyInput.value.trim();
         if (!val) { keyError.style.display = 'block'; return; }
         apiKey = val;
-        const modelVal = modelInput.value.trim();
-        if (modelVal) modelId = modelVal;
         setupView.style.display = 'none';
         consentView.style.display = 'flex';
         subtitle.textContent = 'One quick step before we start';
@@ -1070,8 +1065,7 @@ Your job:
                 const errBody = await res.json().catch(() => null);
                 const msg = errBody?.error?.message || ('Request failed (' + res.status + ')');
                 typingEl.remove();
-                const hint = /model/i.test(msg) ? " Try a different Model ID on the setup screen (reload the chat to see it again)." : '';
-                addMessage('bot', "Hmm, I couldn't reach the AI service: " + msg + hint);
+                addMessage('bot', "Hmm, I couldn't reach the AI service: " + msg);
                 return;
             }
 
