@@ -9,10 +9,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Pacifico&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
 <style>
-button, a { -webkit-tap-highlight-color: transparent; }
 :root {
     --kraft: #ECE0C8;
     --kraft-line: rgba(43,32,18,0.14);
@@ -47,6 +46,18 @@ a:focus-visible, .btn:focus-visible, .navlink:focus-visible, .secret:focus-visib
     outline: 3px solid var(--rare);
     outline-offset: 3px;
 }
+
+/* BETA BANNER */
+.beta-banner {
+    background: var(--ink);
+    color: var(--face);
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 10px 16px;
+}
+.beta-banner span { color: var(--gold); text-transform: uppercase; }
 
 /* NAV */
 nav.top {
@@ -84,6 +95,44 @@ nav.top {
 
 .navlink:hover { border-color: var(--ink); }
 
+/* CART BUTTON */
+#cart-btn {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--face);
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--ink);
+    box-shadow: 3px 3px 0 rgba(43,32,18,0.3);
+    font-family: 'Inter', sans-serif;
+}
+
+#cart-btn svg { width: 18px; height: 18px; }
+
+#cart-count {
+    background: var(--rare);
+    color: var(--face);
+    border-radius: 999px;
+    min-width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    padding: 0 5px;
+}
+
+#cart-count.zero { display: none; }
+
 /* HERO */
 header.hero {
     max-width: 1120px;
@@ -119,6 +168,7 @@ header.hero {
     border: 2.5px solid var(--ink);
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    font-family: 'Inter', sans-serif;
 }
 
 .btn-primary {
@@ -192,7 +242,7 @@ header.hero {
 
 /* SET GRID */
 section.set {
-    padding: 20px 24px 90px;
+    padding: 20px 24px 60px;
 }
 
 .set-head {
@@ -224,6 +274,8 @@ section.set {
     border: 4px solid var(--frame, var(--common));
     box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
     transition: transform 0.18s ease, box-shadow 0.18s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .tcard:hover {
@@ -247,21 +299,35 @@ section.set {
     border-radius: 8px;
 }
 
+.tcard .photo svg { width: 56px; height: 56px; }
+
 .tcard .body {
     padding: 16px 18px 20px;
     border-top: 3px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .tcard .body h3 {
     font-size: 1.1rem;
     font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.tcard .p-desc {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
     margin-bottom: 14px;
+    flex: 1;
 }
 
 .tcard .foot {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
 .value-tag {
@@ -274,14 +340,38 @@ section.set {
     border: 2px solid var(--ink);
 }
 
-/* ELF BOX CARD (special preorder styling, sized to match product cards) */
+.add-cart-btn {
+    background: var(--rare);
+    color: var(--face);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+}
+
+.add-cart-btn:hover { filter: brightness(1.05); }
+
+/* ELF BOX (its own section now, not mixed into the shop grid) */
+.elf-section { max-width: 480px; margin: 0 auto 20px; padding: 0 24px; }
+
 .elf-card {
     display: block;
     text-decoration: none;
     background: var(--ink);
     color: var(--face);
     position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 4px solid var(--xmas-red);
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
+
+.elf-card:hover { transform: translateY(-4px); }
 
 .elf-card::before {
     content: '';
@@ -296,7 +386,7 @@ section.set {
 .elf-card:hover::before { transform: translateX(120%); }
 
 .elf-card-inner {
-    padding: 24px 18px 22px;
+    padding: 26px 22px 24px;
     text-align: center;
     position: relative;
     z-index: 1;
@@ -317,7 +407,7 @@ section.set {
     font-family: 'Anton', sans-serif;
     font-weight: 400;
     text-transform: uppercase;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin-bottom: 8px;
 }
 
@@ -325,7 +415,7 @@ section.set {
 .xmas-word-green { color: var(--xmas-green-bright); }
 
 .elf-desc {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: rgba(255,253,247,0.75);
     margin-bottom: 14px;
 }
@@ -350,7 +440,7 @@ section.set {
 /* CTA */
 section.cta {
     text-align: center;
-    padding: 90px 24px 110px;
+    padding: 60px 24px 110px;
 }
 
 section.cta h2 {
@@ -383,253 +473,182 @@ footer {
 
 .footer-link:hover { border-color: var(--ink-soft); }
 
+/* ---------- Modal overlay (customize + cart) ---------- */
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(43,32,18,0.45);
+    z-index: 300;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 30px 16px;
+    overflow-y: auto;
+}
+
+.overlay.open { display: flex; }
+
+.modal-card {
+    background: var(--face);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    padding: 26px 24px 28px;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--ink-soft);
+}
+
+.modal-card h2 { font-size: 1.15rem; text-transform: uppercase; margin-bottom: 18px; padding-right: 24px; }
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; }
+.field .hint { font-weight: 400; color: var(--ink-soft); font-size: 0.78rem; }
+
+.field input[type="text"],
+.field input[type="email"],
+.field select,
+.field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--kraft-line);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    background: var(--face);
+    color: var(--ink);
+}
+
+.field textarea { min-height: 80px; resize: vertical; }
+
+.radio-row { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.88rem; }
+.radio-row label { display: flex; align-items: center; gap: 6px; font-weight: 400; }
+
+.font-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.font-card {
+    border: 2px solid var(--kraft-line);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    display: block;
+    position: relative;
+}
+.font-card input { position: absolute; opacity: 0; pointer-events: none; }
+.font-card .sample { font-size: 1.3rem; }
+.font-card .fname { font-size: 0.7rem; color: var(--ink-soft); margin-top: 4px; }
+.font-card:has(input:checked) { border-color: var(--rare); border-width: 3px; }
+
+.hidden { display: none !important; }
+
+.modal-submit-btn {
+    width: 100%;
+    background: var(--rare);
+    color: var(--face);
+    border: 2.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 13px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    margin-top: 6px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--kraft-line);
+}
+
+.cart-item:last-of-type { border-bottom: none; }
+.cart-item .ci-name { font-weight: 700; font-size: 0.9rem; }
+.cart-item .ci-detail { font-size: 0.78rem; color: var(--ink-soft); margin-top: 2px; }
+.cart-item .ci-price { font-weight: 700; font-size: 0.85rem; white-space: nowrap; }
+
+.remove-item-btn {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 6px;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.cart-empty { color: var(--ink-soft); font-size: 0.88rem; padding: 10px 0; }
+
+.cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 1rem;
+    padding-top: 14px;
+    margin-top: 6px;
+    border-top: 2px solid var(--ink);
+}
+
+.error-msg {
+    display: none;
+    background: #F8E3E1;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+}
+
+#summary-panel {
+    display: none;
+    background: var(--face);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    padding: 24px;
+    margin: 0 auto 40px;
+    max-width: 1120px;
+}
+#summary-panel h2 { font-size: 1.1rem; text-transform: uppercase; margin-bottom: 14px; }
+#summary-panel .summary-item { padding: 10px 0; border-bottom: 1px solid var(--kraft-line); font-size: 0.88rem; }
+#summary-panel .summary-item:last-of-type { border-bottom: none; }
+#summary-panel dl { display: grid; grid-template-columns: 40% 60%; row-gap: 4px; font-size: 0.85rem; margin-top: 4px; }
+#summary-panel dt { color: var(--ink-soft); font-weight: 600; }
+#summary-panel dd { color: var(--ink); }
+#summary-panel .note { margin-top: 16px; font-size: 0.8rem; color: var(--ink-soft); }
+
 @media (max-width: 820px) {
     .hero { grid-template-columns: 1fr; }
     .fan { margin-top: 20px; }
 }
 
-@media (max-width: 480px) {
-    nav.top { padding: 16px; }
-    .wordmark { font-size: 1.05rem; }
-    .navlink { font-size: 0.85rem; }
-    header.hero { padding: 24px 16px 60px; }
-    .hero p.lede { font-size: 1rem; }
-    .btn { padding: 13px 22px; font-size: 0.92rem; }
-    .fan-stack { transform: scale(0.85); }
-    section.set, section.cta { padding-left: 16px; padding-right: 16px; }
-    .grid { gap: 18px; }
-}
-
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
-
-/* ===================== Chat widget ===================== */
-#chat-launcher {
-    position: fixed;
-    bottom: 26px;
-    right: 26px;
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: var(--rare);
-    border: 2.5px solid var(--ink);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 4px 4px 0 var(--ink);
-    z-index: 1000;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-#chat-launcher:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
-#chat-launcher:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
-#chat-launcher svg { width: 24px; height: 24px; }
-
-#chat-panel {
-    position: fixed;
-    bottom: 96px;
-    right: 26px;
-    width: 340px;
-    max-width: calc(100vw - 40px);
-    height: 460px;
-    max-height: calc(100vh - 140px);
-    background: var(--face);
-    border-radius: 16px;
-    border: 3px solid var(--ink);
-    box-shadow: 6px 6px 0 rgba(43,32,18,0.35);
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 1000;
-}
-
-#chat-panel.open { display: flex; }
-
-.chat-header {
-    background: var(--rare);
-    color: var(--face);
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 3px solid var(--ink);
-}
-
-.chat-header .who { display: flex; align-items: center; gap: 9px; }
-.chat-header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--common); }
-.chat-header h4 { font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; font-size: 0.95rem; letter-spacing: 0.02em; }
-.chat-header span { font-size: 0.72rem; opacity: 0.9; display: block; font-family: 'Inter', sans-serif; }
-.chat-header button { background: none; border: none; color: var(--face); cursor: pointer; font-size: 1.1rem; line-height: 1; }
-
-#chat-setup { padding: 20px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-#chat-setup p { font-size: 0.85rem; color: var(--ink-soft); }
-#chat-setup .note, #chat-consent .note { font-size: 0.76rem; background: var(--kraft); border: 1.5px solid var(--kraft-line); color: var(--ink); padding: 9px 11px; border-radius: 8px; }
-#chat-consent { padding: 20px 18px; display: none; flex-direction: column; gap: 13px; flex: 1; }
-#chat-consent p { font-size: 0.85rem; color: var(--ink-soft); }
-#chat-setup input {
-    padding: 10px 11px;
-    border-radius: 8px;
-    border: 2px solid var(--ink);
-    font-size: 16px;
-    font-family: 'Inter', sans-serif;
-}
-#chat-setup input:focus { outline: none; border-color: var(--rare); }
-#chat-setup button {
-    margin-top: 2px;
-    padding: 11px;
-    border-radius: 8px;
-    border: 2.5px solid var(--ink);
-    background: var(--rare);
-    color: var(--face);
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 0.88rem;
-    box-shadow: 3px 3px 0 var(--ink);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-#chat-setup button:hover, #chat-consent button:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
-#chat-consent button {
-    margin-top: 2px;
-    padding: 11px;
-    border-radius: 8px;
-    border: 2.5px solid var(--ink);
-    background: var(--rare);
-    color: var(--face);
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 0.88rem;
-    box-shadow: 3px 3px 0 var(--ink);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-#chat-setup .error { font-size: 0.78rem; color: var(--xmas-red); display: none; }
-
-#chat-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 14px;
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    background: var(--kraft);
-}
-#chat-body.open { display: flex; }
-
-.msg { max-width: 82%; padding: 9px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.45; font-family: 'Inter', sans-serif; }
-.msg.bot { background: var(--face); border: 2px solid var(--ink); align-self: flex-start; border-bottom-left-radius: 3px; }
-.msg.user { background: var(--rare); border: 2px solid var(--ink); color: var(--face); align-self: flex-end; border-bottom-right-radius: 3px; }
-.msg.typing { color: var(--ink-soft); font-style: italic; border-style: dashed; }
-.msg p { margin: 0 0 6px; }
-.msg p:last-child { margin-bottom: 0; }
-.msg ul { margin: 0 0 6px 18px; padding: 0; }
-.msg ul:last-child { margin-bottom: 0; }
-.msg li { margin-bottom: 2px; }
-.msg a { color: var(--rare); font-weight: 600; text-decoration: underline; }
-.msg.user a { color: var(--face); }
-.msg strong { font-weight: 700; }
-
-.choice-row { display: flex; flex-wrap: wrap; gap: 7px; margin: -2px 0 2px; }
-.choice-btn {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 7px 13px;
-    border-radius: 999px;
-    border: 2px solid var(--ink);
-    background: var(--face);
-    color: var(--ink);
-    cursor: pointer;
-    box-shadow: 2px 2px 0 rgba(43,32,18,0.3);
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-}
-.choice-btn:hover:not(:disabled) { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(43,32,18,0.3); background: var(--kraft); }
-.choice-row.used .choice-btn { opacity: 0.5; cursor: default; box-shadow: none; }
-.choice-btn:disabled { cursor: default; }
-
-.beta-banner {
-    background: var(--gold, #C9962C);
-    color: var(--ink);
-    text-align: center;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 0.82rem;
-    padding: 8px 14px;
-    border-bottom: 2.5px solid var(--ink);
-}
-
-@media (max-width: 480px) {
-    #chat-launcher { bottom: 16px; right: 16px; width: 52px; height: 52px; }
-    #chat-launcher svg { width: 21px; height: 21px; }
-    #chat-panel {
-        bottom: 78px;
-        right: 12px;
-        left: 12px;
-        width: auto;
-        max-width: none;
-        height: min(72vh, 480px);
-    }
-    .beta-banner { font-size: 0.74rem; padding: 7px 10px; }
-}
-
-
-#chat-input-row { display: none; flex-direction: column; border-top: 3px solid var(--ink); padding: 10px; gap: 8px; background: var(--face); }
-#chat-input-row.open { display: flex; }
-.input-row-main { display: flex; align-items: center; gap: 8px; }
-.input-row-main input {
-    flex: 1;
-    border: 2px solid var(--ink);
-    border-radius: 999px;
-    padding: 9px 13px;
-    font-size: 16px;
-    font-family: 'Inter', sans-serif;
-}
-.input-row-main input:focus { outline: none; border-color: var(--rare); }
-.input-row-main button {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 2px solid var(--ink);
-    background: var(--rare);
-    color: var(--face);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-#attach-btn { background: var(--face); color: var(--ink); }
-#attach-btn:hover { background: var(--kraft); }
-
-#image-preview-chip {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    background: var(--kraft);
-    border: 1.5px solid var(--kraft-line);
-    border-radius: 10px;
-    padding: 6px 8px;
-}
-#image-preview-chip.open { display: flex; }
-#image-preview-chip img { width: 34px; height: 34px; object-fit: cover; border-radius: 6px; border: 1.5px solid var(--ink); }
-#image-preview-chip span { flex: 1; font-size: 0.78rem; color: var(--ink-soft); }
-#remove-image-btn {
-    background: none;
-    border: none;
-    color: var(--ink-soft);
-    cursor: pointer;
-    font-size: 0.95rem;
-    line-height: 1;
-    padding: 4px;
-}
-
-.msg-image { max-width: 180px; display: block; border-radius: 10px; border: 2px solid var(--ink); }
-.msg-image + .msg-text { margin-top: 6px; }
 </style>
 </head>
 <body>
 
-<div class="beta-banner">This page is in development. You're viewing the beta version.</div>
+<div class="beta-banner">This is the <span>beta</span> version of the new order page, some things may still change.</div>
+
+<button id="cart-btn" type="button" aria-label="View cart">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    Cart <span id="cart-count" class="zero">0</span>
+</button>
 
 <nav class="top">
     <div class="wordmark"><span class="logo-dot" role="button" tabindex="0" aria-label="iPrint logo"></span>iPrint Keychains</div>
@@ -639,6 +658,7 @@ footer {
 <header class="hero">
     <div>
         <h1>Custom Printed</h1>
+        <p class="lede">Pick a style, customize it, and add it to your cart. Order as many as you like, then check out all at once.</p>
         <a class="btn btn-primary" href="#lineup">See what we print</a>
     </div>
     <div class="fan">
@@ -657,434 +677,595 @@ footer {
 <section class="set" id="lineup">
     <div class="set-head">
         <h2>What we print</h2>
-        <p>Five dollars each, printed in the colors you choose.</p>
+        <p>Five dollars each, printed in the colors you choose. Customize one below to add it to your cart.</p>
     </div>
 
-    <div class="grid">
-
-        <article class="tcard" style="--frame: var(--common)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCvFHMTfp1xsh1oQVM8Jei32t1wr7GOeaNEyaTfBq6gbcT2rTYGJdEC5s_u4ycwBfP6Ozd6fxl_Ozje0GowFKe4x9Y8KVAfKWL4nr-heo1tHDh-zak7-Or513A2Mhm7o_bEHFBp37fqsEs92nfdPcGRQnhnzXgKNTTxg19DBBHwpWKcXBfWM5Q8mvj8waQ9qVupnpO1pY-uzjB-=w2048?key=YtUivrP-NlKTleUP6T1zBw" alt="Baseball keychain"></div>
-            <div class="body">
-                <h3>Baseball</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--rare)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVBNtIcihG4JkIrEC7KCJxuHRLuoGJNlj7SIEXYOtMd_-gyvgR2P6J2bWy0ty0Ix-wzbnAR1c6TJQBvbF16ZoYvea4zJd6CfShJc_wlxIbToKygkLe1TDnbKicRPVoW3qrr4epZsdJqATc5biyaefTRTjjVvqOuzYaXlFuFz9lw-SenzmL4iuEd_QOq6ifHaV1HGSrAOXq08LVIv=w3101?key=YtUivrP-NlKTleUP6T1zBw" alt="Disney keychain"></div>
-            <div class="body">
-                <h3>Disney</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--epic)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVB4aFFZSX7cViUNxsG3ejG_7KqUKGP8DpBYXgoK0by8afkk11JHRLUBTrmJIBhwIX70bxqYxi7g7VuRGpa_t3DrYeWRdqJHLbdhXLK-8l87aBiFvGRkMjBBTVmtfR6mw4mWtABFJqu8-rKjqzQL1XL-zd3qSbA3aWeuD4B1Fey17_2TNNbbdPgPdmEFcMNrEWUY2ERQBl9CMvs=w2048?key=YtUivrP-NlKTleUP6T1zBw" alt="Custom name keychain"></div>
-            <div class="body">
-                <h3>Custom name</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--common)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVDr5_kkCngFcQkhrB0Bw4uE1ueVsqGQZbHbVb2MzWI4bmD0sIZ2GrLjLXOJSJ7apss-6HJZbhZZqmbrT_8WuUcxBpNPrHftp8Z0O5-PFMBhCRXMgwbCVyv2Zrnz-jIiEWuu7r0ImfCsdmlOzdSgIZ7HvX5HfCpf406qQn5Y6rfc6FVaZmL_CU-wEp1nhedizO-35gYy72v2BPM=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Cheer megaphone keychain"></div>
-            <div class="body">
-                <h3>Cheer megaphone</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--common)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCoV2Wn0fvvHzxf6M17odWQbPIWiXNw3zMVUz7y3Bel4x7qNgYUW2cXtmePxk_gD-ZWG0Oo1BGjWG0jKMGkTrD45HBSdGBrb7prxjyUwfNUhaiWPeVyibxSDdNbMIHauthnmcm1xw9CG99HZUtQpirudrngD9qwFb61N_MOcAnLtmGFVmGVo39YnU-pRqFGT_xlROiHXVKXi-s=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Soccer keychain"></div>
-            <div class="body">
-                <h3>Soccer</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--epic)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVBW_rT-V37CWZijVazo8NWoNQlBgZhFb63t7QogZVo691_A8PFkaZysaObThBNsMNEAJGz_RWpXFvLVDBdFXOZ0Ad6g3-I2i0D2_plAhwGw-6ONWNlLCKYkKO8PDEVDUaMBXErqOdhpeH4YTYa5rQ-CWEpbD6m9V2n-rOAH-eXUn71ht-BIMHzstU4tk6HxQhL1rpj50WkR_HXK=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Backpack keychain"></div>
-            <div class="body">
-                <h3>Backpack charm</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--common)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCKKB_oYSm3MkqZsR70ry4sQ86By9NXZMifU1LYyu3QMqm1Nhpcokfsi8g_UIuVsEIWK4Q0MTCtIotdUqYdQvUz2BEzHYGwa-qBI3rl2pAagQ_VmAshJEfOU1HYWWh9poWxVKfVdrOM7u_8kWXS4DBF0dv9D2Z8yJWT12MDG3VzOvlBhPpq_1x_mFV4dkq8OrUIBboYmsAzjrD9=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Football keychain"></div>
-            <div class="body">
-                <h3>Football</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--epic)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVDTg3iB9DtlQ6X9fXTGSHHanpeBK-ZtyEBeIjEI8rJ4pfSzF6csciADWQolxJaIT_IZe5slnDpZgf4TsYwrXvqdqso_ITEuTH7i7QxuDvclTl-_NWrWcP3eYy1zZ-WVlSaj2qM4Q2Q8mwaxSQ4vwQJpeBIiq-D4Sm5Tn_rSM6nzULVspRYKV4vBBZXn2pmSXJMtstMI43BqHgoA=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="School spirit custom keychain"></div>
-            <div class="body">
-                <h3>School spirit</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <article class="tcard" style="--frame: var(--rare)">
-            <div class="photo"><img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVATLpQHghrTmymRun39Qqgqdgg1xKiRbBIIzqifR2lb0vjGD69XDGLNnH7iCuybztYxEWX7TrRgBYN3us3eCC7ZOKvBKFmKfxvQiyzQ9hfxKrLEaanbvYKi3-tSXUe4w6i94WrAoKTzr10aD6C2V22j2pxFsYuqxPACaESZPxr_Yx58jwLmzDPzyEVIHYW-rG5EOGsV2AIu-9_x=w260?key=2Gn_PRJNnQxQlObNZI5Ksg" alt="Custom bow keychain"></div>
-            <div class="body">
-                <h3>Custom bow</h3>
-                <div class="foot"><span class="value-tag">$5</span></div>
-            </div>
-        </article>
-
-        <a class="tcard elf-card" style="--frame: var(--xmas-red)" href="preorder">
-            <div class="elf-card-inner">
-                <span class="elf-badge">Limited availability</span>
-                <h3><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h3>
-                <p class="elf-desc">Secure your preorder now and guarantee in time for your elf's return.</p>
-                <div class="elf-price">$35</div>
-                <span class="elf-btn">Reserve mine</span>
-            </div>
-        </a>
-
-    </div>
+    <div class="grid" id="product-grid"></div>
 </section>
+
+<div class="elf-section">
+    <a class="elf-card" href="preorder">
+        <div class="elf-card-inner">
+            <span class="elf-badge">Limited availability</span>
+            <h3><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h3>
+            <p class="elf-desc">Secure your preorder now and guarantee in time for your elf's return.</p>
+            <div class="elf-price">$35</div>
+            <span class="elf-btn">Reserve mine</span>
+        </div>
+    </a>
+</div>
+
+<div class="wrap" style="max-width:1120px; margin:0 auto; padding:0 24px;">
+    <div id="summary-panel">
+        <h2>Order Summary</h2>
+        <div id="summary-items"></div>
+        <dl id="summary-checkout"></dl>
+        <p class="note">This is a beta preview only, nothing has been sent yet. This will submit straight to Isaac once the beta is finished.</p>
+    </div>
+</div>
 
 <section class="cta">
     <h2>Ready to order</h2>
-    <p>Fill out the form with your design, color, and name, and we will start printing.</p>
-    <a class="btn btn-primary" href="https://forms.gle/4RqgULYWgq9ZEH6K6" target="_blank">Start my order</a>
+    <p>Add what you want from the lineup above, then check out right here on the page.</p>
+    <button class="btn btn-primary" id="cta-cart-btn" type="button">Open my cart</button>
 </section>
+
+<!-- Customize modal -->
+<div class="overlay" id="customize-overlay">
+    <div class="modal-card">
+        <button type="button" class="modal-close" id="customize-close" aria-label="Close">&times;</button>
+        <h2 id="customize-title">Customize</h2>
+        <form id="customize-form">
+            <div id="customize-fields"></div>
+            <button type="submit" class="modal-submit-btn">Add to Cart</button>
+        </form>
+    </div>
+</div>
+
+<!-- Cart modal -->
+<div class="overlay" id="cart-overlay">
+    <div class="modal-card" style="max-width:620px;">
+        <button type="button" class="modal-close" id="cart-close" aria-label="Close">&times;</button>
+        <h2>Your Cart</h2>
+        <div id="cart-items"></div>
+        <div class="cart-total-row"><span>Total</span><span id="cart-total">$0</span></div>
+
+        <form id="checkout-form" style="margin-top:22px;">
+            <div class="field">
+                <label for="cust-name">Your name</label>
+                <input type="text" id="cust-name" required>
+            </div>
+            <div class="field">
+                <label for="cust-email">Email <span class="hint">(I'll ask questions and let you know when it's ready)</span></label>
+                <input type="email" id="cust-email" required>
+            </div>
+            <div class="field">
+                <label>Payment</label>
+                <div class="radio-row">
+                    <label><input type="radio" name="payment" value="Venmo (@JenniferNeal1982, last 4 of phone 8675)" required> Venmo (@JenniferNeal1982), last 4 of phone is 8675</label>
+                    <label><input type="radio" name="payment" value="Zelle (jks98765@gmail.com)"> Zelle (jks98765@gmail.com)</label>
+                    <label><input type="radio" name="payment" value="Cash when ready"> Cash when ready</label>
+                </div>
+            </div>
+            <div class="field">
+                <label for="notes">Anything else? <span class="hint">Not required, note if you need it by a specific date, or your address if shipping.</span></label>
+                <textarea id="notes"></textarea>
+            </div>
+            <div class="error-msg" id="checkout-error"></div>
+            <button type="submit" class="modal-submit-btn" id="place-order-btn">Place Order</button>
+        </form>
+    </div>
+</div>
 
 <footer>
     <a class="footer-link" href="testimonials.html">Testimonials</a>
 </footer>
 
-<!-- ===================== Chat widget ===================== -->
-<button id="chat-launcher" aria-label="Open support chat">
-    <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 12a8 8 0 1 1 3.2 6.4L4 20l1.3-3.6A7.96 7.96 0 0 1 4 12Z" stroke="#FFFDF7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-</button>
-
-<div id="chat-panel">
-    <div class="chat-header">
-        <div class="who">
-            <span class="dot"></span>
-            <div>
-                <h4>iPrint Support</h4>
-                <span id="chat-subtitle">Dev mode: API key required</span>
-            </div>
-        </div>
-        <button id="chat-close" aria-label="Close chat">✕</button>
-    </div>
-
-    <div id="chat-setup">
-        <p>This runs on an AI API straight from your browser, so it needs a key to work.</p>
-        <div class="note">This page is in development, you're looking at the beta version. Dev only: the key stays in memory for this tab and is never saved or sent anywhere but the API. Don't ship this pattern live, proxy the key through a backend first.</div>
-        <input id="api-key-input" type="password" placeholder="Enter API key..." autocomplete="off" />
-        <span class="error" id="key-error">Please enter a key to continue.</span>
-        <button id="connect-btn">Connect</button>
-    </div>
-
-    <div id="chat-consent">
-        <p>One quick thing before we start:</p>
-        <div class="note">This chat is <strong>powered by AI</strong>, not a real person, and it can get things wrong. Please double-check anything important, like pricing, availability, or order details, rather than taking its answers at face value.</div>
-        <button id="consent-btn">I understand, continue</button>
-    </div>
-
-    <div id="chat-body"></div>
-    <div id="chat-input-row">
-        <div id="image-preview-chip">
-            <img id="image-preview-thumb" alt="Attached photo preview" />
-            <span>Photo attached</span>
-            <button id="remove-image-btn" type="button" aria-label="Remove attached image">✕</button>
-        </div>
-        <div class="input-row-main">
-            <input type="file" id="image-file-input" accept="image/*" style="display:none" />
-            <button id="attach-btn" type="button" aria-label="Upload a photo">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4l-4.5 4.5M12 4l4.5 4.5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <input id="chat-text-input" type="text" placeholder="Ask a question or attach a photo..." />
-            <button id="chat-send-btn" aria-label="Send">
-                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 3l5 5-5 5" stroke="#FFFDF7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
-(function () {
-    const launcher = document.getElementById('chat-launcher');
-    const panel = document.getElementById('chat-panel');
-    const closeBtn = document.getElementById('chat-close');
-    const setupView = document.getElementById('chat-setup');
-    const consentView = document.getElementById('chat-consent');
-    const consentBtn = document.getElementById('consent-btn');
-    const bodyView = document.getElementById('chat-body');
-    const inputRow = document.getElementById('chat-input-row');
-    const keyInput = document.getElementById('api-key-input');
-    const keyError = document.getElementById('key-error');
-    const connectBtn = document.getElementById('connect-btn');
-    const textInput = document.getElementById('chat-text-input');
-    const sendBtn = document.getElementById('chat-send-btn');
-    const subtitle = document.getElementById('chat-subtitle');
-    const attachBtn = document.getElementById('attach-btn');
-    const imageFileInput = document.getElementById('image-file-input');
-    const imagePreviewChip = document.getElementById('image-preview-chip');
-    const imagePreviewThumb = document.getElementById('image-preview-thumb');
-    const removeImageBtn = document.getElementById('remove-image-btn');
+const COLORS = [
+  "Red", "Red/Black dual (colors will blend)", "Orange", "Red/Yellow dual (colors will blend)",
+  "Yellow", "Peach", "Gold", "Green", "Lime Green", "Sea Green", "Royal Blue", "Dark Blue",
+  "Light Blue", "Matte Teal", "Blue/Green dual (colors will blend)", "Purple", "Metallic Purple",
+  "Periwinkle", "Magenta", "Fuschia", "Hot Pink", "Light Pink",
+  "Purple/Gold/Black tri color (colors will blend)", "Brown", "Stardust Shimmer (silver)",
+  "Black", "White", "Glow Green (clear/white when not charged)"
+];
 
-    // Kept only in memory for this tab, never persisted.
-    let apiKey = null;
-    const modelId = 'qwen/qwen3.8-27b';
-    let pendingImage = null;
+const COLOR_CHART_URL = "https://i.postimg.cc/V6JPgdsm/unnamed.png";
 
-    const SYSTEM_PROMPT = `
-You are the friendly support assistant embedded on isaacneal.com, the site for Isaac's small business, iPrint Keychains.
+function colorChart() {
+  return `
+    <div class="field">
+      <label>Color options</label>
+      <img src="${COLOR_CHART_URL}" alt="Color options chart" style="width:100%; max-width:520px; border:3px solid var(--ink); border-radius:12px; display:block;">
+    </div>`;
+}
 
-About the business:
-- Isaac designs and 3D prints custom keychains himself, based in Prairieville, Louisiana. He handles the design, printing, website, and order emails.
-- All standard keychains are $5 each, printed in the colors the customer chooses.
-- Current lineup: Baseball, Disney (classic characters), Custom name (your name or word in any color you pick), Cheer megaphone, Soccer, Backpack charm, Football, School spirit (school colors & mascots), and Custom bow designs.
-- During the winter season there's also a limited-edition Elf Box ($35) with its own holiday-themed designs.
-- Customers can leave reviews on the testimonials page.
+function colorSelect(id, labelText, extraOption) {
+  const opts = extraOption ? [extraOption, ...COLORS] : COLORS;
+  const options = opts.map(c => `<option value="${c}">${c}</option>`).join("");
+  return `
+    <div class="field">
+      <label for="${id}">${labelText}</label>
+      <select id="${id}" required>
+        <option value="" disabled selected>Choose a color...</option>
+        ${options}
+      </select>
+    </div>`;
+}
 
-How ordering works: customers fill out the order form (linked from the homepage as "Start my order") with their design choice, color, and name, and Isaac starts printing after that.
+const TYPES = [
+  {
+    id: "custom-name",
+    label: "Custom name",
+    desc: "Type a name, pick 2 or 3 colors, choose a font.",
+    price: 5,
+    frame: "var(--epic)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVB4aFFZSX7cViUNxsG3ejG_7KqUKGP8DpBYXgoK0by8afkk11JHRLUBTrmJIBhwIX70bxqYxi7g7VuRGpa_t3DrYeWRdqJHLbdhXLK-8l87aBiFvGRkMjBBTVmtfR6mw4mWtABFJqu8-rKjqzQL1XL-zd3qSbA3aWeuD4B1Fey17_2TNNbbdPgPdmEFcMNrEWUY2ERQBl9CMvs=w2048?key=YtUivrP-NlKTleUP6T1zBw",
+    fields: `
+      <div class="field">
+        <label for="cn-text">What would you like it to say? <span class="hint">(made exactly as typed)</span></label>
+        <input type="text" id="cn-text">
+      </div>
+      <div class="field">
+        <label for="cn-count">How many colors?</label>
+        <select id="cn-count">
+          <option value="2">2 color</option>
+          <option value="3">3 color</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>What font would you like?</label>
+        <div class="font-grid" id="cn-font-grid"></div>
+      </div>
+      ${colorChart()}
+      ${colorSelect("cn-bottom", "Bottom layer color")}
+      <div id="cn-middle-wrap">${colorSelect("cn-middle", "Middle layer color (3 color only)")}</div>
+      ${colorSelect("cn-top", "Top layer color")}
+    `
+  },
+  {
+    id: "baseball",
+    label: "Baseball",
+    desc: "A name or number on a baseball charm.",
+    price: 5,
+    frame: "var(--common)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVCvFHMTfp1xsh1oQVM8Jei32t1wr7GOeaNEyaTfBq6gbcT2rTYGJdEC5s_u4ycwBfP6Ozd6fxl_Ozje0GowFKe4x9Y8KVAfKWL4nr-heo1tHDh-zak7-Or513A2Mhm7o_bEHFBp37fqsEs92nfdPcGRQnhnzXgKNTTxg19DBBHwpWKcXBfWM5Q8mvj8waQ9qVupnpO1pY-uzjB-=w2048?key=YtUivrP-NlKTleUP6T1zBw",
+    fields: `
+      <div class="field">
+        <label for="bb-text">What name or number would you like?</label>
+        <input type="text" id="bb-text">
+      </div>
+      ${colorChart()}
+      ${colorSelect("bb-ball", "Baseball color")}
+      ${colorSelect("bb-laces", "Ring & laces color")}
+      ${colorSelect("bb-name", "Name/number color")}
+    `
+  },
+  {
+    id: "disney",
+    label: "Disney",
+    desc: "Mickey or Minnie style, with a name.",
+    price: 5,
+    frame: "var(--rare)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVBNtIcihG4JkIrEC7KCJxuHRLuoGJNlj7SIEXYOtMd_-gyvgR2P6J2bWy0ty0Ix-wzbnAR1c6TJQBvbF16ZoYvea4zJd6CfShJc_wlxIbToKygkLe1TDnbKicRPVoW3qrr4epZsdJqATc5biyaefTRTjjVvqOuzYaXlFuFz9lw-SenzmL4iuEd_QOq6ifHaV1HGSrAOXq08LVIv=w3101?key=YtUivrP-NlKTleUP6T1zBw",
+    fields: `
+      <div class="field">
+        <label>Which style?</label>
+        <div class="radio-row">
+          <label><input type="radio" name="dn-style" value="Mickey"> Mickey</label>
+          <label><input type="radio" name="dn-style" value="Pink Minnie"> Pink Minnie</label>
+          <label><input type="radio" name="dn-style" value="Red Minnie"> Red Minnie</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="dn-text">What would you like it to say?</label>
+        <input type="text" id="dn-text">
+      </div>
+      ${colorChart()}
+      ${colorSelect("dn-name", "Text color")}
+    `
+  },
+  {
+    id: "cheer",
+    label: "Cheer megaphone",
+    desc: "Your name on a cheer megaphone charm.",
+    price: 5,
+    frame: "var(--common)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVDr5_kkCngFcQkhrB0Bw4uE1ueVsqGQZbHbVb2MzWI4bmD0sIZ2GrLjLXOJSJ7apss-6HJZbhZZqmbrT_8WuUcxBpNPrHftp8Z0O5-PFMBhCRXMgwbCVyv2Zrnz-jIiEWuu7r0ImfCsdmlOzdSgIZ7HvX5HfCpf406qQn5Y6rfc6FVaZmL_CU-wEp1nhedizO-35gYy72v2BPM=w260?key=2Gn_PRJNnQxQlObNZI5Ksg",
+    fields: `
+      <div class="field">
+        <label for="ch-text">What name would you like on the megaphone?</label>
+        <input type="text" id="ch-text">
+      </div>
+      ${colorChart()}
+      ${colorSelect("ch-body", "Megaphone color")}
+      ${colorSelect("ch-name", "Outline and name color")}
+    `
+  },
+  {
+    id: "soccer",
+    label: "Soccer",
+    desc: "Your name or text on a soccer ball charm.",
+    price: 5,
+    frame: "var(--common)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVCoV2Wn0fvvHzxf6M17odWQbPIWiXNw3zMVUz7y3Bel4x7qNgYUW2cXtmePxk_gD-ZWG0Oo1BGjWG0jKMGkTrD45HBSdGBrb7prxjyUwfNUhaiWPeVyibxSDdNbMIHauthnmcm1xw9CG99HZUtQpirudrngD9qwFb61N_MOcAnLtmGFVmGVo39YnU-pRqFGT_xlROiHXVKXi-s=w260?key=2Gn_PRJNnQxQlObNZI5Ksg",
+    fields: `
+      <div class="field">
+        <label for="sc-text">What would you like it to say?</label>
+        <input type="text" id="sc-text">
+      </div>
+      ${colorChart()}
+      ${colorSelect("sc-name", "Name color")}
+    `
+  },
+  {
+    id: "backpack",
+    label: "Backpack charm",
+    desc: "A name charm for backpacks or bags.",
+    price: 5,
+    frame: "var(--epic)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVBW_rT-V37CWZijVazo8NWoNQlBgZhFb63t7QogZVo691_A8PFkaZysaObThBNsMNEAJGz_RWpXFvLVDBdFXOZ0Ad6g3-I2i0D2_plAhwGw-6ONWNlLCKYkKO8PDEVDUaMBXErqOdhpeH4YTYa5rQ-CWEpbD6m9V2n-rOAH-eXUn71ht-BIMHzstU4tk6HxQhL1rpj50WkR_HXK=w260?key=2Gn_PRJNnQxQlObNZI5Ksg",
+    fields: `
+      <div class="field">
+        <label for="bp-text">What would you like the name to be?</label>
+        <input type="text" id="bp-text">
+      </div>
+      ${colorChart()}
+      ${colorSelect("bp-base", "Base color")}
+      ${colorSelect("bp-trim", "Trim / name color")}
+    `
+  },
+  {
+    id: "football",
+    label: "Football",
+    desc: "Your name or text on a football charm.",
+    price: 5,
+    frame: "var(--common)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVCKKB_oYSm3MkqZsR70ry4sQ86By9NXZMifU1LYyu3QMqm1Nhpcokfsi8g_UIuVsEIWK4Q0MTCtIotdUqYdQvUz2BEzHYGwa-qBI3rl2pAagQ_VmAshJEfOU1HYWWh9poWxVKfVdrOM7u_8kWXS4DBF0dv9D2Z8yJWT12MDG3VzOvlBhPpq_1x_mFV4dkq8OrUIBboYmsAzjrD9=w260?key=2Gn_PRJNnQxQlObNZI5Ksg",
+    fields: `
+      <div class="field">
+        <label for="fb-text">What would you like it to say?</label>
+        <input type="text" id="fb-text">
+      </div>
+      ${colorChart()}
+      ${colorSelect("fb-name", "Text color")}
+    `
+  },
+  {
+    id: "school-spirit",
+    label: "School spirit",
+    desc: "A name in your school's colors.",
+    price: 5,
+    frame: "var(--epic)",
+    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVDTg3iB9DtlQ6X9fXTGSHHanpeBK-ZtyEBeIjEI8rJ4pfSzF6csciADWQolxJaIT_IZe5slnDpZgf4TsYwrXvqdqso_ITEuTH7i7QxuDvclTl-_NWrWcP3eYy1zZ-WVlSaj2qM4Q2Q8mwaxSQ4vwQJpeBIiq-D4Sm5Tn_rSM6nzULVspRYKV4vBBZXn2pmSXJMtstMI43BqHgoA=w260?key=2Gn_PRJNnQxQlObNZI5Ksg",
+    fields: `
+      <div class="field">
+        <label for="ss-text">What name or text would you like?</label>
+        <input type="text" id="ss-text">
+      </div>
+      ${colorChart()}
+      ${colorSelect("ss-main", "Main color")}
+      ${colorSelect("ss-accent", "Accent color")}
+    `
+  },
+  {
+    id: "bow",
+    label: "Custom bow",
+    desc: "A custom bow design with a name.",
+    price: 5,
+    frame: "var(--rare)",
+    img: "https://cdn.phototourl.com/free/2026-09-05-99bd1aea-3f0a-4518-8e72-766a3387a3f5.png",
+    fields: `
+      <div class="field">
+        <label for="bow-text">What would you like the name to be?</label>
+        <input type="text" id="bow-text">
+      </div>
+      <div class="field">
+        <label>Section reference</label>
+        <img src="https://i.postimg.cc/wM9cHst3/unnamed.png" alt="Bow section reference" style="width:100%; max-width:420px; border:3px solid var(--ink); border-radius:12px; display:block;">
+      </div>
+      ${colorChart()}
+      ${colorSelect("bow-outline", "Outline color")}
+      ${colorSelect("bow-s1", "Section 1 color")}
+      ${colorSelect("bow-s2", "Section 2 color")}
+      ${colorSelect("bow-base", "Name base layer color")}
+      ${colorSelect("bow-top", "Top name color")}
+    `
+  },
+  {
+    id: "pvm",
+    label: "PVM custom",
+    desc: "PVM paw design with a name.",
+    price: 5,
+    frame: "var(--gold)",
+    icon: `<svg viewBox="0 0 24 24" fill="#2B2012" stroke="none"><ellipse cx="12" cy="15" rx="4.5" ry="4"/><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="9" cy="5.5" rx="1.8" ry="2.3"/><ellipse cx="15" cy="5.5" rx="1.8" ry="2.3"/></svg>`,
+    fields: `
+      <div class="field">
+        <label for="pvm-text">What would you like the name to be?</label>
+        <input type="text" id="pvm-text">
+      </div>
+    `
+  },
+  {
+    id: "custom-design",
+    label: "Custom design",
+    desc: "Describe your own design idea (price TBD).",
+    price: null,
+    frame: "var(--gold)",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#2B2012" stroke-width="1.5"><path d="M15.2 4.8a1.4 1.4 0 012 2L7.5 16.5 4 17.5l1-3.5z"/><path d="M13.2 6.8l2 2"/></svg>`,
+    fields: `
+      <div class="field">
+        <label for="cd-text">What would you like your design to be? <span class="hint">Be specific: colors, size, what it should do, and whether it's a keychain.</span></label>
+        <textarea id="cd-text"></textarea>
+      </div>
+      <p class="hint" style="display:block; margin-top:-6px;">Custom requests need to be approved before printing, price depends on the design.</p>
+      ${colorChart()}
+    `
+  }
+];
 
-Photo attachments: customers can attach a photo, for example a character, logo, color scheme, or an existing keychain they like. When a photo comes in, look at it and give friendly, specific feedback on how it could translate into one of the keychain products (closest matching design, which colors would work, whether it fits Custom name, Custom design, or another item). Never invent an exact price beyond the standard $5 or the $35 Elf Box, and don't claim you can guarantee an exact reproduction, since Isaac does the actual modeling by hand.
+const FONTS = [
+  { name: "Pacifico", family: "'Pacifico', cursive" },
+  { name: "Brush Script", family: "'Brush Script MT', 'Segoe Script', cursive" },
+  { name: "Gill Sans Ultra Bold", family: "'Arial Black', 'Archivo Black', sans-serif" },
+  { name: "Tahoma", family: "Tahoma, Geneva, sans-serif" },
+  { name: "Lucida Handwriting", family: "'Dancing Script', 'Lucida Handwriting', cursive" }
+];
 
-Formatting:
-- Reply using light markdown: **bold** for product names or prices, and "- " bullet lists when listing multiple keychains or options.
-- Link to real pages on the site with markdown links when relevant: the keychain lineup is [on the homepage](index.html#lineup), the Elf Box preorder is at [preorder.html](preorder.html), reviews are on [testimonials.html](testimonials.html), and orders go through the [order form](https://forms.gle/4RqgULYWgq9ZEH6K6).
-- Keep replies short and easy to scan, a few sentences or a short list, not a wall of text.
-- Do not use em dashes anywhere in your replies. Use commas, periods, or parentheses instead.
+// ---- Cookie helpers ----
+function getCookie(name) {
+  const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return match ? decodeURIComponent(match.pop()) : '';
+}
+function setCookie(name, value, days) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+}
 
-Follow-up choices:
-- When a customer's request is broad or you need one more detail to help them well (e.g. they say "I want to buy something" and you'd want to know which design, or you're checking whether they want pricing vs. how to order), ask a short clarifying question and offer up to 4 short quick-reply options.
-- To offer options, end your reply with one line formatted exactly like this: [[choices: Option one | Option two | Option three]]. Keep each option to just a few words, and only include this line when it genuinely narrows things down, not on every message.
-- That bracket line is a control signal, not something to explain or mention to the customer.
+const CART_COOKIE = 'ipk_cart';
+let cart = [];
+try {
+  const raw = getCookie(CART_COOKIE);
+  cart = raw ? JSON.parse(raw) : [];
+  if (!Array.isArray(cart)) cart = [];
+} catch (e) {
+  cart = [];
+}
 
-Your job:
-- Answer questions about the business, the keychain lineup, pricing, and how ordering works in a warm, friendly, upbeat tone.
-- You don't have access to live order status or guaranteed turnaround time. For anything order-specific, point the customer to the order form or suggest they email isaacneal225@gmail.com.
-- Stay strictly on topic: iPrint Keychains and this site. If asked something unrelated, briefly and kindly steer back to how you can help with their order.
-`.trim();
+function saveCart() {
+  setCookie(CART_COOKIE, JSON.stringify(cart), 30);
+  renderCartBadge();
+}
 
-    let history = [{ role: 'system', content: SYSTEM_PROMPT }];
+function renderCartBadge() {
+  const countEl = document.getElementById('cart-count');
+  countEl.textContent = cart.length;
+  countEl.classList.toggle('zero', cart.length === 0);
+}
 
-    function togglePanel() { panel.classList.toggle('open'); }
-    launcher.addEventListener('click', togglePanel);
-    closeBtn.addEventListener('click', togglePanel);
+// ---- Build the product grid ----
+const productGrid = document.getElementById('product-grid');
+TYPES.forEach(t => {
+  const thumb = t.img ? `<img src="${t.img}" alt="${t.label} keychain">` : t.icon;
+  const priceLabel = t.price === null ? 'Price TBD' : ('$' + t.price);
+  productGrid.insertAdjacentHTML('beforeend', `
+    <article class="tcard" style="--frame: ${t.frame}">
+      <div class="photo">${thumb}</div>
+      <div class="body">
+        <h3>${t.label}</h3>
+        <p class="p-desc">${t.desc}</p>
+        <div class="foot"><span class="value-tag">${priceLabel}</span></div>
+        <button type="button" class="add-cart-btn" data-open-type="${t.id}">Customize &amp; Add to Cart</button>
+      </div>
+    </article>
+  `);
+});
 
-    connectBtn.addEventListener('click', () => {
-        const val = keyInput.value.trim();
-        if (!val) { keyError.style.display = 'block'; return; }
-        apiKey = val;
-        setupView.style.display = 'none';
-        consentView.style.display = 'flex';
-        subtitle.textContent = 'One quick step before we start';
+// ---- Customize modal ----
+const customizeOverlay = document.getElementById('customize-overlay');
+const customizeTitle = document.getElementById('customize-title');
+const customizeFields = document.getElementById('customize-fields');
+const customizeForm = document.getElementById('customize-form');
+let currentTypeId = null;
+
+function openCustomizeModal(typeId) {
+  const t = TYPES.find(x => x.id === typeId);
+  if (!t) return;
+  currentTypeId = typeId;
+  customizeTitle.textContent = t.label + ' details';
+  customizeFields.innerHTML = t.fields;
+
+  if (typeId === 'custom-name') {
+    const fontGrid = document.getElementById('cn-font-grid');
+    FONTS.forEach((f, i) => {
+      fontGrid.insertAdjacentHTML('beforeend', `
+        <label class="font-card">
+          <input type="radio" name="cn-font" value="${f.name}" ${i === 0 ? 'checked' : ''}>
+          <div class="sample" style="font-family:${f.family}">Bryce</div>
+          <div class="fname">${f.name}</div>
+        </label>
+      `);
     });
-
-    keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') connectBtn.click(); });
-
-    consentBtn.addEventListener('click', () => {
-        consentView.style.display = 'none';
-        bodyView.classList.add('open');
-        inputRow.classList.add('open');
-        subtitle.textContent = 'Usually replies in a few seconds';
-        addMessage('bot', "Hey! I'm Isaac's keychain support bot 👋 Ask me about the lineup, pricing, or how ordering works. You can also attach a photo of a design idea.");
-        textInput.focus();
-    });
-
-    // Shrinks a chosen image to a reasonable size and returns it as a JPEG data URL,
-    // so photos from a phone camera don't balloon the request payload.
-    function resizeImageFile(file, maxDim = 1024, quality = 0.82) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onerror = () => reject(new Error('Could not read that file.'));
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onerror = () => reject(new Error('Could not read that image.'));
-                img.onload = () => {
-                    let { width, height } = img;
-                    if (width > maxDim || height > maxDim) {
-                        if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
-                        else { width = Math.round(width * maxDim / height); height = maxDim; }
-                    }
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', quality));
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
+    const cnCount = document.getElementById('cn-count');
+    const cnMiddleWrap = document.getElementById('cn-middle-wrap');
+    const cnMiddleSelect = document.getElementById('cn-middle');
+    function updateMiddleLayer() {
+      const need3 = cnCount.value === '3';
+      cnMiddleWrap.classList.toggle('hidden', !need3);
+      // A required field inside a hidden wrapper still blocks native form
+      // validation in Chrome (the browser only skips validation for a
+      // field that is itself display:none, not one whose ANCESTOR is
+      // hidden). Toggling the attribute directly, not just the visual
+      // hiding, is what actually fixes that, verified by reproducing the
+      // exact "2 color silently does nothing" bug and confirming this
+      // resolves it.
+      cnMiddleSelect.required = need3;
+      if (!need3) cnMiddleSelect.value = '';
     }
+    cnCount.addEventListener('change', updateMiddleLayer);
+    updateMiddleLayer();
+  }
 
-    function clearPendingImage() {
-        pendingImage = null;
-        imagePreviewChip.classList.remove('open');
-        imagePreviewThumb.src = '';
+  customizeOverlay.classList.add('open');
+}
+
+function closeCustomizeModal() {
+  customizeOverlay.classList.remove('open');
+  currentTypeId = null;
+}
+
+document.getElementById('customize-close').addEventListener('click', closeCustomizeModal);
+customizeOverlay.addEventListener('click', e => { if (e.target === customizeOverlay) closeCustomizeModal(); });
+
+productGrid.addEventListener('click', e => {
+  const btn = e.target.closest('[data-open-type]');
+  if (btn) openCustomizeModal(btn.dataset.openType);
+});
+
+function collectFields(container) {
+  const rows = [];
+  container.querySelectorAll('input[type=text], textarea').forEach(el => {
+    if (el.value) {
+      const lbl = el.closest('.field')?.querySelector('label');
+      rows.push({ label: lbl ? lbl.firstChild.textContent.trim() : 'Detail', value: el.value });
     }
-
-    attachBtn.addEventListener('click', () => imageFileInput.click());
-
-    imageFileInput.addEventListener('change', async () => {
-        const file = imageFileInput.files[0];
-        imageFileInput.value = '';
-        if (!file || !file.type.startsWith('image/')) return;
-        try {
-            pendingImage = await resizeImageFile(file);
-            imagePreviewThumb.src = pendingImage;
-            imagePreviewChip.classList.add('open');
-        } catch (err) {
-            addMessage('bot', "I couldn't read that image, mind trying a different file?");
-        }
-    });
-
-    removeImageBtn.addEventListener('click', clearPendingImage);
-
-    // Turns a small subset of markdown (**bold**, "- " lists, [text](url) links)
-    // into safe HTML. Input is escaped first, so raw HTML in a reply can't leak through.
-    function renderMarkdown(text) {
-        const escaped = text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-
-        const withInline = escaped
-            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-
-        const lines = withInline.split('\n');
-        let html = '';
-        let inList = false;
-        for (const raw of lines) {
-            const line = raw.trim();
-            if (line.startsWith('- ')) {
-                if (!inList) { html += '<ul>'; inList = true; }
-                html += '<li>' + line.slice(2) + '</li>';
-            } else {
-                if (inList) { html += '</ul>'; inList = false; }
-                if (line.length) html += '<p>' + line + '</p>';
-            }
-        }
-        if (inList) html += '</ul>';
-        return html;
+  });
+  container.querySelectorAll('select').forEach(el => {
+    if (el.value && !el.closest('.hidden')) {
+      const lbl = el.closest('.field')?.querySelector('label');
+      rows.push({ label: lbl ? lbl.textContent.trim() : 'Color', value: el.value });
     }
+  });
+  const checkedRadio = container.querySelector('input[type=radio][name="dn-style"]:checked');
+  if (checkedRadio) rows.push({ label: 'Style', value: checkedRadio.value });
+  const checkedFont = container.querySelector('input[name="cn-font"]:checked');
+  if (checkedFont) rows.push({ label: 'Font', value: checkedFont.value });
+  return rows;
+}
 
-    function addMessage(role, text, imageDataUrl) {
-        const div = document.createElement('div');
-        div.className = 'msg ' + role;
-        if (role.startsWith('bot')) {
-            div.innerHTML = renderMarkdown(text);
-        } else {
-            if (imageDataUrl) {
-                const img = document.createElement('img');
-                img.src = imageDataUrl;
-                img.className = 'msg-image';
-                div.appendChild(img);
-            }
-            if (text) {
-                const p = document.createElement('div');
-                p.className = 'msg-text';
-                p.textContent = text;
-                div.appendChild(p);
-            }
-        }
-        bodyView.appendChild(div);
-        bodyView.scrollTop = bodyView.scrollHeight;
-        return div;
-    }
+customizeForm.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!customizeForm.reportValidity()) return;
 
-    // Pulls a trailing "[[choices: A | B | C]]" control line out of a reply,
-    // returning the cleaned text plus up to 4 short option strings (or none).
-    function extractChoices(text) {
-        const match = text.match(/\[\[choices:\s*([^\]]+)\]\]/i);
-        if (!match) return { text: text, choices: null };
-        const choices = match[1].split('|').map(s => s.trim()).filter(Boolean).slice(0, 4);
-        const cleanText = text.replace(match[0], '').trim();
-        return { text: cleanText, choices: choices.length ? choices : null };
-    }
+  const t = TYPES.find(x => x.id === currentTypeId);
+  if (!t) return;
 
-    function addChoiceButtons(choices) {
-        const row = document.createElement('div');
-        row.className = 'choice-row';
-        choices.forEach((choice) => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.textContent = choice;
-            btn.addEventListener('click', () => {
-                row.querySelectorAll('button').forEach((b) => (b.disabled = true));
-                row.classList.add('used');
-                textInput.value = choice;
-                sendMessage();
-            });
-            row.appendChild(btn);
-        });
-        bodyView.appendChild(row);
-        bodyView.scrollTop = bodyView.scrollHeight;
-    }
+  const fields = collectFields(customizeFields);
+  cart.push({
+    cartId: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
+    typeId: t.id,
+    typeLabel: t.label,
+    price: t.price,
+    fields: fields
+  });
+  saveCart();
+  closeCustomizeModal();
+});
 
-    async function sendMessage() {
-        const text = textInput.value.trim();
-        const image = pendingImage;
-        if ((!text && !image) || !apiKey) return;
+// ---- Cart modal ----
+const cartOverlay = document.getElementById('cart-overlay');
+const cartItemsEl = document.getElementById('cart-items');
+const cartTotalEl = document.getElementById('cart-total');
 
-        addMessage('user', text, image);
+function renderCart() {
+  if (!cart.length) {
+    cartItemsEl.innerHTML = '<p class="cart-empty">Your cart is empty. Close this and add something from the lineup.</p>';
+    cartTotalEl.textContent = '$0';
+    document.getElementById('place-order-btn').disabled = true;
+    return;
+  }
+  document.getElementById('place-order-btn').disabled = false;
 
-        const userContent = image
-            ? [
-                  { type: 'text', text: text || "Here's a photo, what do you think?" },
-                  { type: 'image_url', image_url: { url: image } }
-              ]
-            : text;
-        history.push({ role: 'user', content: userContent });
+  let total = 0;
+  let hasTbd = false;
+  cartItemsEl.innerHTML = cart.map(item => {
+    if (item.price === null) hasTbd = true; else total += item.price;
+    const detailText = item.fields.map(f => f.value).filter(Boolean).join(', ');
+    return `
+      <div class="cart-item" data-cart-id="${item.cartId}">
+        <div>
+          <div class="ci-name">${item.typeLabel}</div>
+          <div class="ci-detail">${detailText || 'No details entered'}</div>
+          <button type="button" class="remove-item-btn" data-remove="${item.cartId}">Remove</button>
+        </div>
+        <div class="ci-price">${item.price === null ? 'TBD' : ('$' + item.price)}</div>
+      </div>
+    `;
+  }).join('');
 
-        textInput.value = '';
-        clearPendingImage();
+  cartTotalEl.textContent = '$' + total + (hasTbd ? ' + TBD' : '');
+}
 
-        const typingEl = addMessage('bot typing', 'Typing...');
+cartItemsEl.addEventListener('click', e => {
+  const btn = e.target.closest('[data-remove]');
+  if (!btn) return;
+  cart = cart.filter(item => item.cartId !== btn.dataset.remove);
+  saveCart();
+  renderCart();
+});
 
-        try {
-            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + apiKey
-                },
-                body: JSON.stringify({
-                    model: modelId,
-                    messages: history,
-                    temperature: 0.6,
-                    max_tokens: 300
-                })
-            });
+function openCart() {
+  renderCart();
+  cartOverlay.classList.add('open');
+}
 
-            if (!res.ok) {
-                const errBody = await res.json().catch(() => null);
-                const msg = errBody?.error?.message || ('Request failed (' + res.status + ')');
-                typingEl.remove();
-                addMessage('bot', "Hmm, I couldn't reach the AI service: " + msg);
-                return;
-            }
+document.getElementById('cart-btn').addEventListener('click', openCart);
+document.getElementById('cta-cart-btn').addEventListener('click', openCart);
+document.getElementById('cart-close').addEventListener('click', () => cartOverlay.classList.remove('open'));
+cartOverlay.addEventListener('click', e => { if (e.target === cartOverlay) cartOverlay.classList.remove('open'); });
 
-            const data = await res.json();
-            const reply = data.choices?.[0]?.message?.content?.trim() || "Sorry, I didn't catch that, could you rephrase?";
-            typingEl.remove();
-            const { text: cleanReply, choices } = extractChoices(reply);
-            addMessage('bot', cleanReply);
-            if (choices) addChoiceButtons(choices);
-            history.push({ role: 'assistant', content: reply });
-        } catch (err) {
-            typingEl.remove();
-            addMessage('bot', 'Something went wrong reaching the AI service. Check your connection and API key and try again.');
-        }
-    }
+// ---- Checkout / place order ----
+const checkoutForm = document.getElementById('checkout-form');
+const checkoutError = document.getElementById('checkout-error');
+const summaryPanel = document.getElementById('summary-panel');
+const summaryItems = document.getElementById('summary-items');
+const summaryCheckout = document.getElementById('summary-checkout');
 
-    sendBtn.addEventListener('click', sendMessage);
-    textInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
-})();
+checkoutForm.addEventListener('submit', e => {
+  e.preventDefault();
+  checkoutError.style.display = 'none';
+
+  if (!cart.length) {
+    checkoutError.textContent = 'Your cart is empty, add at least one keychain first.';
+    checkoutError.style.display = 'block';
+    return;
+  }
+  if (!checkoutForm.reportValidity()) return;
+
+  const payment = document.querySelector('input[name="payment"]:checked');
+  if (!payment) {
+    checkoutError.textContent = 'Choose a payment method.';
+    checkoutError.style.display = 'block';
+    return;
+  }
+
+  summaryItems.innerHTML = cart.map(item => `
+    <div class="summary-item">
+      <strong>${item.typeLabel}</strong> ${item.price === null ? '(price TBD)' : ('- $' + item.price)}
+      <dl>${item.fields.map(f => `<dt>${f.label}</dt><dd>${f.value}</dd>`).join('')}</dl>
+    </div>
+  `).join('');
+
+  summaryCheckout.innerHTML = '';
+  function addRow(label, value) {
+    if (!value) return;
+    summaryCheckout.insertAdjacentHTML('beforeend', `<dt>${label}</dt><dd>${value}</dd>`);
+  }
+  addRow('Name', document.getElementById('cust-name').value);
+  addRow('Email', document.getElementById('cust-email').value);
+  addRow('Payment', payment.value);
+  addRow('Notes', document.getElementById('notes').value);
+
+  cartOverlay.classList.remove('open');
+  summaryPanel.style.display = 'block';
+  summaryPanel.scrollIntoView({ behavior: 'smooth' });
+
+  cart = [];
+  saveCart();
+});
+
+renderCartBadge();
 </script>
 
 </body>
