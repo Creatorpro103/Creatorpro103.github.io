@@ -546,9 +546,25 @@ footer {
     position: relative;
 }
 .font-card input { position: absolute; opacity: 0; pointer-events: none; }
-.font-card .sample { font-size: 1.3rem; }
+.font-card .sample-img { width: 100%; max-height: 46px; object-fit: contain; }
 .font-card .fname { font-size: 0.7rem; color: var(--ink-soft); margin-top: 4px; }
 .font-card:has(input:checked) { border-color: var(--rare); border-width: 3px; }
+
+.style-photo-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.style-photo-card {
+    border: 2px solid var(--kraft-line);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    display: block;
+    position: relative;
+    text-align: center;
+    background: var(--face);
+}
+.style-photo-card input { position: absolute; opacity: 0; pointer-events: none; }
+.style-photo-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.style-photo-card span { display: block; font-size: 0.75rem; font-weight: 700; padding: 6px 4px; }
+.style-photo-card:has(input:checked) { border-color: var(--rare); border-width: 3px; }
 
 .hidden { display: none !important; }
 
@@ -848,14 +864,26 @@ const TYPES = [
     desc: "Mickey or Minnie style, with a name.",
     price: 5,
     frame: "var(--rare)",
-    img: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVBNtIcihG4JkIrEC7KCJxuHRLuoGJNlj7SIEXYOtMd_-gyvgR2P6J2bWy0ty0Ix-wzbnAR1c6TJQBvbF16ZoYvea4zJd6CfShJc_wlxIbToKygkLe1TDnbKicRPVoW3qrr4epZsdJqATc5biyaefTRTjjVvqOuzYaXlFuFz9lw-SenzmL4iuEd_QOq6ifHaV1HGSrAOXq08LVIv=w3101?key=YtUivrP-NlKTleUP6T1zBw",
+    img: "images/Mickey.jpg",
     fields: `
       <div class="field">
         <label>Which style?</label>
-        <div class="radio-row">
-          <label><input type="radio" name="dn-style" value="Mickey"> Mickey</label>
-          <label><input type="radio" name="dn-style" value="Pink Minnie"> Pink Minnie</label>
-          <label><input type="radio" name="dn-style" value="Red Minnie"> Red Minnie</label>
+        <div class="style-photo-row">
+          <label class="style-photo-card">
+            <input type="radio" name="dn-style" value="Mickey" checked>
+            <img src="images/Mickey.jpg" alt="Mickey style">
+            <span>Mickey</span>
+          </label>
+          <label class="style-photo-card">
+            <input type="radio" name="dn-style" value="Pink Minnie">
+            <img src="images/Pink_Minnie.jpg" alt="Pink Minnie style">
+            <span>Pink Minnie</span>
+          </label>
+          <label class="style-photo-card">
+            <input type="radio" name="dn-style" value="Red Minnie">
+            <img src="images/Red_Minnie.jpg" alt="Red Minnie style">
+            <span>Red Minnie</span>
+          </label>
         </div>
       </div>
       <div class="field">
@@ -955,7 +983,7 @@ const TYPES = [
     desc: "A custom bow design with a name.",
     price: 5,
     frame: "var(--rare)",
-    img: "https://cdn.phototourl.com/free/2026-09-05-99bd1aea-3f0a-4518-8e72-766a3387a3f5.png",
+    img: "images/Bow.png",
     fields: `
       <div class="field">
         <label for="bow-text">What would you like the name to be?</label>
@@ -963,7 +991,7 @@ const TYPES = [
       </div>
       <div class="field">
         <label>Section reference</label>
-        <img src="https://i.postimg.cc/wM9cHst3/unnamed.png" alt="Bow section reference" style="width:100%; max-width:420px; border:3px solid var(--ink); border-radius:12px; display:block;">
+        <img src="images/Bow.png" alt="Bow section reference, showing Section 1 and Section 2" style="width:100%; max-width:420px; border:3px solid var(--ink); border-radius:12px; display:block;">
       </div>
       ${colorChart()}
       ${colorSelect("bow-outline", "Outline color")}
@@ -1006,11 +1034,11 @@ const TYPES = [
 ];
 
 const FONTS = [
-  { name: "Pacifico", family: "'Pacifico', cursive" },
-  { name: "Brush Script", family: "'Brush Script MT', 'Segoe Script', cursive" },
-  { name: "Gill Sans Ultra Bold", family: "'Arial Black', 'Archivo Black', sans-serif" },
-  { name: "Tahoma", family: "Tahoma, Geneva, sans-serif" },
-  { name: "Lucida Handwriting", family: "'Dancing Script', 'Lucida Handwriting', cursive" }
+  { name: "Pacifico", family: "'Pacifico', cursive", preview: "images/Pacifico.png" },
+  { name: "Brush Script", family: "'Brush Script MT', 'Segoe Script', cursive", preview: "images/Brushscript.png" },
+  { name: "Gill Sans Ultra Bold", family: "'Arial Black', 'Archivo Black', sans-serif", preview: "images/Gill_Sans_Ultra_Bold.png" },
+  { name: "Tahoma", family: "Tahoma, Geneva, sans-serif", preview: "images/Tahoma.png" },
+  { name: "Lucida Handwriting", family: "'Dancing Script', 'Lucida Handwriting', cursive", preview: "images/Lucida_handwriting.png" }
 ];
 
 // ---- Cookie helpers ----
@@ -1082,7 +1110,7 @@ function openCustomizeModal(typeId) {
       fontGrid.insertAdjacentHTML('beforeend', `
         <label class="font-card">
           <input type="radio" name="cn-font" value="${f.name}" ${i === 0 ? 'checked' : ''}>
-          <div class="sample" style="font-family:${f.family}">Bryce</div>
+          <img class="sample-img" src="${f.preview}" alt="${f.name} font preview">
           <div class="fname">${f.name}</div>
         </label>
       `);
