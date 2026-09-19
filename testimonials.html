@@ -548,7 +548,7 @@ footer {
 </footer>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbytzpfy9-pTugLhpKcNb__GicgF5V4bToao1GXG-AeVMMqS3Mbhvk9MUIwSuM5H6yrVeg/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxwg-noETLbdpQE0TXQZ-H-wvlkSZ-xDHt3h8gqyLywRopGxGZ-4kZgGVRS2Wx50GM0Tg/exec";
   const FRAMES = ['var(--common)', 'var(--rare)', 'var(--epic)'];
 
   // ---- Spam prevention: limit submissions per browser using a cookie ----
@@ -791,31 +791,57 @@ footer {
 
   let lastReviews_ = [];
 
-  function loadReviews(skipEngagementRefetch) {
-    const reviewsPromise = fetch(API_URL + '?action=list').then(res => res.json());
-    const engagementPromise = skipEngagementRefetch
-      ? Promise.resolve({ success: true, comments: engagementData.comments })
-      : fetch(API_URL + '?action=list_engagement').then(res => res.json());
-    const configPromise = fetch(API_URL + '?action=get_public_settings').then(res => res.json());
+  function loadReviews(isRetry) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    Promise.all([reviewsPromise, engagementPromise, configPromise])
-      .then(([reviewsData, engagement, configData]) => {
-        if (engagement.success) {
-          engagementData = { comments: engagement.comments || {} };
-        }
-        if (configData.success) {
-          publicConfig = configData.config;
-        }
-        if (reviewsData.success) {
-          lastReviews_ = reviewsData.reviews;
-          renderReviews(reviewsData.reviews);
+    fetch(API_URL + '?action=list', { signal: controller.signal })
+      .then(res => res.json())
+      .then(data => {
+        clearTimeout(timeoutId);
+        if (data.success) {
+          engagementData = { comments: data.comments || {} };
+          if (data.config) publicConfig = data.config;
+          lastReviews_ = data.reviews;
+          renderReviews(data.reviews);
+        } else {
+          showLoadError_(data.error || 'Something went wrong.');
         }
       })
       .catch(() => {
-        emptyState.textContent = "Could not load reviews right now. Check back soon.";
-        emptyState.style.display = 'block';
-        grid.style.display = 'none';
+        clearTimeout(timeoutId);
+        // One quiet automatic retry before bothering the visitor with an
+        // error, this alone fixes most "it just hung" cases, since a slow
+        // first request (a cold Apps Script start) is usually fast the
+        // very next try.
+        if (!isRetry) {
+          loadReviews(true);
+        } else {
+          showLoadError_("Could not reach the server.");
+        }
       });
+  }
+
+  function showLoadError_(detail) {
+    grid.style.display = 'none';
+    emptyState.innerHTML = '';
+
+    const msg = document.createElement('p');
+    msg.style.margin = '0 0 14px';
+    msg.textContent = "Couldn't load reviews right now. " + detail;
+    emptyState.appendChild(msg);
+
+    const retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.textContent = 'Try again';
+    retryBtn.style.cssText = 'background:var(--rare);color:var(--face);border:2.5px solid var(--ink);border-radius:8px;padding:9px 18px;font-weight:700;font-size:0.9rem;cursor:pointer;font-family:inherit;';
+    retryBtn.addEventListener('click', () => {
+      emptyState.textContent = 'Loading...';
+      loadReviews(false);
+    });
+    emptyState.appendChild(retryBtn);
+
+    emptyState.style.display = 'block';
   }
 
   loadReviews();
