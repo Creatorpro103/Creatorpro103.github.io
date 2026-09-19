@@ -89,7 +89,29 @@ header.hero p { color: var(--ink-soft); margin-top: 10px; max-width: 52ch; }
 }
 
 .entry h2 { font-size: 1.05rem; margin-bottom: 8px; text-transform: none; }
-.entry p { color: var(--ink-soft); font-size: 0.92rem; white-space: pre-wrap; }
+
+.entry p {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    white-space: normal;
+    margin: 0 0 14px;
+}
+
+.entry p:last-child {
+    margin-bottom: 0;
+}
+
+.entry strong {
+    font-weight: 700;
+}
+
+.entry em {
+    font-style: italic;
+}
+
+.entry a {
+    color: inherit;
+}
 
 .empty-state {
     border: 3px dashed var(--kraft-line);
@@ -133,22 +155,62 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// A small, safe subset of Markdown: bold, italic, links, and paragraphs.
-// Everything is HTML-escaped first, then markdown patterns are applied
-// on top of the escaped text, so nothing typed into the admin form can
-// inject real HTML, only these specific formatting patterns render.
+// Render Markdown formatting safely.
+// Supports:
+// **bold**
+// *italic*
+// [links](https://example.com)
+// Blank lines create new paragraphs.
 function renderMarkdownInline(text) {
   let safe = escapeHtml(text);
-  safe = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  safe = safe.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-  safe = safe.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+  // Links
+  safe = safe.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
+
+  // Bold
+  safe = safe.replace(
+    /\*\*([^*]+)\*\*/g,
+    '<strong>$1</strong>'
+  );
+
+  // Italic
+  safe = safe.replace(
+    /(?<!\*)\*([^*]+)\*(?!\*)/g,
+    '<em>$1</em>'
+  );
+
+  // Underscore italic
+  safe = safe.replace(
+    /_([^_]+)_/g,
+    '<em>$1</em>'
+  );
+
   return safe;
 }
 
 function renderMarkdown(text) {
-  const paragraphs = String(text == null ? '' : text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
-  return paragraphs.map(p => '<p>' + renderMarkdownInline(p).replace(/\n/g, '<br>') + '</p>').join('');
+  if (text == null || text === '') return '';
+
+  // Normalize line breaks
+  const normalized = String(text)
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+
+  // Split into paragraphs using blank lines
+  const paragraphs = normalized
+    .split(/\n\s*\n/)
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  return paragraphs.map(paragraph => {
+    const formatted = renderMarkdownInline(paragraph)
+      .replace(/\n/g, '<br>');
+
+    return '<p>' + formatted + '</p>';
+  }).join('');
 }
 
 fetch(API_URL + '?action=list_updates')
@@ -158,12 +220,15 @@ fetch(API_URL + '?action=list_updates')
       statusEl.textContent = "Couldn't load updates right now.";
       return;
     }
+
     if (!data.updates.length) {
       statusEl.textContent = '';
       timelineEl.innerHTML = '<div class="empty-state">Nothing posted yet, check back soon.</div>';
       return;
     }
+
     statusEl.style.display = 'none';
+
     timelineEl.innerHTML = data.updates.map(u => `
       <div class="entry">
         <span class="date">${escapeHtml(u.date)}</span>
