@@ -716,7 +716,7 @@ footer {
         <h2>Order Summary</h2>
         <div id="summary-items"></div>
         <dl id="summary-checkout"></dl>
-        <p class="note">This is a beta preview only, nothing has been sent yet. This will submit straight to Isaac once the beta is finished.</p>
+        <p class="note">Your order was sent to Isaac. This ordering system is still in beta, if anything looks off or you don't hear back, email isaacneal225@gmail.com directly.</p>
     </div>
 </div>
 
@@ -776,9 +776,9 @@ footer {
 <footer>
     <a class="footer-link" href="https://isaacneal.com">Home</a>
     &middot;
-    <a class="footer-link" href="testimonials">Testimonials</a>
+    <a class="footer-link" href="testimonials.html">Testimonials</a>
     &middot;
-    <a class="footer-link" href="updates">Update Logs</a>
+    <a class="footer-link" href="update-log.html">Update Logs</a>
 </footer>
 
 <script>
@@ -792,6 +792,10 @@ const COLORS = [
 ];
 
 const COLOR_CHART_URL = "images/color_options.png";
+
+// Real backend for actual order submissions. This beta page now sends
+// real orders through, not just a local preview.
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzvFTJwUS-hVEeG7BXLr_rGS5prmvX8etEIl4R8NrVVUx3Y9yBogDPdwyT65SvP2nrA/exec";
 
 function colorChart() {
   return `
@@ -1258,29 +1262,65 @@ checkoutForm.addEventListener('submit', e => {
     return;
   }
 
-  summaryItems.innerHTML = cart.map(item => `
-    <div class="summary-item">
-      <strong>${item.typeLabel}</strong> ${item.price === null ? '(price TBD)' : ('- $' + item.price)}
-      <dl>${item.fields.map(f => `<dt>${f.label}</dt><dd>${f.value}</dd>`).join('')}</dl>
-    </div>
-  `).join('');
+  const placeOrderBtn = document.getElementById('place-order-btn');
+  placeOrderBtn.disabled = true;
+  placeOrderBtn.textContent = 'Sending...';
 
-  summaryCheckout.innerHTML = '';
-  function addRow(label, value) {
-    if (!value) return;
-    summaryCheckout.insertAdjacentHTML('beforeend', `<dt>${label}</dt><dd>${value}</dd>`);
-  }
-  addRow('Name', document.getElementById('cust-name').value);
-  addRow('Email', document.getElementById('cust-email').value);
-  addRow('Payment', payment.value);
-  addRow('Notes', document.getElementById('notes').value);
+  const orderPayload = {
+    name: document.getElementById('cust-name').value,
+    email: document.getElementById('cust-email').value,
+    payment: payment.value,
+    notes: document.getElementById('notes').value,
+    items: cart
+  };
 
-  cartOverlay.classList.remove('open');
-  summaryPanel.style.display = 'block';
-  summaryPanel.scrollIntoView({ behavior: 'smooth' });
+  fetch(ORDERS_API_URL, {
+    method: 'POST',
+    body: JSON.stringify(orderPayload)
+  })
+    .then(res => res.json())
+    .then(data => {
+      placeOrderBtn.disabled = false;
+      placeOrderBtn.textContent = 'Place Order';
 
-  cart = [];
-  saveCart();
+      if (!data.success) {
+        checkoutError.textContent = data.error || 'Something went wrong sending your order. Try again.';
+        checkoutError.style.display = 'block';
+        return;
+      }
+
+      summaryItems.innerHTML = cart.map(item => `
+        <div class="summary-item">
+          <strong>${item.typeLabel}</strong> ${item.price === null ? '(price TBD)' : ('- $' + item.price)}
+          <dl>${item.fields.map(f => `<dt>${f.label}</dt><dd>${f.value}</dd>`).join('')}</dl>
+        </div>
+      `).join('');
+
+      summaryCheckout.innerHTML = '';
+      function addRow(label, value) {
+        if (!value) return;
+        summaryCheckout.insertAdjacentHTML('beforeend', `<dt>${label}</dt><dd>${value}</dd>`);
+      }
+      addRow('Name', orderPayload.name);
+      addRow('Email', orderPayload.email);
+      addRow('Payment', orderPayload.payment);
+      addRow('Notes', orderPayload.notes);
+
+      cartOverlay.classList.remove('open');
+      summaryPanel.style.display = 'block';
+      summaryPanel.scrollIntoView({ behavior: 'smooth' });
+
+      // Only clear the cart once the order is actually confirmed sent,
+      // not just because the checkout form was submitted.
+      cart = [];
+      saveCart();
+    })
+    .catch(() => {
+      placeOrderBtn.disabled = false;
+      placeOrderBtn.textContent = 'Place Order';
+      checkoutError.textContent = "Couldn't reach the order system. Check your connection and try again.";
+      checkoutError.style.display = 'block';
+    });
 });
 
 renderCartBadge();
