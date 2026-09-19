@@ -489,6 +489,7 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
         <button class="view-btn" data-view="comments" id="comments-tab-btn">Comments</button>
         <button class="view-btn" data-view="logs" id="logs-tab-btn">Activity Log</button>
         <button class="view-btn" data-view="settings" id="settings-tab-btn">Manager Settings</button>
+        <button class="view-btn" data-view="updatelog" id="updatelog-tab-btn">Update Log</button>
     </div>
 
     <div id="reviews-view">
@@ -621,6 +622,33 @@ header.top h1 { font-size: 1.6rem; text-transform: uppercase; }
             <button class="btn" id="save-settings-btn" style="margin-top:14px;">Save Settings</button>
         </div>
     </div>
+
+    <div id="updatelog-view" style="display:none;">
+        <div class="settings-card">
+            <h2 style="font-family:'Anton',sans-serif; font-size:1.2rem; text-transform:uppercase; margin-bottom:14px;">Post an Update</h2>
+            <p class="settings-note">Shows up immediately on the public Update Log page, newest first.</p>
+            <div class="field">
+                <label for="ul-title">Title <span class="hint">(supports **bold**, *italic*, and [links](url))</span></label>
+                <input type="text" id="ul-title" placeholder="New Elf Box designs added">
+            </div>
+            <div class="field">
+                <label for="ul-description">Description <span class="hint">(optional, supports **bold**, *italic*, [links](url), and blank lines for new paragraphs)</span></label>
+                <textarea id="ul-description" rows="3" style="width:100%; padding:9px 11px; border:2px solid var(--ink); border-radius:8px; background:var(--kraft); color:var(--ink); font-family:inherit; font-size:0.88rem;"></textarea>
+            </div>
+            <div class="field">
+                <label for="ul-date">Date <span class="hint">(optional, defaults to today)</span></label>
+                <input type="text" id="ul-date" placeholder="September 18, 2026">
+            </div>
+            <button class="btn" id="ul-post-btn">Post Update</button>
+            <button class="btn" id="ul-cancel-edit-btn" style="display:none; background:var(--face); margin-left:8px;" type="button">Cancel Edit</button>
+        </div>
+
+        <div class="settings-card" style="margin-top:16px;">
+            <h2 style="font-family:'Anton',sans-serif; font-size:1.1rem; text-transform:uppercase; margin-bottom:14px;">Posted Updates</h2>
+            <p class="status-msg" id="ul-status">Loading...</p>
+            <div id="ul-list"></div>
+        </div>
+    </div>
 </div>
 </div>
 
@@ -646,7 +674,7 @@ function showToast(message, type) {
   toastContainer.appendChild(toast);
   setTimeout(() => toast.remove(), 5000);
 }
-const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycbytzpfy9-pTugLhpKcNb__GicgF5V4bToao1GXG-AeVMMqS3Mbhvk9MUIwSuM5H6yrVeg/exec";
+const TESTIMONIALS_URL = "https://script.google.com/macros/s/AKfycbxwg-noETLbdpQE0TXQZ-H-wvlkSZ-xDHt3h8gqyLywRopGxGZ-4kZgGVRS2Wx50GM0Tg/exec";
 
 // Separate, standalone Apps Script whose only job is logging activity.
 // Paste in its /exec URL once you've deployed LoggerCode.gs.
@@ -794,10 +822,11 @@ function completeUnlock_(account) {
   const showLogTab = isOwnerNow || managerPermissions.canViewLog;
   const showSettingsTab = isOwnerNow || managerPermissions.canViewSettings;
   const showCommentsTab = isOwnerNow || managerPermissions.canDelete;
-  document.getElementById("view-row").style.display = (showLogTab || showSettingsTab || showCommentsTab) ? "flex" : "none";
+  document.getElementById("view-row").style.display = (showLogTab || showSettingsTab || showCommentsTab || isOwnerNow) ? "flex" : "none";
   document.getElementById("logs-tab-btn").style.display = showLogTab ? "inline-block" : "none";
   document.getElementById("settings-tab-btn").style.display = showSettingsTab ? "inline-block" : "none";
   document.getElementById("comments-tab-btn").style.display = showCommentsTab ? "inline-block" : "none";
+  document.getElementById("updatelog-tab-btn").style.display = isOwnerNow ? "inline-block" : "none";
 
   // A restricted Manager only ever sees All/Pending/Approved filters
   // if that's allowed; otherwise force the pending-only queue.
@@ -878,9 +907,11 @@ document.querySelectorAll(".view-btn").forEach(btn => {
     document.getElementById("comments-view").style.display = view === "comments" ? "block" : "none";
     document.getElementById("logs-view").style.display = view === "logs" ? "block" : "none";
     document.getElementById("settings-view").style.display = view === "settings" ? "block" : "none";
+    document.getElementById("updatelog-view").style.display = view === "updatelog" ? "block" : "none";
     if (view === "logs") loadLogs();
     if (view === "settings") loadSettingsPanel();
     if (view === "comments") loadCommentsPanel();
+    if (view === "updatelog") loadUpdateLog();
   });
 });
 
@@ -1121,6 +1152,23 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// A small, safe subset of Markdown: bold, italic, links, and paragraphs.
+// Everything is HTML-escaped first, then markdown patterns are applied
+// on top of the escaped text, so typed input can never inject real HTML.
+function renderMarkdownInline(text) {
+  let safe = escapeHtml(text);
+  safe = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  safe = safe.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  safe = safe.replace(/_([^_]+)_/g, "<em>$1</em>");
+  return safe;
+}
+
+function renderMarkdown(text) {
+  const paragraphs = String(text == null ? "" : text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  return paragraphs.map(p => "<p>" + renderMarkdownInline(p).replace(/\n/g, "<br>") + "</p>").join("");
+}
+
 function starsHtml(n) {
   return "★".repeat(n) + "☆".repeat(5 - n);
 }
@@ -1314,6 +1362,122 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
     currentFilter = btn.dataset.filter;
     render();
   });
+});
+
+let lastUpdates = [];
+let editingUpdateId = null;
+
+function loadUpdateLog() {
+  const status = document.getElementById("ul-status");
+  const list = document.getElementById("ul-list");
+  status.textContent = "Loading...";
+
+  fetch(TESTIMONIALS_URL + "?action=list_updates")
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        status.textContent = "Error: " + data.error;
+        return;
+      }
+      if (!data.updates.length) {
+        status.textContent = "Nothing posted yet.";
+        list.innerHTML = "";
+        return;
+      }
+      status.textContent = data.updates.length + " update(s).";
+      lastUpdates = data.updates;
+      list.innerHTML = data.updates.map(u => `
+        <div class="mod-comment-row" data-update-id="${u.id}">
+          <div>
+            <div class="mc-name">${escapeHtml(u.date)} &middot; ${renderMarkdownInline(u.title)}</div>
+            ${u.description ? renderMarkdown(u.description) : ""}
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button class="btn edit-update-btn" data-update-id="${u.id}">Edit</button>
+            <button class="btn btn-danger delete-update-btn" data-update-id="${u.id}">Delete</button>
+          </div>
+        </div>
+      `).join("");
+
+      list.querySelectorAll(".edit-update-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const entry = lastUpdates.find(u => u.id === btn.dataset.updateId);
+          if (!entry) return;
+          editingUpdateId = entry.id;
+          document.getElementById("ul-title").value = entry.title;
+          document.getElementById("ul-description").value = entry.description || "";
+          document.getElementById("ul-date").value = entry.date;
+          document.getElementById("ul-post-btn").textContent = "Save Changes";
+          document.getElementById("ul-cancel-edit-btn").style.display = "inline-block";
+          document.getElementById("ul-title").scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+      });
+
+      list.querySelectorAll(".delete-update-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (!confirm("Delete this update log entry?")) return;
+          fetch(TESTIMONIALS_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "admin_delete_update", id: btn.dataset.updateId })
+          })
+            .then(res => res.json())
+            .then(res => {
+              if (res.success) {
+                showToast("Update deleted.", "success");
+                loadUpdateLog();
+              } else {
+                showToast("Couldn't delete: " + res.error, "error");
+              }
+            });
+        });
+      });
+    })
+    .catch(() => {
+      status.textContent = "Couldn't reach the script.";
+    });
+}
+
+function resetUpdateForm_() {
+  editingUpdateId = null;
+  document.getElementById("ul-title").value = "";
+  document.getElementById("ul-description").value = "";
+  document.getElementById("ul-date").value = "";
+  document.getElementById("ul-post-btn").textContent = "Post Update";
+  document.getElementById("ul-cancel-edit-btn").style.display = "none";
+}
+
+document.getElementById("ul-cancel-edit-btn").addEventListener("click", resetUpdateForm_);
+
+document.getElementById("ul-post-btn").addEventListener("click", () => {
+  const title = document.getElementById("ul-title").value.trim();
+  const description = document.getElementById("ul-description").value.trim();
+  const date = document.getElementById("ul-date").value.trim();
+
+  if (!title) {
+    showToast("A title is required.", "error");
+    return;
+  }
+
+  const isEditing = !!editingUpdateId;
+  const payload = isEditing
+    ? { action: "admin_edit_update", id: editingUpdateId, title, description, date }
+    : { action: "admin_add_update", title, description, date };
+
+  fetch(TESTIMONIALS_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        showToast(isEditing ? "Update saved." : "Update posted.", "success");
+        resetUpdateForm_();
+        loadUpdateLog();
+      } else {
+        showToast("Couldn't save: " + res.error, "error");
+      }
+    })
+    .catch(() => showToast("Couldn't reach the script.", "error"));
 });
 </script>
 
