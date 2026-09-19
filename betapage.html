@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -355,7 +356,7 @@ section.set {
 
 .add-cart-btn:hover { filter: brightness(1.05); }
 
-/* ELF BOX (its own section now, not mixed into the shop grid) */
+/* ELF BOX */
 .elf-section { max-width: 480px; margin: 0 auto 20px; padding: 0 24px; }
 
 .elf-card {
@@ -536,6 +537,7 @@ footer {
 .radio-row label { display: flex; align-items: center; gap: 6px; font-weight: 400; }
 
 .font-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+
 .font-card {
     border: 2px solid var(--kraft-line);
     border-radius: 10px;
@@ -545,12 +547,14 @@ footer {
     display: block;
     position: relative;
 }
+
 .font-card input { position: absolute; opacity: 0; pointer-events: none; }
 .font-card .sample-img { width: 100%; max-height: 46px; object-fit: contain; }
 .font-card .fname { font-size: 0.7rem; color: var(--ink-soft); margin-top: 4px; }
 .font-card:has(input:checked) { border-color: var(--rare); border-width: 3px; }
 
 .style-photo-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+
 .style-photo-card {
     border: 2px solid var(--kraft-line);
     border-radius: 10px;
@@ -561,6 +565,7 @@ footer {
     text-align: center;
     background: var(--face);
 }
+
 .style-photo-card input { position: absolute; opacity: 0; pointer-events: none; }
 .style-photo-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 .style-photo-card span { display: block; font-size: 0.75rem; font-weight: 700; padding: 6px 4px; }
@@ -639,6 +644,7 @@ footer {
     margin: 0 auto 40px;
     max-width: 1120px;
 }
+
 #summary-panel h2 { font-size: 1.1rem; text-transform: uppercase; margin-bottom: 14px; }
 #summary-panel .summary-item { padding: 10px 0; border-bottom: 1px solid var(--kraft-line); font-size: 0.88rem; }
 #summary-panel .summary-item:last-of-type { border-bottom: none; }
@@ -657,6 +663,7 @@ footer {
 }
 </style>
 </head>
+
 <body>
 
 <div class="beta-banner">This is the <span>beta</span> version of the new order page, some things may still change.</div>
@@ -751,10 +758,12 @@ footer {
                 <label for="cust-name">Your name</label>
                 <input type="text" id="cust-name" required>
             </div>
+
             <div class="field">
                 <label for="cust-email">Email <span class="hint">(I'll ask questions and let you know when it's ready)</span></label>
                 <input type="email" id="cust-email" required>
             </div>
+
             <div class="field">
                 <label>Payment</label>
                 <div class="radio-row">
@@ -763,10 +772,12 @@ footer {
                     <label><input type="radio" name="payment" value="Cash when ready"> Cash when ready</label>
                 </div>
             </div>
+
             <div class="field">
                 <label for="notes">Anything else? <span class="hint">Not required, note if you need it by a specific date, or your address if shipping.</span></label>
                 <textarea id="notes"></textarea>
             </div>
+
             <div class="error-msg" id="checkout-error"></div>
             <button type="submit" class="modal-submit-btn" id="place-order-btn">Place Order</button>
         </form>
@@ -793,9 +804,9 @@ const COLORS = [
 
 const COLOR_CHART_URL = "images/color_options.png";
 
-// Real backend for actual order submissions. This beta page now sends
-// real orders through, not just a local preview.
+// Real backend for actual order submissions.
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw91yXdLwYCw1MSSo_VbZGbVn2kTqsWxdmy3U-0GyVwxPCA-CgsxGSRGUTKCLwsVxpK/exec";
+
 function colorChart() {
   return `
     <div class="field">
@@ -830,6 +841,7 @@ const TYPES = [
         <label for="cn-text">What would you like it to say? <span class="hint">(made exactly as typed)</span></label>
         <input type="text" id="cn-text">
       </div>
+
       <div class="field">
         <label for="cn-count">How many colors?</label>
         <select id="cn-count">
@@ -837,16 +849,19 @@ const TYPES = [
           <option value="3">3 color</option>
         </select>
       </div>
+
       <div class="field">
         <label>What font would you like?</label>
         <div class="font-grid" id="cn-font-grid"></div>
       </div>
+
       ${colorChart()}
       ${colorSelect("cn-bottom", "Bottom layer color")}
       <div id="cn-middle-wrap">${colorSelect("cn-middle", "Middle layer color (3 color only)")}</div>
       ${colorSelect("cn-top", "Top layer color")}
     `
   },
+
   {
     id: "baseball",
     label: "Baseball",
@@ -865,6 +880,7 @@ const TYPES = [
       ${colorSelect("bb-name", "Name/number color")}
     `
   },
+
   {
     id: "disney",
     label: "Disney",
@@ -881,11 +897,13 @@ const TYPES = [
             <img src="images/Mickey.jpg" alt="Mickey style">
             <span>Mickey</span>
           </label>
+
           <label class="style-photo-card">
             <input type="radio" name="dn-style" value="Pink Minnie">
             <img src="images/Pink_Minnie.jpg" alt="Pink Minnie style">
             <span>Pink Minnie</span>
           </label>
+
           <label class="style-photo-card">
             <input type="radio" name="dn-style" value="Red Minnie">
             <img src="images/Red_Minnie.jpg" alt="Red Minnie style">
@@ -893,14 +911,17 @@ const TYPES = [
           </label>
         </div>
       </div>
+
       <div class="field">
         <label for="dn-text">What would you like it to say?</label>
         <input type="text" id="dn-text">
       </div>
+
       ${colorChart()}
       ${colorSelect("dn-name", "Text color")}
     `
   },
+
   {
     id: "cheer",
     label: "Cheer megaphone",
@@ -918,6 +939,7 @@ const TYPES = [
       ${colorSelect("ch-name", "Outline and name color")}
     `
   },
+
   {
     id: "soccer",
     label: "Soccer",
@@ -934,6 +956,7 @@ const TYPES = [
       ${colorSelect("sc-name", "Name color")}
     `
   },
+
   {
     id: "backpack",
     label: "Backpack charm",
@@ -951,6 +974,7 @@ const TYPES = [
       ${colorSelect("bp-trim", "Trim / name color")}
     `
   },
+
   {
     id: "football",
     label: "Football",
@@ -967,6 +991,7 @@ const TYPES = [
       ${colorSelect("fb-name", "Text color")}
     `
   },
+
   {
     id: "school-spirit",
     label: "School spirit",
@@ -984,6 +1009,7 @@ const TYPES = [
       ${colorSelect("ss-accent", "Accent color")}
     `
   },
+
   {
     id: "bow",
     label: "Custom bow",
@@ -996,10 +1022,12 @@ const TYPES = [
         <label for="bow-text">What would you like the name to be?</label>
         <input type="text" id="bow-text">
       </div>
+
       <div class="field">
         <label>Section reference</label>
         <img src="images/Bow.png" alt="Bow section reference, showing Section 1 and Section 2" style="width:100%; max-width:420px; border:3px solid var(--ink); border-radius:12px; display:block;">
       </div>
+
       ${colorChart()}
       ${colorSelect("bow-outline", "Outline color")}
       ${colorSelect("bow-s1", "Section 1 color")}
@@ -1008,6 +1036,7 @@ const TYPES = [
       ${colorSelect("bow-top", "Top name color")}
     `
   },
+
   {
     id: "custom-design",
     label: "Custom design",
@@ -1020,6 +1049,7 @@ const TYPES = [
         <label for="cd-text">What would you like your design to be? <span class="hint">Be specific: colors, size, what it should do, and whether it's a keychain.</span></label>
         <textarea id="cd-text"></textarea>
       </div>
+
       <p class="hint" style="display:block; margin-top:-6px;">Custom requests need to be approved before printing, price depends on the design.</p>
       ${colorChart()}
     `
@@ -1039,6 +1069,7 @@ function getCookie(name) {
   const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
   return match ? decodeURIComponent(match.pop()) : '';
 }
+
 function setCookie(name, value, days) {
   const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
   document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
@@ -1046,6 +1077,7 @@ function setCookie(name, value, days) {
 
 const CART_COOKIE = 'ipk_cart';
 let cart = [];
+
 try {
   const raw = getCookie(CART_COOKIE);
   cart = raw ? JSON.parse(raw) : [];
@@ -1067,9 +1099,11 @@ function renderCartBadge() {
 
 // ---- Build the product grid ----
 const productGrid = document.getElementById('product-grid');
+
 TYPES.forEach(t => {
   const thumb = t.img ? `<img src="${t.img}" alt="${t.label} keychain">` : t.icon;
   const priceLabel = t.price === null ? 'Price TBD' : ('$' + t.price);
+
   productGrid.insertAdjacentHTML('beforeend', `
     <article class="tcard" style="--frame: ${t.frame}">
       <div class="photo">${thumb}</div>
@@ -1093,12 +1127,14 @@ let currentTypeId = null;
 function openCustomizeModal(typeId) {
   const t = TYPES.find(x => x.id === typeId);
   if (!t) return;
+
   currentTypeId = typeId;
   customizeTitle.textContent = t.label + ' details';
   customizeFields.innerHTML = t.fields;
 
   if (typeId === 'custom-name') {
     const fontGrid = document.getElementById('cn-font-grid');
+
     FONTS.forEach((f, i) => {
       fontGrid.insertAdjacentHTML('beforeend', `
         <label class="font-card">
@@ -1108,22 +1144,20 @@ function openCustomizeModal(typeId) {
         </label>
       `);
     });
+
     const cnCount = document.getElementById('cn-count');
     const cnMiddleWrap = document.getElementById('cn-middle-wrap');
     const cnMiddleSelect = document.getElementById('cn-middle');
+
     function updateMiddleLayer() {
       const need3 = cnCount.value === '3';
+
       cnMiddleWrap.classList.toggle('hidden', !need3);
-      // A required field inside a hidden wrapper still blocks native form
-      // validation in Chrome (the browser only skips validation for a
-      // field that is itself display:none, not one whose ANCESTOR is
-      // hidden). Toggling the attribute directly, not just the visual
-      // hiding, is what actually fixes that, verified by reproducing the
-      // exact "2 color silently does nothing" bug and confirming this
-      // resolves it.
       cnMiddleSelect.required = need3;
+
       if (!need3) cnMiddleSelect.value = '';
     }
+
     cnCount.addEventListener('change', updateMiddleLayer);
     updateMiddleLayer();
   }
@@ -1137,7 +1171,10 @@ function closeCustomizeModal() {
 }
 
 document.getElementById('customize-close').addEventListener('click', closeCustomizeModal);
-customizeOverlay.addEventListener('click', e => { if (e.target === customizeOverlay) closeCustomizeModal(); });
+
+customizeOverlay.addEventListener('click', e => {
+  if (e.target === customizeOverlay) closeCustomizeModal();
+});
 
 productGrid.addEventListener('click', e => {
   const btn = e.target.closest('[data-open-type]');
@@ -1146,33 +1183,46 @@ productGrid.addEventListener('click', e => {
 
 function collectFields(container) {
   const rows = [];
+
   container.querySelectorAll('input[type=text], textarea').forEach(el => {
     if (el.value) {
       const lbl = el.closest('.field')?.querySelector('label');
-      rows.push({ label: lbl ? lbl.firstChild.textContent.trim() : 'Detail', value: el.value });
+      rows.push({
+        label: lbl ? lbl.firstChild.textContent.trim() : 'Detail',
+        value: el.value
+      });
     }
   });
+
   container.querySelectorAll('select').forEach(el => {
     if (el.value && !el.closest('.hidden')) {
       const lbl = el.closest('.field')?.querySelector('label');
-      rows.push({ label: lbl ? lbl.textContent.trim() : 'Color', value: el.value });
+      rows.push({
+        label: lbl ? lbl.textContent.trim() : 'Color',
+        value: el.value
+      });
     }
   });
+
   const checkedRadio = container.querySelector('input[type=radio][name="dn-style"]:checked');
   if (checkedRadio) rows.push({ label: 'Style', value: checkedRadio.value });
+
   const checkedFont = container.querySelector('input[name="cn-font"]:checked');
   if (checkedFont) rows.push({ label: 'Font', value: checkedFont.value });
+
   return rows;
 }
 
 customizeForm.addEventListener('submit', e => {
   e.preventDefault();
+
   if (!customizeForm.reportValidity()) return;
 
   const t = TYPES.find(x => x.id === currentTypeId);
   if (!t) return;
 
   const fields = collectFields(customizeFields);
+
   cart.push({
     cartId: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
     typeId: t.id,
@@ -1180,6 +1230,7 @@ customizeForm.addEventListener('submit', e => {
     price: t.price,
     fields: fields
   });
+
   saveCart();
   closeCustomizeModal();
 });
@@ -1196,13 +1247,21 @@ function renderCart() {
     document.getElementById('place-order-btn').disabled = true;
     return;
   }
+
   document.getElementById('place-order-btn').disabled = false;
 
   let total = 0;
   let hasTbd = false;
+
   cartItemsEl.innerHTML = cart.map(item => {
-    if (item.price === null) hasTbd = true; else total += item.price;
+    if (item.price === null) {
+      hasTbd = true;
+    } else {
+      total += item.price;
+    }
+
     const detailText = item.fields.map(f => f.value).filter(Boolean).join(', ');
+
     return `
       <div class="cart-item" data-cart-id="${item.cartId}">
         <div>
@@ -1221,6 +1280,7 @@ function renderCart() {
 cartItemsEl.addEventListener('click', e => {
   const btn = e.target.closest('[data-remove]');
   if (!btn) return;
+
   cart = cart.filter(item => item.cartId !== btn.dataset.remove);
   saveCart();
   renderCart();
@@ -1234,7 +1294,10 @@ function openCart() {
 document.getElementById('cart-btn').addEventListener('click', openCart);
 document.getElementById('cta-cart-btn').addEventListener('click', openCart);
 document.getElementById('cart-close').addEventListener('click', () => cartOverlay.classList.remove('open'));
-cartOverlay.addEventListener('click', e => { if (e.target === cartOverlay) cartOverlay.classList.remove('open'); });
+
+cartOverlay.addEventListener('click', e => {
+  if (e.target === cartOverlay) cartOverlay.classList.remove('open');
+});
 
 // ---- Checkout / place order ----
 const checkoutForm = document.getElementById('checkout-form');
@@ -1252,9 +1315,11 @@ checkoutForm.addEventListener('submit', e => {
     checkoutError.style.display = 'block';
     return;
   }
+
   if (!checkoutForm.reportValidity()) return;
 
   const payment = document.querySelector('input[name="payment"]:checked');
+
   if (!payment) {
     checkoutError.textContent = 'Choose a payment method.';
     checkoutError.style.display = 'block';
@@ -1262,6 +1327,7 @@ checkoutForm.addEventListener('submit', e => {
   }
 
   const placeOrderBtn = document.getElementById('place-order-btn');
+
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = 'Sending...';
 
@@ -1273,7 +1339,8 @@ checkoutForm.addEventListener('submit', e => {
     items: cart
   };
 
-  fetch(ORDERS_API_URL, {
+  /* FIXED: uses the Version 5 SCRIPT_URL defined above */
+  fetch(SCRIPT_URL, {
     method: 'POST',
     body: JSON.stringify(orderPayload)
   })
@@ -1296,10 +1363,15 @@ checkoutForm.addEventListener('submit', e => {
       `).join('');
 
       summaryCheckout.innerHTML = '';
+
       function addRow(label, value) {
         if (!value) return;
-        summaryCheckout.insertAdjacentHTML('beforeend', `<dt>${label}</dt><dd>${value}</dd>`);
+        summaryCheckout.insertAdjacentHTML(
+          'beforeend',
+          `<dt>${label}</dt><dd>${value}</dd>`
+        );
       }
+
       addRow('Name', orderPayload.name);
       addRow('Email', orderPayload.email);
       addRow('Payment', orderPayload.payment);
@@ -1309,8 +1381,7 @@ checkoutForm.addEventListener('submit', e => {
       summaryPanel.style.display = 'block';
       summaryPanel.scrollIntoView({ behavior: 'smooth' });
 
-      // Only clear the cart once the order is actually confirmed sent,
-      // not just because the checkout form was submitted.
+      // Only clear the cart once the order is actually confirmed sent.
       cart = [];
       saveCart();
     })
@@ -1327,3 +1398,4 @@ renderCartBadge();
 
 </body>
 </html>
+```
