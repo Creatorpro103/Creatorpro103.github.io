@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders - iPrint Keychains</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --rare: #3E7CB1;
+    --gold: #C9971F;
+    --common: #4C9A63;
+    --danger: #B3492F;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--kraft);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+h1, h2 { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+
+.wrap { max-width: 900px; margin: 0 auto; padding: 30px 24px 60px; }
+
+/* Lock screen */
+#lock-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.lock-card {
+    background: var(--face);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 30px 28px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+}
+
+.lock-card h1 { font-size: 1.3rem; text-transform: uppercase; margin-bottom: 16px; }
+
+.lock-card input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 2px solid var(--kraft-line);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    font-family: inherit;
+}
+
+.btn {
+    display: inline-block;
+    background: var(--rare);
+    color: var(--face);
+    border: 2.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 11px 22px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.lock-error { color: var(--danger); font-size: 0.85rem; margin-top: 8px; display: none; }
+
+/* Main view */
+#main-view { display: none; }
+
+header.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+header.top h1 { font-size: 1.8rem; text-transform: uppercase; }
+
+.summary-line { color: var(--ink-soft); font-size: 0.9rem; }
+
+.controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.controls input, .controls select {
+    padding: 10px 12px;
+    border: 2px solid var(--kraft-line);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: var(--face);
+    color: var(--ink);
+}
+
+#search-input { flex: 1; min-width: 200px; }
+
+.status-msg { color: var(--ink-soft); font-size: 0.9rem; margin-bottom: 16px; }
+
+.order-card {
+    background: var(--face);
+    border: 1px solid var(--kraft-line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+}
+
+.order-card .oc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+}
+
+.oc-head .oc-name { font-weight: 700; font-size: 1.05rem; }
+.oc-head .oc-meta { font-size: 0.82rem; color: var(--ink-soft); margin-top: 3px; }
+.oc-head .oc-meta a { color: var(--rare); text-decoration: none; }
+
+.oc-status-select {
+    padding: 7px 10px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: inherit;
+    background: var(--face);
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.oc-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--kraft-line);
+    font-size: 0.86rem;
+}
+.oc-item:last-of-type { border-bottom: none; }
+.oc-item .oi-name { font-weight: 700; }
+.oc-item .oi-detail { color: var(--ink-soft); margin-top: 2px; }
+
+.oc-notes {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--kraft-line);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-style: italic;
+}
+
+.oc-total {
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-top: 10px;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 40px 20px;
+    border: 3px dashed var(--kraft-line);
+    border-radius: 16px;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.toast {
+    background: var(--ink);
+    color: var(--face);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+}
+.toast.error { background: var(--danger); }
+</style>
+</head>
+<body>
+
+<div id="lock-screen">
+    <div class="lock-card">
+        <h1>Orders</h1>
+        <input type="password" id="lock-input" placeholder="Password">
+        <button class="btn" id="unlock-btn" style="width:100%;">Unlock</button>
+        <p class="lock-error" id="lock-error">Wrong password.</p>
+    </div>
+</div>
+
+<div id="main-view">
+    <div class="wrap">
+        <header class="top">
+            <h1>Orders</h1>
+            <span class="summary-line" id="summary-line"></span>
+        </header>
+
+        <div class="controls">
+            <input type="text" id="search-input" placeholder="Search name, email, item, or order ID...">
+            <select id="status-filter">
+                <option value="">All statuses</option>
+            </select>
+        </div>
+
+        <p class="status-msg" id="status-msg">Loading...</p>
+        <div id="order-list"></div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+const ADMIN_PASSWORD = "3467";
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzvFTJwUS-hVEeG7BXLr_rGS5prmvX8etEIl4R8NrVVUx3Y9yBogDPdwyT65SvP2nrA/exec";
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+function showToast(message, type) {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type === 'error' ? ' error' : '');
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+document.getElementById('unlock-btn').addEventListener('click', unlock);
+document.getElementById('lock-input').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+function unlock() {
+  const input = document.getElementById('lock-input');
+  if (input.value !== ADMIN_PASSWORD) {
+    document.getElementById('lock-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('main-view').style.display = 'block';
+  loadOrders();
+}
+
+// Fixed columns that describe the order itself, not a per-item question.
+// Everything else in a row is treated as a customization field.
+const FIXED_KEYS = ['OrderID', 'Timestamp', 'Name', 'Email', 'Payment', 'Notes', 'ItemType', 'Price', 'Status'];
+
+let groupedOrders = [];
+
+function loadOrders() {
+  const statusMsg = document.getElementById('status-msg');
+  statusMsg.textContent = 'Loading...';
+
+  fetch(ORDERS_API_URL + '?action=admin_list_orders')
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        statusMsg.textContent = 'Error: ' + data.error;
+        return;
+      }
+      groupedOrders = groupByOrderId(data.orders || []);
+      populateStatusFilter(groupedOrders);
+      renderOrders();
+    })
+    .catch(() => {
+      statusMsg.textContent = "Couldn't reach the order system.";
+    });
+}
+
+function groupByOrderId(rows) {
+  const byId = {};
+  const order = [];
+
+  rows.forEach(row => {
+    const id = row.OrderID;
+    if (!id) return;
+    if (!byId[id]) {
+      byId[id] = {
+        orderId: id,
+        timestamp: row.Timestamp,
+        name: row.Name,
+        email: row.Email,
+        payment: row.Payment,
+        notes: row.Notes,
+        status: row.Status,
+        items: []
+      };
+      order.push(byId[id]);
+    }
+
+    const fields = Object.keys(row)
+      .filter(k => FIXED_KEYS.indexOf(k) === -1 && row[k] !== '' && row[k] !== null && row[k] !== undefined)
+      .map(k => ({ label: k, value: row[k] }));
+
+    byId[id].items.push({
+      typeLabel: row.ItemType,
+      price: row.Price,
+      fields: fields
+    });
+  });
+
+  return order; // already newest-first, admin_list_orders reverses rows
+}
+
+function populateStatusFilter(orders) {
+  const select = document.getElementById('status-filter');
+  const current = select.value;
+  const statuses = Array.from(new Set(orders.map(o => o.status).filter(Boolean)));
+  select.innerHTML = '<option value="">All statuses</option>' +
+    statuses.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  select.value = current;
+}
+
+function matchesSearch(order, query) {
+  if (!query) return true;
+  const haystack = [
+    order.orderId, order.name, order.email, order.payment, order.notes,
+    ...order.items.map(i => i.typeLabel),
+    ...order.items.flatMap(i => i.fields.map(f => f.value))
+  ].join(' ').toLowerCase();
+  return haystack.includes(query.toLowerCase());
+}
+
+function formatPrice(p) {
+  if (p === 'TBD' || p === '' || p === null || p === undefined) return 'TBD';
+  return p;
+}
+
+function orderTotal(order) {
+  let total = 0;
+  let hasTbd = false;
+  order.items.forEach(item => {
+    const n = parseFloat(String(item.price).replace('$', ''));
+    if (!isNaN(n)) total += n; else hasTbd = true;
+  });
+  return '$' + total + (hasTbd ? ' + TBD' : '');
+}
+
+function renderOrders() {
+  const query = document.getElementById('search-input').value.trim();
+  const statusFilter = document.getElementById('status-filter').value;
+  const statusMsg = document.getElementById('status-msg');
+  const list = document.getElementById('order-list');
+
+  const filtered = groupedOrders.filter(o =>
+    matchesSearch(o, query) && (!statusFilter || o.status === statusFilter)
+  );
+
+  const totalOrders = groupedOrders.length;
+  document.getElementById('summary-line').textContent =
+    totalOrders + ' order' + (totalOrders === 1 ? '' : 's') + ' total';
+
+  if (!filtered.length) {
+    statusMsg.textContent = '';
+    list.innerHTML = '<div class="empty-state">No orders match.</div>';
+    return;
+  }
+
+  statusMsg.textContent = filtered.length + ' shown';
+
+  list.innerHTML = filtered.map(order => `
+    <div class="order-card" data-order-id="${escapeHtml(order.orderId)}">
+      <div class="oc-head">
+        <div>
+          <div class="oc-name">${escapeHtml(order.name)}</div>
+          <div class="oc-meta">
+            <a href="mailto:${escapeHtml(order.email)}">${escapeHtml(order.email)}</a>
+            &middot; ${escapeHtml(order.payment)}
+            &middot; ${escapeHtml(order.timestamp)}
+          </div>
+        </div>
+        <select class="oc-status-select" data-order-id="${escapeHtml(order.orderId)}">
+          ${['New', 'In Progress', 'Done'].map(s =>
+            `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`
+          ).join('')}
+        </select>
+      </div>
+
+      ${order.items.map(item => `
+        <div class="oc-item">
+          <div class="oi-name">${escapeHtml(item.typeLabel)} &middot; ${escapeHtml(formatPrice(item.price))}</div>
+          <div class="oi-detail">${item.fields.map(f => `${escapeHtml(f.label)}: ${escapeHtml(f.value)}`).join(' &middot; ') || 'No details'}</div>
+        </div>
+      `).join('')}
+
+      ${order.notes ? `<div class="oc-notes">Note: ${escapeHtml(order.notes)}</div>` : ''}
+      <div class="oc-total">Total: ${orderTotal(order)}</div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.oc-status-select').forEach(sel => {
+    sel.addEventListener('change', () => updateStatus(sel.dataset.orderId, sel.value));
+  });
+}
+
+function updateStatus(orderId, status) {
+  fetch(ORDERS_API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'admin_update_status', orderId, status })
+  })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        const order = groupedOrders.find(o => o.orderId === orderId);
+        if (order) order.status = status;
+        populateStatusFilter(groupedOrders);
+        showToast('Status updated.');
+      } else {
+        showToast("Couldn't update: " + res.error, 'error');
+      }
+    })
+    .catch(() => showToast("Couldn't reach the server.", 'error'));
+}
+
+document.getElementById('search-input').addEventListener('input', renderOrders);
+document.getElementById('status-filter').addEventListener('change', renderOrders);
+</script>
+
+</body>
+</html>
