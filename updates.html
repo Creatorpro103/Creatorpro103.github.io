@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Update Log - iPrint Keychains</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
 <meta name="description" content="What's new at iPrint Keychains. New products, site changes, and updates as they happen.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,7 +107,7 @@ footer { text-align: center; padding: 30px 0; color: var(--ink-soft); font-size:
 
 <nav class="top">
     <div class="wordmark"><span class="logo-dot"></span>iPrint Keychains</div>
-    <a class="navlink" href="index.html">Back home</a>
+    <a class="navlink" href="https://isaacneal.com">Back home</a>
 </nav>
 
 <div class="wrap">
@@ -133,52 +134,22 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// Markdown renderer
+// A small, safe subset of Markdown: bold, italic, links, and paragraphs.
+// Everything is HTML-escaped first, then markdown patterns are applied
+// on top of the escaped text, so nothing typed into the admin form can
+// inject real HTML, only these specific formatting patterns render.
 function renderMarkdownInline(text) {
   let safe = escapeHtml(text);
-
-  // Links
-  safe = safe.replace(
-    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener">$1</a>'
-  );
-
-  // Bold
-  safe = safe.replace(
-    /\*\*([^*]+)\*\*/g,
-    '<strong>$1</strong>'
-  );
-
-  // Italic
-  safe = safe.replace(
-    /(?<!\*)\*([^*]+)\*(?!\*)/g,
-    '<em>$1</em>'
-  );
-
-  // Underscore italic
-  safe = safe.replace(
-    /_([^_]+)_/g,
-    '<em>$1</em>'
-  );
-
+  safe = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  safe = safe.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  safe = safe.replace(/_([^_]+)_/g, '<em>$1</em>');
   return safe;
 }
 
 function renderMarkdown(text) {
-  const normalized = String(text == null ? '' : text)
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n');
-
-  const paragraphs = normalized
-    .split(/\n\s*\n/)
-    .map(p => p.trim())
-    .filter(Boolean);
-
-  return paragraphs.map(p => {
-    return '<p>' +
-      renderMarkdownInline(p).replace(/\n/g, '<br>') +
-      '</p>';
-  }).join('');
+  const paragraphs = String(text == null ? '' : text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  return paragraphs.map(p => '<p>' + renderMarkdownInline(p).replace(/\n/g, '<br>') + '</p>').join('');
 }
 
 fetch(API_URL + '?action=list_updates')
@@ -188,15 +159,12 @@ fetch(API_URL + '?action=list_updates')
       statusEl.textContent = "Couldn't load updates right now.";
       return;
     }
-
     if (!data.updates.length) {
       statusEl.textContent = '';
       timelineEl.innerHTML = '<div class="empty-state">Nothing posted yet, check back soon.</div>';
       return;
     }
-
     statusEl.style.display = 'none';
-
     timelineEl.innerHTML = data.updates.map(u => `
       <div class="entry">
         <span class="date">${escapeHtml(u.date)}</span>
