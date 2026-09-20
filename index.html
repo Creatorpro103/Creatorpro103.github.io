@@ -365,6 +365,101 @@ section.cta p {
 }
 
 /* FOOTER */
+/* Temporary Google Form deprecation notice */
+.notice-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(43,32,18,0.45);
+    z-index: 400;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.notice-overlay.open { display: flex; }
+
+.notice-card {
+    background: var(--face);
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    max-width: 420px;
+    width: 100%;
+    padding: 26px 26px 24px;
+    box-shadow: 6px 6px 0 rgba(43,32,18,0.3);
+    position: relative;
+    text-align: center;
+}
+
+.notice-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--ink-soft);
+}
+
+.notice-card h2 {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-right: 20px;
+}
+
+.notice-card p {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    margin-bottom: 18px;
+}
+
+.notice-dont-show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+}
+
+.notice-dont-show input { width: 15px; height: 15px; accent-color: var(--rare); cursor: pointer; }
+.notice-dont-show label { cursor: pointer; }
+
+.notice-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.notice-actions a.notice-link {
+    display: inline-block;
+    background: var(--rare);
+    color: var(--face);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+}
+
+.notice-actions button.notice-close-btn {
+    background: var(--face);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
 footer {
     border-top: 3px solid var(--ink);
     padding: 32px 24px 44px;
@@ -524,6 +619,58 @@ footer {
     &middot;
     <a class="footer-link" href="updates">Update Logs</a>
 </footer>
+
+<div class="notice-overlay" id="notice-overlay">
+    <div class="notice-card">
+        <button type="button" class="notice-close" id="notice-close" aria-label="Close">&times;</button>
+        <h2>Notice of Deprecation</h2>
+        <p>The Google Form we've used for orders is being phased out as we move to direct ordering here on the site.</p>
+        <div class="notice-dont-show">
+            <input type="checkbox" id="notice-dont-show-check">
+            <label for="notice-dont-show-check">Don't show this again</label>
+        </div>
+        <div class="notice-actions">
+            <button type="button" class="notice-close-btn" id="notice-close-btn">Close</button>
+            <a class="notice-link" href="https://isaacneal.com/updates">Learn more at isaacneal.com/updates</a>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    function getCookie(name) {
+        var match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return match ? decodeURIComponent(match.pop()) : '';
+    }
+    function setCookie(name, value, days) {
+        var expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+    }
+
+    var cutoff = new Date('2026-09-23T23:59:59');
+    if (new Date() > cutoff) return; // notice has expired, never show it
+    if (getCookie('gf_notice_dismissed') === '1') return; // visitor already dismissed it for good
+
+    var overlay = document.getElementById('notice-overlay');
+    var checkbox = document.getElementById('notice-dont-show-check');
+    overlay.classList.add('open');
+
+    function dismiss() {
+        if (checkbox.checked) setCookie('gf_notice_dismissed', '1', 30);
+        overlay.classList.remove('open');
+    }
+
+    document.getElementById('notice-close').addEventListener('click', dismiss);
+    document.getElementById('notice-close-btn').addEventListener('click', dismiss);
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) dismiss();
+    });
+    // Also honor the checkbox if they click through to Learn More instead of closing
+    document.querySelector('.notice-link').addEventListener('click', function() {
+        if (checkbox.checked) setCookie('gf_notice_dismissed', '1', 30);
+    });
+})();
+</script>
 
 </body>
 </html>
