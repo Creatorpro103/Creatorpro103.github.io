@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us - iPrint Keychains</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
+<meta name="description" content="Get in touch with iPrint Keychains, questions about an order, bulk pricing, or anything else.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --rare: #3E7CB1;
+    --gold: #C9971F;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--kraft);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+h1, h2 { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+a { color: inherit; }
+
+nav.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 26px 24px;
+}
+
+.wordmark { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
+.logo-dot { width: 20px; height: 26px; border-radius: 4px; background: var(--rare); border: 2.5px solid var(--ink); }
+
+.navlink { text-decoration: none; font-weight: 600; font-size: 0.95rem; border-bottom: 2px solid transparent; }
+.navlink:hover { border-color: var(--ink); }
+
+.wrap { max-width: 640px; margin: 0 auto; padding: 10px 24px 60px; }
+
+header.hero {
+    padding: 10px 0 36px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 32px;
+}
+
+header.hero h1 { font-size: clamp(2rem, 5vw, 2.8rem); text-transform: uppercase; }
+header.hero p { color: var(--ink-soft); margin-top: 10px; max-width: 48ch; }
+
+.card {
+    background: var(--face);
+    border: 1px solid var(--kraft-line);
+    border-radius: 14px;
+    padding: 26px 24px 28px;
+}
+
+.field { margin-bottom: 18px; }
+.field label { display: block; font-weight: 700; font-size: 0.88rem; margin-bottom: 6px; }
+
+.field input[type="text"],
+.field input[type="email"],
+.field textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 2px solid var(--kraft-line);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    background: var(--face);
+    color: var(--ink);
+}
+
+.field textarea { min-height: 130px; resize: vertical; }
+
+.submit-btn {
+    width: 100%;
+    background: var(--rare);
+    color: var(--face);
+    border: 2.5px solid var(--ink);
+    border-radius: 10px;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.status-msg {
+    display: none;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+    border: 2px solid var(--ink);
+}
+
+.status-msg.error { display: block; background: #F8E3E1; }
+.status-msg.success { display: block; background: #E4F0E7; }
+
+footer {
+    border-top: 3px solid var(--ink);
+    padding: 32px 24px 44px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+.footer-link {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+}
+
+.footer-link:hover { border-color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<nav class="top">
+    <div class="wordmark"><span class="logo-dot"></span>iPrint Keychains</div>
+    <a class="navlink" href="https://isaacneal.com">Back home</a>
+</nav>
+
+<div class="wrap">
+    <header class="hero">
+        <h1>Contact Us</h1>
+        <p>Questions about an order, bulk pricing, or anything else, send a message and I'll get back to you.</p>
+    </header>
+
+    <div class="card">
+        <div class="status-msg" id="status"></div>
+        <form id="contact-form">
+            <div class="field">
+                <label for="c-name">Your name</label>
+                <input type="text" id="c-name" required>
+            </div>
+            <div class="field">
+                <label for="c-email">Your email</label>
+                <input type="email" id="c-email" required>
+            </div>
+            <div class="field">
+                <label for="c-message">Message</label>
+                <textarea id="c-message" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn" id="submit-btn">Send Message</button>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <a class="footer-link" href="https://isaacneal.com">Home</a>
+    &middot;
+    <a class="footer-link" href="testimonials">Testimonials</a>
+    &middot;
+    <a class="footer-link" href="updates">Update Logs</a>
+</footer>
+
+<script>
+const CONTACT_API_URL = "https://script.google.com/macros/s/AKfycbzd2AkBA_sDvBGyMqsnEDap4hKyJZ7ScC-EvEAUzWbIoixbR-V0JXGSjyvArMwUhnZOOw/exec";
+
+const form = document.getElementById('contact-form');
+const status = document.getElementById('status');
+const submitBtn = document.getElementById('submit-btn');
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  status.className = 'status-msg';
+  status.textContent = '';
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
+
+  const payload = {
+    name: document.getElementById('c-name').value,
+    email: document.getElementById('c-email').value,
+    message: document.getElementById('c-message').value
+  };
+
+  fetch(CONTACT_API_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(data => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Message';
+
+      if (!data.success) {
+        status.textContent = data.error || 'Something went wrong. Try again.';
+        status.className = 'status-msg error';
+        return;
+      }
+
+      status.textContent = "Message sent! I'll get back to you soon.";
+      status.className = 'status-msg success';
+      form.reset();
+    })
+    .catch(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Message';
+      status.textContent = "Couldn't reach the server. Check your connection and try again.";
+      status.className = 'status-msg error';
+    });
+});
+</script>
+
+</body>
+</html>
