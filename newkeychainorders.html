@@ -156,6 +156,18 @@ header.top h1 { font-size: 1.8rem; text-transform: uppercase; }
     cursor: pointer;
 }
 
+.oc-delete-btn {
+    padding: 7px 10px;
+    border: 2px solid var(--danger);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: inherit;
+    background: var(--face);
+    color: var(--danger);
+    cursor: pointer;
+}
+
 .oc-item {
     padding: 8px 0;
     border-bottom: 1px solid var(--kraft-line);
@@ -243,7 +255,7 @@ header.top h1 { font-size: 1.8rem; text-transform: uppercase; }
 
 <script>
 const ADMIN_PASSWORD = "3467";
-const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzvFTJwUS-hVEeG7BXLr_rGS5prmvX8etEIl4R8NrVVUx3Y9yBogDPdwyT65SvP2nrA/exec";
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbxj-X42c4T50Pjxq9H3mbkjbd8D2mIEYH3TNoMVmtUqxfFDEPFhZFodtnwjt64peBv4/exec";
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -402,11 +414,14 @@ function renderOrders() {
             &middot; ${escapeHtml(order.timestamp)}
           </div>
         </div>
-        <select class="oc-status-select" data-order-id="${escapeHtml(order.orderId)}">
-          ${['New', 'In Progress', 'Done'].map(s =>
-            `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`
-          ).join('')}
-        </select>
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <select class="oc-status-select" data-order-id="${escapeHtml(order.orderId)}">
+            ${['New', 'In Progress', 'Done'].map(s =>
+              `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`
+            ).join('')}
+          </select>
+          <button type="button" class="oc-delete-btn" data-order-id="${escapeHtml(order.orderId)}" title="Delete this order">Delete</button>
+        </div>
       </div>
 
       ${order.items.map(item => `
@@ -424,6 +439,32 @@ function renderOrders() {
   list.querySelectorAll('.oc-status-select').forEach(sel => {
     sel.addEventListener('change', () => updateStatus(sel.dataset.orderId, sel.value));
   });
+
+  list.querySelectorAll('.oc-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Delete this whole order? This removes every item in it and cannot be undone.')) return;
+      deleteOrder(btn.dataset.orderId);
+    });
+  });
+}
+
+function deleteOrder(orderId) {
+  fetch(ORDERS_API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'admin_delete_order', orderId })
+  })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        groupedOrders = groupedOrders.filter(o => o.orderId !== orderId);
+        populateStatusFilter(groupedOrders);
+        renderOrders();
+        showToast('Order deleted.');
+      } else {
+        showToast("Couldn't delete: " + res.error, 'error');
+      }
+    })
+    .catch(() => showToast("Couldn't reach the server.", 'error'));
 }
 
 function updateStatus(orderId, status) {
