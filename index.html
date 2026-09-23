@@ -500,6 +500,29 @@ footer {
 
 .modal-card h2 { font-size: 1.15rem; text-transform: uppercase; margin-bottom: 18px; padding-right: 24px; }
 
+.gf-notice-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.gf-notice-actions .btn-light {
+    background: var(--face);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+.gf-notice-dont-show {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+}
+.gf-notice-dont-show input { width: 15px; height: 15px; accent-color: var(--rare); cursor: pointer; }
+.gf-notice-dont-show label { cursor: pointer; }
+
 .field { margin-bottom: 16px; }
 .field label { display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; }
 .field .hint { font-weight: 400; color: var(--ink-soft); font-size: 0.78rem; }
@@ -712,6 +735,23 @@ footer {
     <button class="btn btn-primary" id="cta-cart-btn" type="button">Open my cart</button>
 </section>
 
+<!-- Google Form retirement notice -->
+<div class="overlay" id="gf-notice-overlay">
+    <div class="modal-card">
+        <button type="button" class="modal-close" id="gf-notice-close" aria-label="Close">&times;</button>
+        <h2>Google Form Retired</h2>
+        <p style="color:var(--ink-soft); font-size:0.92rem;">The Google Form is no longer available. Ordering is now built directly into this site.</p>
+        <div class="gf-notice-dont-show">
+            <input type="checkbox" id="gf-notice-dont-show-check">
+            <label for="gf-notice-dont-show-check">Don't show this again</label>
+        </div>
+        <div class="gf-notice-actions">
+            <button type="button" class="btn-light" id="gf-notice-close-btn">Close</button>
+            <a class="btn btn-primary" href="https://isaacneal.com/updates" style="padding:10px 18px; font-size:0.88rem;">Learn more at isaacneal.com/updates</a>
+        </div>
+    </div>
+</div>
+
 <!-- Customize modal -->
 <div class="overlay" id="customize-overlay">
     <div class="modal-card">
@@ -780,7 +820,7 @@ const COLORS = [
 const COLOR_CHART_URL = "images/color_options.png";
 
 // Real backend for order submissions.
-const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbxj-X42c4T50Pjxq9H3mbkjbd8D2mIEYH3TNoMVmtUqxfFDEPFhZFodtnwjt64peBv4/exec";
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbyYzm5YAess_gIfriFt0W-Wkr1OvappmpxRcCEoaBCjJ_uEYc2geOrgvGlE-U-BbEZE/exec";
 
 function colorChart() {
   return `
@@ -1309,6 +1349,38 @@ checkoutForm.addEventListener('submit', e => {
 });
 
 renderCartBadge();
+
+// ---- Google Form retirement notice ----
+(function() {
+  function getCookie(name) {
+    var match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return match ? decodeURIComponent(match.pop()) : '';
+  }
+  function setCookie(name, value, days) {
+    var expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+  }
+
+  var cutoff = new Date('2026-09-25T23:59:59');
+  if (new Date() > cutoff) return; // notice has expired, never show it
+  if (getCookie('gf_retired_notice_dismissed') === '1') return;
+
+  var overlay = document.getElementById('gf-notice-overlay');
+  var checkbox = document.getElementById('gf-notice-dont-show-check');
+  overlay.classList.add('open');
+
+  function dismiss() {
+    if (checkbox.checked) setCookie('gf_retired_notice_dismissed', '1', 30);
+    overlay.classList.remove('open');
+  }
+
+  document.getElementById('gf-notice-close').addEventListener('click', dismiss);
+  document.getElementById('gf-notice-close-btn').addEventListener('click', dismiss);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) dismiss(); });
+  document.querySelector('#gf-notice-overlay a.btn-primary').addEventListener('click', function() {
+    if (checkbox.checked) setCookie('gf_retired_notice_dismissed', '1', 30);
+  });
+})();
 </script>
 
 </body>
