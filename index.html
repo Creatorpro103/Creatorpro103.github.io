@@ -461,6 +461,44 @@ footer {
 
 .footer-link:hover { border-color: var(--ink-soft); }
 
+.secret {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(43,32,18,0.07);
+    bottom: 9px;
+    right: 9px;
+    cursor: default;
+}
+
+/* ---------- Easter egg toast ---------- */
+.egg-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--ink);
+    color: var(--face);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    padding: 14px 22px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.egg-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 /* ---------- Modal overlay (customize + cart) ---------- */
 .overlay {
     display: none;
@@ -805,7 +843,10 @@ footer {
     <a class="footer-link" href="updates">Update Logs</a>
     &middot;
     <a class="footer-link" href="contact">Contact Us</a>
+    <span class="secret" id="secret-dot" tabindex="0" role="button" aria-label=""></span>
 </footer>
+
+<div class="egg-toast" id="egg-toast" role="status" aria-live="polite"></div>
 
 <script>
 const COLORS = [
@@ -1380,6 +1421,195 @@ renderCartBadge();
   document.querySelector('#gf-notice-overlay a.btn-primary').addEventListener('click', function() {
     if (checkbox.checked) setCookie('gf_retired_notice_dismissed', '1', 30);
   });
+})();
+
+// ---- Easter eggs (shh) ----
+(function() {
+  const toast = document.getElementById('egg-toast');
+  let toastTimer;
+
+  function showEgg(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4200);
+  }
+
+  // 1) Konami code, anywhere on the page.
+  const KONAMI = ['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','b','a'];
+  let konamiPos = 0;
+  document.addEventListener('keydown', e => {
+    const key = e.key.toLowerCase();
+    konamiPos = (key === KONAMI[konamiPos]) ? konamiPos + 1 : (key === KONAMI[0] ? 1 : 0);
+    if (konamiPos === KONAMI.length) {
+      konamiPos = 0;
+      showEgg("Konami code, on a keychain site. Respect. Five bucks off is tempting to offer but I'm just a static page.");
+    }
+  });
+
+  // 2) Click the little logo dot 7 times fast.
+  const logoDot = document.querySelector('.logo-dot');
+  if (logoDot) {
+    let logoClicks = 0;
+    let logoTimer;
+    const bumpLogo = () => {
+      logoClicks++;
+      clearTimeout(logoTimer);
+      logoTimer = setTimeout(() => { logoClicks = 0; }, 1800);
+      if (logoClicks === 7) {
+        logoClicks = 0;
+        showEgg("Seven clicks on a tiny rectangle. You have the patience of a keychain maker.");
+      }
+    };
+    logoDot.addEventListener('click', bumpLogo);
+    logoDot.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') bumpLogo(); });
+  }
+
+  // 3) Type a secret word anywhere on the page.
+  const SECRET_WORDS = {
+    'keychain': "You typed the magic word. Nothing unlocks, I just liked that you tried.",
+    'unlock': "There's nothing to unlock here, but I admire the effort.",
+    'ipk': "Initials spotted. I see what you did there."
+  };
+  let typedBuffer = '';
+  document.addEventListener('keypress', e => {
+    if (!e.key || e.key.length !== 1) return;
+    typedBuffer = (typedBuffer + e.key).slice(-20).toLowerCase();
+    for (const word in SECRET_WORDS) {
+      if (typedBuffer.endsWith(word)) {
+        typedBuffer = '';
+        showEgg(SECRET_WORDS[word]);
+        break;
+      }
+    }
+  });
+
+  // 4) A near-invisible dot tucked in the corner of the footer.
+  const secretDot = document.getElementById('secret-dot');
+  if (secretDot) {
+    const triggerSecret = () => showEgg("Found the tiny dot nobody was supposed to notice. Good eyes.");
+    secretDot.addEventListener('click', triggerSecret);
+    secretDot.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') triggerSecret(); });
+  }
+
+  // 5) Triple-click the hero headline.
+  const heroHeading = document.querySelector('header.hero h1');
+  if (heroHeading) {
+    let headingClicks = 0;
+    let headingTimer;
+    heroHeading.addEventListener('click', () => {
+      headingClicks++;
+      clearTimeout(headingTimer);
+      headingTimer = setTimeout(() => { headingClicks = 0; }, 900);
+      if (headingClicks === 3) {
+        headingClicks = 0;
+        showEgg("That's Anton, by the way. Every heading on this site is set in it.");
+      }
+    });
+  }
+
+  // 6) Click the little chip circle inside the card fan 5 times.
+  const chip = document.querySelector('.mini-card.c3 .chip');
+  if (chip) {
+    let chipClicks = 0;
+    let chipTimer;
+    chip.style.cursor = 'pointer';
+    chip.addEventListener('click', () => {
+      chipClicks++;
+      clearTimeout(chipTimer);
+      chipTimer = setTimeout(() => { chipClicks = 0; }, 1600);
+      if (chipClicks === 5) {
+        chipClicks = 0;
+        showEgg("That little circle isn't a button. Was never supposed to be. You made it one anyway.");
+      }
+    });
+  }
+
+  // 7) Hover over the footer and stay put for 4 seconds.
+  const footerEl = document.querySelector('footer');
+  if (footerEl) {
+    let hoverTimer;
+    footerEl.addEventListener('mouseenter', () => {
+      hoverTimer = setTimeout(() => {
+        showEgg("You've been staring at the footer for a while. There's nothing else down here. Or is there?");
+      }, 4000);
+    });
+    footerEl.addEventListener('mouseleave', () => clearTimeout(hoverTimer));
+  }
+
+  // 8) Click the Elf Box badge three times.
+  const elfBadge = document.querySelector('.elf-badge');
+  if (elfBadge) {
+    let badgeClicks = 0;
+    let badgeTimer;
+    elfBadge.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      badgeClicks++;
+      clearTimeout(badgeTimer);
+      badgeTimer = setTimeout(() => { badgeClicks = 0; }, 1600);
+      if (badgeClicks === 3) {
+        badgeClicks = 0;
+        showEgg("Limited availability, limited patience to click this three times. Nicely done.");
+      }
+    });
+  }
+
+  // 9) Click the business name in the nav (not the logo dot) 4 times fast.
+  const wordmarkText = document.querySelector('.wordmark');
+  if (wordmarkText) {
+    let nameClicks = 0;
+    let nameTimer;
+    wordmarkText.addEventListener('click', e => {
+      if (e.target.closest('.logo-dot')) return;
+      nameClicks++;
+      clearTimeout(nameTimer);
+      nameTimer = setTimeout(() => { nameClicks = 0; }, 1500);
+      if (nameClicks === 4) {
+        nameClicks = 0;
+        showEgg("Clicking the business name four times doesn't do anything special. Except this, apparently.");
+      }
+    });
+  }
+
+  // 10) Right-click the card fan graphic instead of the usual menu.
+  const fanStack = document.querySelector('.fan-stack');
+  if (fanStack) {
+    fanStack.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      showEgg("Right-clicking the card stack was worth a shot. Here's something for the effort.");
+    });
+  }
+
+  // 11) Press and hold the cart button for over a second while it's still empty.
+  const cartBtn = document.getElementById('cart-btn');
+  if (cartBtn) {
+    let cartPressStart = 0;
+    cartBtn.addEventListener('mousedown', () => { cartPressStart = Date.now(); });
+    cartBtn.addEventListener('mouseup', () => {
+      if (cart.length === 0 && cartPressStart && (Date.now() - cartPressStart >= 1200)) {
+        showEgg("Holding down an empty cart doesn't fill it either, but patience like that deserves something.");
+      }
+      cartPressStart = 0;
+    });
+  }
+
+  // 12) Press Escape three times in a row.
+  let escCount = 0;
+  let escTimer;
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    escCount++;
+    clearTimeout(escTimer);
+    escTimer = setTimeout(() => { escCount = 0; }, 1500);
+    if (escCount === 3) {
+      escCount = 0;
+      showEgg("Three taps of Escape and still here. There's no exiting this one.");
+    }
+  });
+
+  // A quiet one for anyone who opens devtools.
+  console.log('Nice, you found the console too. No egg here, just a hello from Isaac.');
 })();
 </script>
 
