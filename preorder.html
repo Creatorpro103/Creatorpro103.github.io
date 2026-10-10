@@ -853,7 +853,7 @@ footer {
       successAudio.play().catch(() => {});
 
       status.className = "loading";
-      status.textContent = "Submitting...";
+      status.textContent = "Submitting... This will take a while (it's not a bug).";
       submitBtn.disabled = true;
 
       const nameValue = document.getElementById("name").value;
