@@ -7,6 +7,11 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
 <meta name="description" content="Get in touch with iPrint Keychains, questions about an order, bulk pricing, or anything else.">
 
+<script>
+window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCaptcha(); };
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -99,6 +104,9 @@ header.hero p { color: var(--ink-soft); margin-top: 10px; max-width: 48ch; }
     font-family: 'Inter', sans-serif;
 }
 
+.captcha-field { overflow: hidden; }
+.captcha-field > div { transform-origin: 0 0; }
+
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .status-msg {
@@ -159,6 +167,7 @@ footer {
                 <label for="c-message">Message</label>
                 <textarea id="c-message" required></textarea>
             </div>
+            <div class="field captcha-field"><div id="recaptcha-box"></div></div>
             <button type="submit" class="submit-btn" id="submit-btn">Send Message</button>
         </form>
     </div>
@@ -173,7 +182,31 @@ footer {
 </footer>
 
 <script>
-const CONTACT_API_URL = "https://script.google.com/macros/s/AKfycbzd2AkBA_sDvBGyMqsnEDap4hKyJZ7ScC-EvEAUzWbIoixbR-V0JXGSjyvArMwUhnZOOw/exec";
+const CONTACT_API_URL = "https://script.google.com/macros/s/AKfycbydoLgq4e5Jv9zDVm0-moa628XCBqI4RnbATUc166a-30CkAhW3YoiuQ9a5Qa5TgNxAXw/exec";
+
+const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
+let captchaWidgetId = null;
+
+function fitCaptcha() {
+  const box = document.getElementById('recaptcha-box');
+  const wrap = box.parentElement;
+  const avail = wrap.clientWidth;
+  const scale = avail > 0 && avail < 304 ? avail / 304 : 1;
+  box.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+  wrap.style.height = scale < 1 ? Math.ceil(78 * scale) + 'px' : '';
+}
+
+window.ensureCaptcha = function() {
+  if (captchaWidgetId !== null || !window.grecaptcha || !grecaptcha.render) return;
+  captchaWidgetId = grecaptcha.render('recaptcha-box', { sitekey: RECAPTCHA_SITE_KEY });
+  fitCaptcha();
+};
+window.addEventListener('resize', fitCaptcha);
+if (window.grecaptcha && grecaptcha.render) window.ensureCaptcha();
+
+function resetCaptcha() {
+  try { if (captchaWidgetId !== null) grecaptcha.reset(captchaWidgetId); } catch (err) {}
+}
 
 const form = document.getElementById('contact-form');
 const status = document.getElementById('status');
@@ -184,13 +217,24 @@ form.addEventListener('submit', e => {
   status.className = 'status-msg';
   status.textContent = '';
 
+  let captchaToken = '';
+  try { if (captchaWidgetId !== null) captchaToken = grecaptcha.getResponse(captchaWidgetId); } catch (err) {}
+  if (!captchaToken) {
+    status.textContent = captchaWidgetId === null
+      ? "The spam check didn't load. Refresh the page and try again."
+      : 'Please check the "I\'m not a robot" box before sending.';
+    status.className = 'status-msg error';
+    return;
+  }
+
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending...';
 
   const payload = {
     name: document.getElementById('c-name').value,
     email: document.getElementById('c-email').value,
-    message: document.getElementById('c-message').value
+    message: document.getElementById('c-message').value,
+    recaptchaToken: captchaToken
   };
 
   fetch(CONTACT_API_URL, {
@@ -199,6 +243,7 @@ form.addEventListener('submit', e => {
   })
     .then(res => res.json())
     .then(data => {
+      resetCaptcha();
       submitBtn.disabled = false;
       submitBtn.textContent = 'Send Message';
 
@@ -213,6 +258,7 @@ form.addEventListener('submit', e => {
       form.reset();
     })
     .catch(() => {
+      resetCaptcha();
       submitBtn.disabled = false;
       submitBtn.textContent = 'Send Message';
       status.textContent = "Couldn't reach the server. Check your connection and try again.";
