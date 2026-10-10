@@ -182,7 +182,9 @@ footer {
 </footer>
 
 <script>
-const CONTACT_API_URL = "https://script.google.com/macros/s/AKfycbydoLgq4e5Jv9zDVm0-moa628XCBqI4RnbATUc166a-30CkAhW3YoiuQ9a5Qa5TgNxAXw/exec";
+// Script 1: checks the reCAPTCHA token. Script 2: emails the message.
+const VERIFY_API_URL = "https://script.google.com/macros/s/AKfycbydoLgq4e5Jv9zDVm0-moa628XCBqI4RnbATUc166a-30CkAhW3YoiuQ9a5Qa5TgNxAXw/exec";
+const CONTACT_API_URL = "https://script.google.com/macros/s/AKfycbzd2AkBA_sDvBGyMqsnEDap4hKyJZ7ScC-EvEAUzWbIoixbR-V0JXGSjyvArMwUhnZOOw/exec";
 
 const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
 let captchaWidgetId = null;
@@ -233,15 +235,21 @@ form.addEventListener('submit', e => {
   const payload = {
     name: document.getElementById('c-name').value,
     email: document.getElementById('c-email').value,
-    message: document.getElementById('c-message').value,
-    recaptchaToken: captchaToken
+    message: document.getElementById('c-message').value
   };
 
-  fetch(CONTACT_API_URL, {
+  fetch(VERIFY_API_URL, {
     method: 'POST',
-    body: JSON.stringify(payload)
+    body: JSON.stringify({ action: 'verify', recaptchaToken: captchaToken })
   })
     .then(res => res.json())
+    .then(check => {
+      if (!check.success) return check;
+      return fetch(CONTACT_API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      }).then(res => res.json());
+    })
     .then(data => {
       resetCaptcha();
       submitBtn.disabled = false;
