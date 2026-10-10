@@ -804,6 +804,7 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
         <button type="button" class="modal-close" id="rc-notice-close" aria-label="Close">&times;</button>
         <h2>New: Spam Check on Forms</h2>
         <p style="color:var(--ink-soft); font-size:0.92rem;">To keep bots out, checkout and the contact, preorder, and testimonials forms now use Google reCAPTCHA. You will see an "I'm not a robot" box before you submit. It is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--rare); font-weight:600;">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color:var(--rare); font-weight:600;">Terms of Service</a> apply.</p>
+        <p style="color:var(--ink-soft); font-size:0.92rem; margin-top:10px;">By using this site you also agree to our <a href="terms" style="color:var(--rare); font-weight:600;">Terms of Service</a>.</p>
         <div class="gf-notice-dont-show">
             <input type="checkbox" id="rc-notice-dont-show-check">
             <label for="rc-notice-dont-show-check">Don't show this again</label>
@@ -857,6 +858,7 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
             </div>
             <div class="field captcha-field"><div id="recaptcha-box"></div></div>
             <div class="error-msg" id="checkout-error"></div>
+            <p style="font-size:0.78rem; color:var(--ink-soft); margin-top:12px; text-align:center;">By placing your order you agree to the <a href="terms" target="_blank" rel="noopener" style="color:var(--rare); font-weight:600;">Terms of Service</a>.</p>
             <button type="submit" class="modal-submit-btn" id="place-order-btn">Place Order</button>
         </form>
     </div>
@@ -868,6 +870,8 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
     <a class="footer-link" href="updates">Update Logs</a>
     &middot;
     <a class="footer-link" href="contact">Contact Us</a>
+    &middot;
+    <a class="footer-link" href="terms">Terms</a>
     <span class="secret" id="secret-dot" tabindex="0" role="button" aria-label=""></span>
 </footer>
 
