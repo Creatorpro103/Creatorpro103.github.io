@@ -7,6 +7,11 @@
 <meta name="description" content="Real reviews from iPrint Keychains customers. See ratings and comments, leave your own review, and reply to others, every review is checked before it goes live.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
 
+<script>
+window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCaptcha(); };
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -445,6 +450,10 @@ section.set {
 
 .star-picker span.active { color: var(--gold); }
 
+.captcha-wrap { overflow: hidden; margin-bottom: 14px; }
+.captcha-wrap > div { transform-origin: 0 0; }
+.captcha-wrap.review { margin-top: 4px; margin-bottom: 18px; }
+
 .form-msg {
     margin-top: 16px;
     font-size: 0.88rem;
@@ -527,6 +536,8 @@ footer {
                 <textarea id="review-input" placeholder="What was your experience like?" maxlength="2000"></textarea>
             </div>
 
+            <div class="captcha-wrap review"><div id="review-captcha"></div></div>
+
             <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%; text-align:center;">Submit review</button>
             <div class="form-msg" id="form-msg"></div>
         </form>
@@ -549,6 +560,51 @@ footer {
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxwg-noETLbdpQE0TXQZ-H-wvlkSZ-xDHt3h8gqyLywRopGxGZ-4kZgGVRS2Wx50GM0Tg/exec";
+  // Script 2 (new): checks the reCAPTCHA token. Paste its /exec URL here.
+  const VERIFY_URL = "https://script.google.com/macros/s/AKfycbw14g6D8RdH_9_OLQR07BqpN-LlbQ33DqY885HlRqkOt_9Lby4HYqorpLoZu4b1qZwc/exec";
+  const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
+
+  function captchaReady_() { return !!(window.grecaptcha && grecaptcha.render); }
+
+  function fitCaptcha_(wrap) {
+    const inner = wrap.firstElementChild;
+    const avail = wrap.clientWidth;
+    const scale = avail > 0 && avail < 304 ? avail / 304 : 1;
+    inner.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+    wrap.style.height = scale < 1 ? Math.ceil(78 * scale) + 'px' : '';
+  }
+
+  // Renders a widget into el (once) and returns true if one exists.
+  function renderCaptcha_(el) {
+    if (el.dataset.widgetId !== undefined && el.dataset.widgetId !== '') return true;
+    if (!captchaReady_()) return false;
+    el.dataset.widgetId = String(grecaptcha.render(el, { sitekey: RECAPTCHA_SITE_KEY }));
+    fitCaptcha_(el.parentElement);
+    return true;
+  }
+
+  function captchaToken_(el) {
+    if (el.dataset.widgetId === undefined || el.dataset.widgetId === '') return '';
+    try { return grecaptcha.getResponse(Number(el.dataset.widgetId)); } catch (e) { return ''; }
+  }
+
+  function resetCaptcha_(el) {
+    try { if (el.dataset.widgetId) grecaptcha.reset(Number(el.dataset.widgetId)); } catch (e) {}
+  }
+
+  window.ensureCaptcha = function() { renderCaptcha_(document.getElementById('review-captcha')); };
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.captcha-wrap').forEach(w => { if (w.firstElementChild.dataset.widgetId) fitCaptcha_(w); });
+  });
+  if (captchaReady_()) window.ensureCaptcha();
+
+  function verifyCaptcha_(token) {
+    return fetch(VERIFY_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'verify', recaptchaToken: token })
+    }).then(res => res.json());
+  }
+
   const FRAMES = ['var(--common)', 'var(--rare)', 'var(--epic)'];
 
   // ---- Spam prevention: limit submissions per browser using a cookie ----
@@ -669,6 +725,7 @@ footer {
               '<input type="text" class="comment-name-input" placeholder="Your name" maxlength="100">' +
               '<label class="comment-anon-row"><input type="checkbox" class="comment-anon-check"> Post anonymously</label>' +
               '<textarea class="comment-text-input" placeholder="Write a reply..." maxlength="1000"></textarea>' +
+              '<div class="captcha-wrap"><div class="comment-captcha"></div></div>' +
               '<button type="submit" class="comment-submit-btn">Post reply</button>' +
               '<div class="comment-msg"></div>' +
             '</form>' +
@@ -697,6 +754,7 @@ footer {
       btn.addEventListener('click', () => {
         const form = grid.querySelector('.comment-form[data-review-id="' + btn.dataset.reviewId + '"]');
         form.classList.toggle('open');
+        if (form.classList.contains('open')) renderCaptcha_(form.querySelector('.comment-captcha'));
       });
     });
 
@@ -731,13 +789,26 @@ footer {
           return;
         }
 
+        const cEl = form.querySelector('.comment-captcha');
+        const cToken = captchaToken_(cEl);
+        if (!cToken) {
+          msg.textContent = cEl.dataset.widgetId
+            ? 'Please check the "I\'m not a robot" box first.'
+            : "The spam check didn't load. Refresh the page and try again.";
+          msg.classList.add('error');
+          return;
+        }
+
         submitBtn.disabled = true;
-        fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'add_comment', reviewId: reviewId, anonymous: anonymous, name: name, text: text })
-        })
-          .then(res => res.json())
+        verifyCaptcha_(cToken)
+          .then(check => check.success
+            ? fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'add_comment', reviewId: reviewId, anonymous: anonymous, name: name, text: text })
+              }).then(res => res.json())
+            : { success: false, error: check.error })
           .then(data => {
+            resetCaptcha_(cEl);
             submitBtn.disabled = false;
             if (data.success) {
               recordCommentSubmission_();
@@ -752,6 +823,7 @@ footer {
             }
           })
           .catch(() => {
+            resetCaptcha_(cEl);
             submitBtn.disabled = false;
             msg.textContent = "Could not reach the server.";
             msg.classList.add('error');
@@ -904,15 +976,28 @@ footer {
       return;
     }
 
+    const rEl = document.getElementById('review-captcha');
+    const rToken = captchaToken_(rEl);
+    if (!rToken) {
+      formMsg.textContent = rEl.dataset.widgetId
+        ? 'Please check the "I\'m not a robot" box before submitting.'
+        : "The spam check didn't load. Refresh the page and try again.";
+      formMsg.classList.add('error');
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Submitting...';
 
-    fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ name: name, anonymous: anonymous, rating: selectedRating, review: review })
-    })
-      .then(res => res.json())
+    verifyCaptcha_(rToken)
+      .then(check => check.success
+        ? fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ name: name, anonymous: anonymous, rating: selectedRating, review: review })
+          }).then(res => res.json())
+        : { success: false, error: check.error })
       .then(data => {
+        resetCaptcha_(rEl);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit review';
 
@@ -930,6 +1015,7 @@ footer {
         }
       })
       .catch(() => {
+        resetCaptcha_(rEl);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit review';
         formMsg.textContent = "Could not reach the server. Check your connection and try again.";
