@@ -704,7 +704,15 @@ footer {
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+.captcha-field { margin-bottom: 14px; }
+#recaptcha-box { transform-origin: 0 0; min-height: 78px; }
 </style>
+<script>
+// reCAPTCHA calls this once its script has loaded; the widget itself is
+// rendered later (when the cart opens) by ensureCaptcha() further down.
+window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCaptcha(); };
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
 </head>
 <body>
 
@@ -831,6 +839,7 @@ footer {
                 <label for="notes">Anything else? <span class="hint">Not required, note if you need it by a specific date, or your address if shipping.</span></label>
                 <textarea id="notes"></textarea>
             </div>
+            <div class="field captcha-field"><div id="recaptcha-box"></div></div>
             <div class="error-msg" id="checkout-error"></div>
             <button type="submit" class="modal-submit-btn" id="place-order-btn">Place Order</button>
         </form>
@@ -861,7 +870,7 @@ const COLORS = [
 const COLOR_CHART_URL = "images/color_options.png";
 
 // Real backend for order submissions.
-const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbxFjxmz5Q8jWH5oV_pxxLtAxTUYqudPXvlQFgoQJMCcZqj3ZNo_Mb-ODxWrxN1XR62Z/exec";
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzAVURxzuc9zVJrrWKzOLfJ66Pf6M5OZHnpSbfA338AWtCTydeVtERiEVJDrjXZo9HS/exec";
 
 function colorChart() {
   return `
@@ -1293,9 +1302,39 @@ cartItemsEl.addEventListener('click', e => {
   renderCart();
 });
 
+// ---- reCAPTCHA (checkbox) ----
+const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
+let captchaWidgetId = null;
+
+function fitCaptcha() {
+  const box = document.getElementById('recaptcha-box');
+  const wrap = box.parentElement;
+  const scale = Math.min(1, wrap.clientWidth / 304);
+  box.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+  wrap.style.height = scale < 1 ? (78 * scale) + 'px' : '';
+}
+
+// Renders the checkbox once, and only while the cart is open (a widget
+// rendered inside a hidden modal can size itself wrong).
+function ensureCaptcha() {
+  if (captchaWidgetId !== null) return;
+  if (!cartOverlay.classList.contains('open')) return;
+  if (!window.grecaptcha || !grecaptcha.render) return;
+  captchaWidgetId = grecaptcha.render('recaptcha-box', { sitekey: RECAPTCHA_SITE_KEY });
+  fitCaptcha();
+}
+window.ensureCaptcha = ensureCaptcha;
+window.addEventListener('resize', fitCaptcha);
+
+// Tokens are single use, so clear the box after every attempt.
+function resetCaptcha() {
+  if (captchaWidgetId !== null && window.grecaptcha) grecaptcha.reset(captchaWidgetId);
+}
+
 function openCart() {
   renderCart();
   cartOverlay.classList.add('open');
+  ensureCaptcha();
 }
 
 document.getElementById('cart-btn').addEventListener('click', openCart);
@@ -1328,6 +1367,19 @@ checkoutForm.addEventListener('submit', e => {
     return;
   }
 
+  // The "I'm not a robot" box must be checked before an order can go out.
+  if (captchaWidgetId === null || !window.grecaptcha) {
+    checkoutError.textContent = "The spam check didn't load. Refresh the page and try again.";
+    checkoutError.style.display = 'block';
+    return;
+  }
+  const captchaToken = grecaptcha.getResponse(captchaWidgetId);
+  if (!captchaToken) {
+    checkoutError.textContent = 'Please check the "I\'m not a robot" box before placing your order.';
+    checkoutError.style.display = 'block';
+    return;
+  }
+
   const placeOrderBtn = document.getElementById('place-order-btn');
   placeOrderBtn.disabled = true;
   placeOrderBtn.textContent = 'Sending...';
@@ -1337,7 +1389,8 @@ checkoutForm.addEventListener('submit', e => {
     email: document.getElementById('cust-email').value,
     payment: payment.value,
     notes: document.getElementById('notes').value,
-    items: cart
+    items: cart,
+    recaptchaToken: captchaToken
   };
 
   fetch(ORDERS_API_URL, {
@@ -1348,6 +1401,7 @@ checkoutForm.addEventListener('submit', e => {
     .then(data => {
       placeOrderBtn.disabled = false;
       placeOrderBtn.textContent = 'Place Order';
+      resetCaptcha();
 
       if (!data.success) {
         checkoutError.textContent = data.error || 'Something went wrong sending your order. Try again.';
@@ -1384,6 +1438,7 @@ checkoutForm.addEventListener('submit', e => {
     .catch(() => {
       placeOrderBtn.disabled = false;
       placeOrderBtn.textContent = 'Place Order';
+      resetCaptcha();
       checkoutError.textContent = "Couldn't reach the order system. Check your connection and try again.";
       checkoutError.style.display = 'block';
     });
