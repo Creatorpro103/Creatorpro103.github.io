@@ -731,6 +731,9 @@ footer {
       try { if (captchaWidgetId !== null) grecaptcha.reset(captchaWidgetId); } catch (err) {}
     }
 
+    // Warm up the checker script so the first submit isn't slowed by a cold start.
+    try { fetch(VERIFY_URL + "?action=warmup", { mode: "no-cors" }).catch(() => {}); } catch (err) {}
+
     const form = document.getElementById("preorderForm");
     const status = document.getElementById("status");
     const submitBtn = document.getElementById("submitBtn");
@@ -885,14 +888,17 @@ footer {
           return;
         }
 
-        await fetch(SCRIPT_URL, {
+        // Send the order in the background so the confirmation scene starts right away
+        // (the script saves the order and emails in about a second, but its reply is slow to come back).
+        fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
+          keepalive: true,
           headers: {
             "Content-Type": "text/plain"
           },
           body: JSON.stringify(data)
-        });
+        }).catch(err => console.error("Order send failed", err));
 
         status.className = "";
         status.textContent = "";
