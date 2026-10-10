@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service - iPrint Keychains</title>
+<meta name="description" content="Terms of Service for iPrint Keychains: ordering, payment, shipping, reviews, and how the site works.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --common: #4C9A63;
+    --rare: #3E7CB1;
+    --epic: #8B5FBF;
+    --gold: #C9971F;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--kraft);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, .display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+a { color: inherit; }
+
+a:focus-visible, .btn:focus-visible, .navlink:focus-visible {
+    outline: 3px solid var(--rare);
+    outline-offset: 3px;
+}
+
+/* NAV */
+nav.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 26px 24px;
+}
+
+.wordmark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.logo-dot {
+    width: 20px;
+    height: 26px;
+    border-radius: 4px;
+    background: var(--rare);
+    border: 2.5px solid var(--ink);
+}
+
+.navlink {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 2px solid transparent;
+}
+
+.navlink.active { border-color: var(--ink); }
+.navlink:hover { border-color: var(--ink); }
+
+/* HERO */
+header.hero {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 30px 24px 70px;
+    text-align: center;
+}
+
+header.hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+}
+
+header.hero p.lede {
+    color: var(--ink-soft);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* ABOUT CARD */
+.container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 24px 90px;
+}
+
+.about-content {
+    background: var(--face);
+    border-radius: 16px;
+    padding: 44px;
+    border: 2.5px solid var(--ink);
+    box-shadow: 6px 6px 0 rgba(43,32,18,0.2);
+}
+
+.about-content h2 {
+    font-size: 1.7rem;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.about-content p {
+    font-size: 1.03rem;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+}
+
+.highlight {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.about-content a {
+    color: var(--rare);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.about-photo {
+    width: 100%;
+    max-width: 280px;
+    display: block;
+    margin: 10px auto 30px;
+    border-radius: 14px;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    margin: 10px 0 30px;
+}
+
+.feature-box {
+    padding: 20px;
+    background: var(--kraft);
+    border-radius: 12px;
+    border: 2.5px solid var(--ink);
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 6px 0 rgba(43,32,18,0.25);
+}
+
+.feature-box h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.feature-box p {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    margin: 0;
+}
+
+/* CTA (matches site-wide cta section) */
+.cta-section {
+    border-top: 3px solid var(--kraft-line);
+    margin-top: 10px;
+    padding-top: 34px;
+    text-align: center;
+}
+
+.cta-section h3 {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.cta-section p {
+    color: var(--ink-soft);
+    margin-bottom: 22px;
+}
+
+.btn {
+    display: inline-block;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 15px 30px;
+    border-radius: 10px;
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary {
+    background: var(--rare);
+    color: var(--face);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+.btn-primary:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
+
+/* FOOTER */
+footer {
+    border-top: 3px solid var(--ink);
+    padding: 32px 24px 44px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.footer-link {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+}
+
+.footer-link:hover { border-color: var(--ink-soft); }
+
+@media (max-width: 600px) {
+    .about-content { padding: 30px 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* TERMS */
+.terms-meta { color: var(--ink-soft); font-size: 0.9rem; font-weight: 600; margin-bottom: 26px; }
+.terms h2 { font-size: 1.25rem; margin: 30px 0 10px; }
+.terms h2:first-of-type { margin-top: 0; }
+.terms ul { margin: 0 0 18px 22px; color: var(--ink-soft); font-size: 1.03rem; }
+.terms li { margin-bottom: 8px; }
+.toc { background: var(--kraft); border: 2.5px solid var(--ink); border-radius: 12px; padding: 16px 20px; margin-bottom: 30px; }
+.toc p { margin: 0 0 8px; font-weight: 700; color: var(--ink); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.toc ol { margin: 0 0 0 20px; font-size: 0.95rem; }
+.toc a { text-decoration: none; font-weight: 600; color: var(--ink); border-bottom: 2px solid transparent; }
+.toc a:hover { border-color: var(--ink); }
+.terms section { scroll-margin-top: 20px; }
+.governing { margin-top: 34px; padding: 18px 20px; background: var(--kraft); border: 2.5px solid var(--ink); border-left: 10px solid var(--gold); border-radius: 12px; }
+.governing p { margin: 0; color: var(--ink); font-weight: 700; font-size: 1.1rem; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<nav class="top">
+    <a class="wordmark" href="index"><span class="logo-dot" aria-hidden="true"></span>iPrint Keychains</a>
+    <a class="navlink" href="About-us">About</a>
+</nav>
+
+<header class="hero">
+    <h1>Terms of Service</h1>
+    <p class="lede">The simple rules for shopping with iPrint Keychains</p>
+</header>
+
+<div class="container">
+    <div class="about-content terms">
+        <p class="terms-meta">Last updated: October 10, 2026</p>
+
+        <div class="toc">
+            <p>On this page</p>
+            <ol><li><a href="#using">Using this site</a></li><li><a href="#orders">Orders</a></li><li><a href="#payment">Prices and payment</a></li><li><a href="#shipping">Shipping</a></li><li><a href="#preorders">Preorders</a></li><li><a href="#safety">Safety</a></li><li><a href="#safety">Safety</a></li><li><a href="#reviews">Reviews, replies, and messages</a></li><li><a href="#recaptcha">Spam protection</a></li><li><a href="#privacy">Your information</a></li><li><a href="#content">Designs and content</a></li><li><a href="#liability">Liability</a></li><li><a href="#changes">Changes</a></li><li><a href="#contact">Contact</a></li></ol>
+        </div>
+
+<section id="using"><h2>Using this site</h2><p>By using this site, placing an order, or sending a form, you agree to these terms. If that is not okay with you, please don't use the site.</p></section>
+<section id="orders"><h2>Orders</h2><p>Everything is 3D printed and made to order, so colors and finish can look a little different from the pictures and from print to print. That's just how 3D printing is.</p><p>Please double check your details before you submit. We'll email you to confirm, and an order isn't final until we do. Sometimes we have to turn an order down, like when something is out of stock or can't be printed, and if that happens we'll let you know.</p></section>
+<section id="payment"><h2>Prices and payment</h2><p>Prices are in US dollars and can change, but a confirmed order stays at the price it was confirmed at.</p><p>You pay us directly after ordering, using the options on the form (Venmo, Zelle, or cash when ready, depending on the item). We make your order once payment is sorted out. We will never ask for a card number, bank login, or password on this site.</p></section>
+<section id="shipping"><h2>Shipping</h2><p>A lot of orders are handed off locally. If you want yours shipped, put your address on the form. Shipping costs extra, and the amount is listed on the page for that item.</p><p>Delivery times are estimates. Prints take time, and preorders go out when they're ready. Once a package is with the post office, delays are out of our hands, but reach out and we'll help however we can.</p></section>
+<section id="preorders"><h2>Preorders</h2><p>A preorder holds your spot for something that isn't ready yet. We'll try to hit any date shown on the page, but those dates are goals, not promises.</p></section>
+<section id="safety"><h2>Safety</h2><p>Keychains have small parts and aren't toys, so they're not for kids under 3. Printed plastic also isn't made to hold heavy weight, so please don't rely on one for anything that matters.</p></section>
+<section id="safety"><h2>Safety</h2><p>Keychains have small parts and aren't toys, so they're not for kids under 3. Printed plastic also isn't made to hold heavy weight, so please don't rely on one for anything that matters.</p><p style="display:none"></p></section>
+<section id="reviews"><h2>Reviews, replies, and messages</h2><p>We check reviews and replies before they go on the testimonials page. If you post one, it should be honest, in your own words, and something you're allowed to share. You're also letting us show it on the site.</p><p>Please keep it kind and real. No spam, no harassing anyone, and no sharing other people's private info. We can edit or remove anything that doesn't fit.</p></section>
+<section id="recaptcha"><h2>Spam protection</h2><p>The checkout, contact, preorder, and testimonials forms use Google reCAPTCHA to keep bots out. It collects things like your IP address and browser details so Google can tell people from bots. Google's <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply to it. Please don't try to get around it.</p></section>
+<section id="privacy"><h2>Your information</h2><p>We only collect what you type into a form: your name, email, order details, how you plan to pay, an address if you want shipping, and any message or review you write. We use it to make and deliver your order, email you about it, answer questions, and run the testimonials page.</p><p>That information is kept in Google tools like Sheets and Gmail. We don't sell it. The site also uses a couple of small cookies, like remembering that you closed a notice or limiting how often a review can be posted. You can clear them in your browser whenever you like.</p></section>
+<section id="content"><h2>Designs and content</h2><p>The site, the iPrint Keychains name, and our original models belong to us, so please don't copy or resell them. If you ask for a custom design, only send artwork you have the right to use. We may say no to anything that copies someone else's characters, logos, or brands.</p></section>
+<section id="liability"><h2>Liability</h2><p>The site and our products are provided as is. To the extent the law allows, we aren't responsible for indirect or incidental losses, and the most we owe for any order is what you paid for it. This doesn't take away any rights you have that can't legally be waived.</p></section>
+<section id="changes"><h2>Changes</h2><p>We might update these terms now and then. The date at the top shows the latest change, and using the site after that means you accept the update.</p></section>
+<section id="contact"><h2>Contact</h2><p>Questions about these terms or an order? Use the <a href="contact">contact page</a>.</p></section>
+
+
+        <div class="governing"><p>These terms are governed by the laws of the State of Louisiana.</p></div>
+    </div>
+</div>
+
+<footer>
+    <a class="footer-link" href="index">Home</a>
+    &middot;
+    <a class="footer-link" href="About-us">About</a>
+    &middot;
+    <a class="footer-link" href="testimonials">Testimonials</a>
+    &middot;
+    <a class="footer-link" href="updates">Update Logs</a>
+    &middot;
+    <a class="footer-link" href="terms">Terms</a>
+</footer>
+
+</body>
+</html>
