@@ -6,6 +6,11 @@
 <title>Elf Box Preorder | iPrint Keychains</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>K</text></svg>">
 
+<script>
+window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCaptcha(); };
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -222,6 +227,9 @@ textarea {
     height: 80px;
     resize: vertical;
 }
+
+.captcha-field { margin-top: 22px; overflow: hidden; }
+.captcha-field > div { transform-origin: 0 0; }
 
 button {
     display: block;
@@ -619,6 +627,8 @@ footer {
             <span class="field-hint">Leave blank if not shipping</span>
             <textarea id="address" placeholder="Only needed if you would like your Elf Box shipped"></textarea>
 
+            <div class="captcha-field"><div id="recaptcha-box"></div></div>
+
             <button type="submit" id="submitBtn">Place Preorder</button>
         </form>
         <div id="status"></div>
@@ -694,6 +704,32 @@ footer {
 <script>
     const SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbzyL1nsc-K7huoHmWT_qmR_NZZpx_gJzxcA_0-DKNu_xjjQWhaCPdfgOrSjFe0t-PdA/exec";
+
+    // Script 2 (new): checks the reCAPTCHA token. Paste its /exec URL here.
+    const VERIFY_URL = "https://script.google.com/macros/s/AKfycbxvJauAztu28zOCE5CwDOCexgEDITmEVRcFm95nkXZ756EdheVbM3ibNRtV7jquQ5DK/exec";
+    const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
+    let captchaWidgetId = null;
+
+    function fitCaptcha() {
+      const box = document.getElementById("recaptcha-box");
+      const wrap = box.parentElement;
+      const avail = wrap.clientWidth;
+      const scale = avail > 0 && avail < 304 ? avail / 304 : 1;
+      box.style.transform = scale < 1 ? "scale(" + scale + ")" : "";
+      wrap.style.height = scale < 1 ? Math.ceil(78 * scale) + "px" : "";
+    }
+
+    window.ensureCaptcha = function() {
+      if (captchaWidgetId !== null || !window.grecaptcha || !grecaptcha.render) return;
+      captchaWidgetId = grecaptcha.render("recaptcha-box", { sitekey: RECAPTCHA_SITE_KEY });
+      fitCaptcha();
+    };
+    window.addEventListener("resize", fitCaptcha);
+    if (window.grecaptcha && grecaptcha.render) window.ensureCaptcha();
+
+    function resetCaptcha() {
+      try { if (captchaWidgetId !== null) grecaptcha.reset(captchaWidgetId); } catch (err) {}
+    }
 
     const form = document.getElementById("preorderForm");
     const status = document.getElementById("status");
@@ -803,6 +839,16 @@ footer {
 
       event.preventDefault();
 
+      let captchaToken = "";
+      try { if (captchaWidgetId !== null) captchaToken = grecaptcha.getResponse(captchaWidgetId); } catch (err) {}
+      if (!captchaToken) {
+        status.className = "error";
+        status.textContent = captchaWidgetId === null
+          ? "The spam check didn't load. Refresh the page and try again."
+          : "Please check the \"I'm not a robot\" box before placing your preorder.";
+        return;
+      }
+
       successAudio.currentTime = 0;
       successAudio.play().catch(() => {});
 
@@ -826,6 +872,18 @@ footer {
       };
 
       try {
+
+        const checkRes = await fetch(VERIFY_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "verify", recaptchaToken: captchaToken })
+        });
+        const check = await checkRes.json();
+        if (!check.success) {
+          successAudio.pause();
+          status.className = "error";
+          status.textContent = check.error || "Spam check failed. Check the box and try again.";
+          return;
+        }
 
         await fetch(SCRIPT_URL, {
           method: "POST",
@@ -860,6 +918,7 @@ footer {
 
       } finally {
 
+        resetCaptcha();
         submitBtn.disabled = false;
 
       }
