@@ -798,6 +798,22 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
     </div>
 </div>
 
+<!-- reCAPTCHA notice (shown until 10/15/26) -->
+<div class="overlay" id="rc-notice-overlay">
+    <div class="modal-card">
+        <button type="button" class="modal-close" id="rc-notice-close" aria-label="Close">&times;</button>
+        <h2>New: Spam Check on Forms</h2>
+        <p style="color:var(--ink-soft); font-size:0.92rem;">To keep bots out, checkout and the contact, preorder, and testimonials forms now use Google reCAPTCHA. You will see an "I'm not a robot" box before you submit. It is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--rare); font-weight:600;">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color:var(--rare); font-weight:600;">Terms of Service</a> apply.</p>
+        <div class="gf-notice-dont-show">
+            <input type="checkbox" id="rc-notice-dont-show-check">
+            <label for="rc-notice-dont-show-check">Don't show this again</label>
+        </div>
+        <div class="gf-notice-actions">
+            <button type="button" class="btn-light" id="rc-notice-close-btn">Got it</button>
+        </div>
+    </div>
+</div>
+
 <!-- Customize modal -->
 <div class="overlay" id="customize-overlay">
     <div class="modal-card">
@@ -1476,6 +1492,35 @@ renderCartBadge();
   document.querySelector('#gf-notice-overlay a.btn-primary').addEventListener('click', function() {
     if (checkbox.checked) setCookie('gf_retired_notice_dismissed', '1', 30);
   });
+})();
+
+// ---- reCAPTCHA notice (until 10/15/26) ----
+(function() {
+  function getCookie(name) {
+    var match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return match ? decodeURIComponent(match.pop()) : '';
+  }
+  function setCookie(name, value, days) {
+    var expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+  }
+
+  var cutoff = new Date('2026-10-15T23:59:59');
+  if (new Date() > cutoff) return; // notice has expired, never show it
+  if (getCookie('rc_notice_dismissed') === '1') return;
+
+  var overlay = document.getElementById('rc-notice-overlay');
+  var checkbox = document.getElementById('rc-notice-dont-show-check');
+  overlay.classList.add('open');
+
+  function dismiss() {
+    if (checkbox.checked) setCookie('rc_notice_dismissed', '1', 30);
+    overlay.classList.remove('open');
+  }
+
+  document.getElementById('rc-notice-close').addEventListener('click', dismiss);
+  document.getElementById('rc-notice-close-btn').addEventListener('click', dismiss);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) dismiss(); });
 })();
 
 // ---- Easter eggs (shh) ----
