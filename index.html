@@ -1492,7 +1492,11 @@ function giftStatusText() {
   if (!giftCard) return '';
   const t = cartTotals();
   let text = 'Gift card ...' + giftCard.last4 + ' has ' + money(giftCard.balance) + '.';
-  if (cart.length && t.giftUse > 0) text += ' ' + money(t.giftUse) + ' will be used on this order.';
+  if (cart.length && t.giftUse > 0) {
+    if (t.covered) text = 'Gift card ...' + giftCard.last4 + ' covers the full cost.';
+    else if (t.due > 0 && !t.hasTbd) text += ' ' + money(t.giftUse) + ' taken off order. You still need to pay ' + money(t.due) + ' with another payment method.';
+    else text += ' ' + money(t.giftUse) + ' taken off order. You still need to pay the rest with another payment method.';
+  }
   return text;
 }
 
@@ -1579,7 +1583,7 @@ function renderCart() {
   }
   if (t.giftUse > 0) {
     document.getElementById('cart-gift-label').textContent = 'Gift card ...' + giftCard.last4;
-    document.getElementById('cart-gift-amt').textContent = '-' + money(t.giftUse);
+    document.getElementById('cart-gift-amt').textContent = money(t.giftUse) + ' taken off order';
     giftRow.hidden = false;
   } else {
     giftRow.hidden = true;
@@ -1686,7 +1690,7 @@ checkoutForm.addEventListener('submit', e => {
   const orderPayload = {
     name: document.getElementById('cust-name').value,
     email: document.getElementById('cust-email').value,
-    payment: payment ? payment.value : 'Gift card (covers the full total)',
+    payment: cartTotals().covered ? 'Gift card covers the full cost' : (payment ? payment.value : ''),
     notes: document.getElementById('notes').value,
     items: cart,
     promoCode: promo ? promo.code : '',
@@ -1730,7 +1734,7 @@ checkoutForm.addEventListener('submit', e => {
       addRow('Payment', orderPayload.payment);
       addRow('Notes', orderPayload.notes);
       if (usedPromo && usedDiscount > 0) addRow('Promo', usedPromo.code + ' (-' + money(usedDiscount) + ')');
-      if (data.giftUsed > 0) addRow('Gift card', '...' + data.giftLast4 + ' (-' + money(data.giftUsed) + ')');
+      if (data.giftUsed > 0) addRow('Gift card', '...' + data.giftLast4 + ' (' + money(data.giftUsed) + ' taken off order)');
 
       cartOverlay.classList.remove('open');
       summaryPanel.style.display = 'block';
