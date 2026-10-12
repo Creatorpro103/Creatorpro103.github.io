@@ -562,6 +562,8 @@ footer {
 .gf-notice-dont-show label { cursor: pointer; }
 
 .field { margin-bottom: 16px; }
+.payment-note { font-weight: 700; font-size: 0.95rem; padding: 12px 14px; border: 2px solid var(--common); border-radius: 10px; background: rgba(76,154,99,0.12); }
+.payment-note[hidden], #payment-options[hidden] { display: none !important; }
 .field label { display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; }
 .field .hint { font-weight: 400; color: var(--ink-soft); font-size: 0.78rem; }
 
@@ -947,9 +949,10 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
                 <label for="cust-email">Email <span class="hint">(I'll ask questions and let you know when it's ready)</span></label>
                 <input type="email" id="cust-email" required>
             </div>
-            <div class="field">
-                <label>Payment</label>
-                <div class="radio-row">
+            <div class="field" id="payment-field">
+                <label id="payment-label">Payment</label>
+                <p class="payment-note" id="payment-covered" hidden>Card covers the cost</p>
+                <div class="radio-row" id="payment-options">
                     <label><input type="radio" name="payment" value="Venmo (@JenniferNeal1982, last 4 of phone 8675)" required> Venmo (@JenniferNeal1982), last 4 of phone is 8675</label>
                     <label><input type="radio" name="payment" value="Zelle (jks98765@gmail.com)"> Zelle (jks98765@gmail.com)</label>
                     <label><input type="radio" name="payment" value="Cash when ready"> Cash when ready</label>
@@ -1556,8 +1559,31 @@ const cartOverlay = document.getElementById('cart-overlay');
 const cartItemsEl = document.getElementById('cart-items');
 const cartTotalEl = document.getElementById('cart-total');
 
+// A gift card that covers everything hides the payment choices; a partial one says how much is left.
+function applyPaymentMode(t) {
+  const radios = document.querySelectorAll('input[name="payment"]');
+  const label = document.getElementById('payment-label');
+  const note = document.getElementById('payment-covered');
+  const options = document.getElementById('payment-options');
+  const partial = !t.covered && t.giftUse > 0;
+  note.hidden = !t.covered;
+  options.hidden = !!t.covered;
+  radios.forEach((r, i) => {
+    r.disabled = !!t.covered;
+    r.required = (i === 0) && !t.covered;
+  });
+  if (t.covered) {
+    label.textContent = 'Payment';
+  } else if (partial) {
+    label.textContent = t.hasTbd || !(t.due > 0)
+      ? "Your card doesn't cover the full balance, pay the rest with the following payment methods"
+      : "Your card doesn't cover the full balance, pay " + money(t.due) + " with the following payment methods";
+  } else {
+    label.textContent = 'Payment';
+  }
+}
+
 function renderCart() {
-  const payFirst = document.querySelector('input[name="payment"]');
   if (!cart.length) {
     cartItemsEl.innerHTML = '<p class="cart-empty">Your cart is empty. Close this and add something from the lineup.</p>';
     cartTotalEl.textContent = '$0';
@@ -1565,7 +1591,7 @@ function renderCart() {
     document.getElementById('cart-discount-row').hidden = true;
     document.getElementById('cart-gift-row').hidden = true;
     document.getElementById('place-order-btn').disabled = true;
-    if (payFirst) payFirst.required = true;
+    applyPaymentMode({ covered: false, giftUse: 0, due: 0, hasTbd: false });
     return;
   }
   document.getElementById('place-order-btn').disabled = false;
@@ -1604,8 +1630,7 @@ function renderCart() {
   const adjusted = t.discount > 0 || t.giftUse > 0;
   document.getElementById('cart-total-label').textContent = adjusted ? 'Total due' : 'Total';
   cartTotalEl.textContent = (adjusted ? money(t.due) : '$' + t.total) + (t.hasTbd ? ' + TBD' : '');
-  // A gift card that covers everything means no payment method is needed.
-  if (payFirst) payFirst.required = !t.covered;
+  applyPaymentMode(t);
   if (promo) setPromoMsg(promoStatusText(), 'ok');
   if (giftCard) setGiftMsg(giftStatusText(), 'ok');
 }
@@ -1864,7 +1889,7 @@ renderCartBadge();
     konamiPos = (key === KONAMI[konamiPos]) ? konamiPos + 1 : (key === KONAMI[0] ? 1 : 0);
     if (konamiPos === KONAMI.length) {
       konamiPos = 0;
-      showEgg("Konami code, on a keychain site. Respect. You deserve some kind of discount. Don't tell anyone but here is a secret code for $1 off. KONAMICODE123");
+      showEgg("Konami code, on a keychain site. Respect. Five bucks off is tempting to offer but I'm just a static page.");
     }
   });
 
