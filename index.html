@@ -724,6 +724,7 @@ section.promo { padding: 10px 24px 0; text-align: center; }
     padding-top: 10px;
 }
 .cart-discount-row[hidden] { display: none; }
+.gift-balance-note { font-size: 0.8rem; color: var(--ink-soft); margin-top: 6px; text-align: right; }
 
 .error-msg {
     display: none;
@@ -779,7 +780,10 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
 
 <nav class="top">
     <div class="wordmark"><span class="logo-dot" role="button" tabindex="0" aria-label="iPrint logo"></span>iPrint Keychains</div>
-    <a class="navlink" href="#lineup">See what we print</a>
+    <div style="display:flex; gap:22px; align-items:center;">
+        <a class="navlink" href="giftcards">Gift cards</a>
+        <a class="navlink" href="#lineup">See what we print</a>
+    </div>
 </nav>
 
 <header class="hero">
@@ -909,8 +913,17 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
             <p class="promo-msg" id="promo-msg-cart" role="status"></p>
             <button type="button" class="promo-remove" id="promo-remove-cart" hidden>Remove code</button>
         </div>
+        <div class="cart-promo" style="margin-top:10px; padding-top:10px;">
+            <form class="promo-form" id="gift-form-cart">
+                <input type="text" id="gift-input-cart" placeholder="Gift card code (16 digits)" maxlength="24" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="Gift card code">
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </form>
+            <p class="promo-msg" id="gift-msg-cart" role="status"></p>
+            <button type="button" class="promo-remove" id="gift-remove-cart" hidden>Remove gift card</button>
+        </div>
         <div class="cart-discount-row" id="cart-discount-row" hidden><span id="cart-discount-label"></span><span id="cart-discount-amt"></span></div>
-        <div class="cart-total-row"><span>Total</span><span id="cart-total">$0</span></div>
+        <div class="cart-discount-row" id="cart-gift-row" hidden><span id="cart-gift-label"></span><span id="cart-gift-amt"></span></div>
+        <div class="cart-total-row"><span id="cart-total-label">Total</span><span id="cart-total">$0</span></div>
 
         <form id="checkout-form" style="margin-top:22px;">
             <div class="field">
@@ -948,6 +961,8 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
     &middot;
     <a class="footer-link" href="contact">Contact Us</a>
     &middot;
+    <a class="footer-link" href="giftcards">Gift Cards</a>
+    &middot;
     <a class="footer-link" href="terms">Terms</a>
     <span class="secret" id="secret-dot" tabindex="0" role="button" aria-label=""></span>
 </footer>
@@ -967,7 +982,7 @@ const COLORS = [
 const COLOR_CHART_URL = "images/color_options.png";
 
 // Real backend for order submissions.
-const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbxH5MTJxFBpSHh103y6UUW5aUjeLNzBpBE7EL3yvFzsYFGg_Dry0yQIsB0k7DngOMYE/exec";
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzmi2FQogZ1putXsW448osorGNQWty7iPKgxGebOE2LaXJzBC5gLCk2ve_I9VxvUr0J/exec";
 
 function colorChart() {
   return `
@@ -1452,24 +1467,93 @@ function applyPromoFromForm(where) {
   });
 });
 
+// ---- Gift cards ----
+// The code is checked by the Orders script and only kept in memory (never saved).
+// The script checks it again and takes the money off when the order is placed.
+let giftCard = null; // { code (16 digits), last4, balance }
+
+function cartTotals() {
+  let total = 0, hasTbd = false;
+  cart.forEach(item => { if (item.price === null) hasTbd = true; else total += item.price; });
+  const discount = promoDiscount();
+  const afterPromo = Math.max(total - discount, 0);
+  const giftUse = giftCard ? Math.round(Math.min(giftCard.balance, afterPromo) * 100) / 100 : 0;
+  const due = Math.round((afterPromo - giftUse) * 100) / 100;
+  return { total: total, hasTbd: hasTbd, discount: discount, giftUse: giftUse, due: due, covered: !!giftCard && giftUse > 0 && due <= 0 && !hasTbd };
+}
+
+function setGiftMsg(text, kind) {
+  const el = document.getElementById('gift-msg-cart');
+  el.textContent = text || '';
+  el.className = 'promo-msg' + (kind ? ' ' + kind : '');
+}
+
+function giftStatusText() {
+  if (!giftCard) return '';
+  const t = cartTotals();
+  let text = 'Gift card ...' + giftCard.last4 + ' has ' + money(giftCard.balance) + '.';
+  if (cart.length && t.giftUse > 0) text += ' ' + money(t.giftUse) + ' will be used on this order.';
+  return text;
+}
+
+function updateGiftUI() {
+  document.getElementById('gift-remove-cart').hidden = !giftCard;
+  if (giftCard) setGiftMsg(giftStatusText(), 'ok');
+  renderCart();
+}
+
+document.getElementById('gift-form-cart').addEventListener('submit', e => {
+  e.preventDefault();
+  const input = document.getElementById('gift-input-cart');
+  const btn = e.target.querySelector('button');
+  const digits = input.value.replace(/\D/g, '');
+  if (digits.length !== 16) { setGiftMsg('Gift card codes are 16 digits.', 'err'); return; }
+  btn.disabled = true;
+  setGiftMsg('Checking...', '');
+  fetch(ORDERS_API_URL, { method: 'POST', body: JSON.stringify({ action: 'check_giftcard', code: digits }) })
+    .then(res => res.json())
+    .then(data => {
+      btn.disabled = false;
+      if (data.success && data.valid) {
+        giftCard = { code: digits, last4: data.last4, balance: Number(data.balance) };
+        input.value = '';
+        updateGiftUI();
+      } else {
+        setGiftMsg((data && data.error) || "That gift card isn't valid.", 'err');
+      }
+    })
+    .catch(() => {
+      btn.disabled = false;
+      setGiftMsg("Couldn't check the card right now. Try again in a moment.", 'err');
+    });
+});
+
+document.getElementById('gift-remove-cart').addEventListener('click', () => {
+  giftCard = null;
+  document.getElementById('gift-input-cart').value = '';
+  updateGiftUI();
+  setGiftMsg('Gift card removed.', '');
+});
+
 const cartOverlay = document.getElementById('cart-overlay');
 const cartItemsEl = document.getElementById('cart-items');
 const cartTotalEl = document.getElementById('cart-total');
 
 function renderCart() {
+  const payFirst = document.querySelector('input[name="payment"]');
   if (!cart.length) {
     cartItemsEl.innerHTML = '<p class="cart-empty">Your cart is empty. Close this and add something from the lineup.</p>';
     cartTotalEl.textContent = '$0';
+    document.getElementById('cart-total-label').textContent = 'Total';
     document.getElementById('cart-discount-row').hidden = true;
+    document.getElementById('cart-gift-row').hidden = true;
     document.getElementById('place-order-btn').disabled = true;
+    if (payFirst) payFirst.required = true;
     return;
   }
   document.getElementById('place-order-btn').disabled = false;
 
-  let total = 0;
-  let hasTbd = false;
   cartItemsEl.innerHTML = cart.map(item => {
-    if (item.price === null) hasTbd = true; else total += item.price;
     const detailText = item.fields.map(f => f.value).filter(Boolean).join(', ');
     return `
       <div class="cart-item" data-cart-id="${item.cartId}">
@@ -1483,18 +1567,30 @@ function renderCart() {
     `;
   }).join('');
 
-  const discount = promoDiscount();
+  const t = cartTotals();
   const discountRow = document.getElementById('cart-discount-row');
-  if (discount > 0) {
+  const giftRow = document.getElementById('cart-gift-row');
+  if (t.discount > 0) {
     document.getElementById('cart-discount-label').textContent = 'Promo ' + promo.code;
-    document.getElementById('cart-discount-amt').textContent = '-' + money(discount);
+    document.getElementById('cart-discount-amt').textContent = '-' + money(t.discount);
     discountRow.hidden = false;
-    cartTotalEl.textContent = money(total - discount) + (hasTbd ? ' + TBD' : '');
   } else {
     discountRow.hidden = true;
-    cartTotalEl.textContent = '$' + total + (hasTbd ? ' + TBD' : '');
   }
+  if (t.giftUse > 0) {
+    document.getElementById('cart-gift-label').textContent = 'Gift card ...' + giftCard.last4;
+    document.getElementById('cart-gift-amt').textContent = '-' + money(t.giftUse);
+    giftRow.hidden = false;
+  } else {
+    giftRow.hidden = true;
+  }
+  const adjusted = t.discount > 0 || t.giftUse > 0;
+  document.getElementById('cart-total-label').textContent = adjusted ? 'Total due' : 'Total';
+  cartTotalEl.textContent = (adjusted ? money(t.due) : '$' + t.total) + (t.hasTbd ? ' + TBD' : '');
+  // A gift card that covers everything means no payment method is needed.
+  if (payFirst) payFirst.required = !t.covered;
   if (promo) setPromoMsg(promoStatusText(), 'ok');
+  if (giftCard) setGiftMsg(giftStatusText(), 'ok');
 }
 
 cartItemsEl.addEventListener('click', e => {
@@ -1564,7 +1660,7 @@ checkoutForm.addEventListener('submit', e => {
   if (!checkoutForm.reportValidity()) return;
 
   const payment = document.querySelector('input[name="payment"]:checked');
-  if (!payment) {
+  if (!payment && !cartTotals().covered) {
     checkoutError.textContent = 'Choose a payment method.';
     checkoutError.style.display = 'block';
     return;
@@ -1590,14 +1686,16 @@ checkoutForm.addEventListener('submit', e => {
   const orderPayload = {
     name: document.getElementById('cust-name').value,
     email: document.getElementById('cust-email').value,
-    payment: payment.value,
+    payment: payment ? payment.value : 'Gift card (covers the full total)',
     notes: document.getElementById('notes').value,
     items: cart,
     promoCode: promo ? promo.code : '',
+    giftCardCode: giftCard ? giftCard.code : '',
     recaptchaToken: captchaToken
   };
   const usedPromo = promo;
   const usedDiscount = promoDiscount();
+  const usedGift = giftCard;
 
   fetch(ORDERS_API_URL, {
     method: 'POST',
@@ -1632,6 +1730,7 @@ checkoutForm.addEventListener('submit', e => {
       addRow('Payment', orderPayload.payment);
       addRow('Notes', orderPayload.notes);
       if (usedPromo && usedDiscount > 0) addRow('Promo', usedPromo.code + ' (-' + money(usedDiscount) + ')');
+      if (data.giftUsed > 0) addRow('Gift card', '...' + data.giftLast4 + ' (-' + money(data.giftUsed) + ')');
 
       cartOverlay.classList.remove('open');
       summaryPanel.style.display = 'block';
@@ -1641,6 +1740,12 @@ checkoutForm.addEventListener('submit', e => {
       // not just because the checkout form was submitted.
       cart = [];
       saveCart();
+      if (usedGift) {
+        giftCard = null;
+        document.getElementById('gift-input-cart').value = '';
+        document.getElementById('gift-remove-cart').hidden = true;
+        setGiftMsg('', '');
+      }
       if (usedPromo) {
         promo = null;
         ['home', 'cart'].forEach(w => {
