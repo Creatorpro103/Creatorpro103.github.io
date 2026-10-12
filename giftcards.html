@@ -68,7 +68,7 @@ header.hero { max-width: 720px; margin: 0 auto; padding: 20px 24px 36px; text-al
 header.hero h1 { font-size: clamp(2.2rem, 5vw, 3.3rem); line-height: 1.05; text-transform: uppercase; margin-bottom: 14px; }
 header.hero p { color: var(--ink-soft); font-size: 1.05rem; max-width: 46ch; margin: 0 auto; }
 
-main { flex: 1; display: flex; justify-content: center; padding: 0 24px 90px; }
+main { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 0 24px 90px; }
 
 .form-card {
     width: 100%;
@@ -147,6 +147,11 @@ button.submit:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var
 button.submit:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
 button.submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: 4px 4px 0 var(--ink); }
 
+#bal-result { margin-top: 18px; text-align: center; font-weight: 600; font-size: 0.95rem; min-height: 1.2em; }
+#bal-result.error { color: #B3261E; }
+#bal-result .bal-amt { display: block; font-family: 'Anton', sans-serif; font-size: 2.6rem; line-height: 1.1; margin: 6px 0 2px; }
+#bal-result .bal-sub { color: var(--ink-soft); font-weight: 500; font-size: 0.85rem; }
+#bal-code { letter-spacing: 0.06em; }
 #status { margin-top: 16px; text-align: center; font-weight: 700; font-size: 0.92rem; min-height: 1.2em; }
 #status.error { color: #7A2A21; }
 #status.loading { color: var(--ink-soft); }
@@ -199,7 +204,7 @@ footer { border-top: 3px solid var(--ink); padding: 32px 24px 44px; text-align: 
 
 <header class="hero">
     <h1>Gift cards</h1>
-    <p>Give someone the keychain of their choice. They use the code at checkout, and any balance left over stays on the card.</p>
+    <p>Give someone the keychain of their choice. They use the code at checkout, and any balance left over stays on the card. Already have a card? You can check its balance below.</p>
 </header>
 
 <main>
@@ -263,6 +268,17 @@ footer { border-top: 3px solid var(--ink); padding: 32px 24px 44px; text-align: 
             <p>The card turns on as soon as your payment is confirmed, and the code is emailed to <strong id="doneTo"></strong>. We also sent a copy of these details to <strong id="doneBuyer"></strong>.</p>
             <button type="button" class="btn-again" id="againBtn">Buy another</button>
         </div>
+    </div>
+
+    <div class="form-card" id="balanceCard">
+        <h2>Check a balance</h2>
+        <p class="subtitle">Enter the 16-digit code to see what is left on a card.</p>
+        <form id="balForm" novalidate>
+            <label class="lbl" for="bal-code" style="margin-top:0;">Gift card code</label>
+            <input type="text" id="bal-code" inputmode="numeric" maxlength="19" autocomplete="off" spellcheck="false" placeholder="0000 0000 0000 0000">
+            <button type="submit" class="submit" id="balBtn">Check balance</button>
+        </form>
+        <div id="bal-result" role="status" aria-live="polite"></div>
     </div>
 </main>
 
@@ -402,6 +418,56 @@ form.addEventListener("submit", function(event) {
       resetCaptcha();
       submitBtn.disabled = false;
       showError("Couldn't reach the server. Check your connection and try again.");
+    });
+});
+
+// ---- balance check ----
+const balCode = document.getElementById("bal-code");
+const balResult = document.getElementById("bal-result");
+const balBtn = document.getElementById("balBtn");
+
+balCode.addEventListener("input", () => {
+  const d = balCode.value.replace(/\D/g, "").slice(0, 16);
+  balCode.value = d.replace(/(.{4})(?=.)/g, "$1 ");
+});
+
+function balError(text) {
+  balResult.className = "error";
+  balResult.textContent = text;
+}
+
+document.getElementById("balForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  balResult.className = "";
+  balResult.textContent = "";
+  const digits = balCode.value.replace(/\D/g, "");
+  if (digits.length !== 16) return balError("Enter all 16 digits of the gift card code.");
+
+  balBtn.disabled = true;
+  balResult.textContent = "Checking...";
+  fetch(ORDERS_API_URL, { method: "POST", body: JSON.stringify({ action: "check_giftcard", code: digits }) })
+    .then(res => res.json())
+    .then(data => {
+      balBtn.disabled = false;
+      if (data && data.success && data.valid) {
+        balResult.className = "";
+        balResult.innerHTML = "";
+        const amt = document.createElement("span");
+        amt.className = "bal-amt";
+        amt.textContent = "$" + Number(data.balance).toFixed(2);
+        const sub = document.createElement("span");
+        sub.className = "bal-sub";
+        sub.textContent = "left on card ending in " + data.last4;
+        balResult.appendChild(document.createTextNode("Balance"));
+        balResult.appendChild(amt);
+        balResult.appendChild(sub);
+      } else {
+        balError((data && data.error) || "We couldn't find that gift card.");
+      }
+    })
+    .catch(() => {
+      balBtn.disabled = false;
+      balError("Couldn't reach the server. Check your connection and try again.");
     });
 });
 
