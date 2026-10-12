@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gift Cards - iPrint Keychains</title>
+<meta name="description" content="Buy an iPrint Keychains gift card for someone. Pick an amount, and the code is emailed once payment is confirmed.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
+
+<script>
+window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCaptcha(); };
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --common: #4C9A63;
+    --rare: #3E7CB1;
+    --epic: #8B5FBF;
+    --gold: #C9971F;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--kraft);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+h1, h2, .display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--rare);
+    outline-offset: 3px;
+}
+
+nav.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 26px 24px;
+    width: 100%;
+}
+.wordmark { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; text-decoration: none; color: inherit; font-weight: 600; }
+.logo-dot { width: 20px; height: 26px; border-radius: 4px; background: var(--rare); border: 2.5px solid var(--ink); }
+.navlink { text-decoration: none; font-weight: 600; font-size: 0.95rem; border-bottom: 2px solid transparent; }
+.navlink:hover { border-color: var(--ink); }
+
+header.hero { max-width: 720px; margin: 0 auto; padding: 20px 24px 36px; text-align: center; }
+header.hero h1 { font-size: clamp(2.2rem, 5vw, 3.3rem); line-height: 1.05; text-transform: uppercase; margin-bottom: 14px; }
+header.hero p { color: var(--ink-soft); font-size: 1.05rem; max-width: 46ch; margin: 0 auto; }
+
+main { flex: 1; display: flex; justify-content: center; padding: 0 24px 90px; }
+
+.form-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--face);
+    border: 4px solid var(--ink);
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 rgba(43,32,18,0.3);
+    padding: 32px 30px 34px;
+}
+.form-card h2 { font-size: 1.5rem; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
+.form-card > p.subtitle { text-align: center; color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 20px; }
+
+label.lbl { display: block; margin-top: 18px; margin-bottom: 6px; font-weight: 700; font-size: 0.9rem; }
+.hint { font-size: 0.78rem; font-weight: 400; color: var(--ink-soft); display: block; margin-top: -2px; margin-bottom: 6px; }
+
+input[type="text"], input[type="email"], input[type="number"], textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--kraft-line);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background: var(--kraft);
+}
+input:focus, textarea:focus { border-color: var(--rare); background: var(--face); outline: none; }
+textarea { height: 84px; resize: vertical; }
+
+.amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.amt-btn {
+    padding: 14px 0;
+    border: 2.5px solid var(--ink);
+    border-radius: 10px;
+    background: var(--kraft);
+    font-family: 'Anton', sans-serif;
+    font-size: 1.3rem;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.amt-btn:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
+.amt-btn[aria-pressed="true"] { background: var(--rare); color: var(--face); box-shadow: 3px 3px 0 var(--ink); }
+.custom-amt { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.custom-amt span { font-weight: 700; }
+.custom-amt input { max-width: 150px; }
+
+.radio-row label { display: flex; align-items: flex-start; gap: 8px; font-weight: 500; font-size: 0.9rem; margin-bottom: 8px; cursor: pointer; }
+.radio-row input { width: 17px; height: 17px; margin-top: 3px; accent-color: var(--rare); }
+
+.counter { font-size: 0.75rem; color: var(--ink-soft); text-align: right; margin-top: 2px; }
+
+.captcha-field { margin-top: 22px; overflow: hidden; }
+.captcha-field > div { transform-origin: 0 0; }
+
+.terms-note { font-size: 0.78rem; color: var(--ink-soft); text-align: center; margin-top: 16px; }
+.terms-note a { color: var(--rare); font-weight: 600; }
+
+button.submit {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2.5px solid var(--ink);
+    background: var(--rare);
+    color: var(--face);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+button.submit:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+button.submit:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--ink); }
+button.submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: 4px 4px 0 var(--ink); }
+
+#status { margin-top: 16px; text-align: center; font-weight: 700; font-size: 0.92rem; min-height: 1.2em; }
+#status.error { color: #7A2A21; }
+#status.loading { color: var(--ink-soft); }
+
+/* success panel */
+#done { display: none; text-align: center; }
+#done h2 { margin-bottom: 8px; }
+.done-card {
+    margin: 20px 0;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    background: var(--kraft);
+    padding: 18px;
+}
+.done-card .big { font-family: 'Anton', sans-serif; font-size: 2.6rem; line-height: 1.1; }
+.done-card .small { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+#done p { color: var(--ink-soft); font-size: 0.95rem; margin-bottom: 10px; }
+#done p strong { color: var(--ink); }
+.btn-again {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 11px 22px;
+    border-radius: 10px;
+    border: 2.5px solid var(--ink);
+    background: var(--face);
+    color: var(--ink);
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+footer { border-top: 3px solid var(--ink); padding: 32px 24px 44px; text-align: center; font-size: 0.9rem; }
+.footer-link { text-decoration: none; color: var(--ink-soft); font-weight: 600; border-bottom: 2px solid transparent; }
+.footer-link:hover { border-color: var(--ink-soft); }
+
+@media (max-width: 520px) {
+    .form-card { padding: 26px 20px 30px; }
+    .amt-btn { font-size: 1.1rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+</style>
+</head>
+<body>
+
+<nav class="top">
+    <a class="wordmark" href="index"><span class="logo-dot" aria-hidden="true"></span>iPrint Keychains</a>
+    <a class="navlink" href="index">Back to shop</a>
+</nav>
+
+<header class="hero">
+    <h1>Gift cards</h1>
+    <p>Give someone the keychain of their choice. They use the code at checkout, and any balance left over stays on the card.</p>
+</header>
+
+<main>
+    <div class="form-card">
+        <div id="formWrap">
+            <h2>Buy a gift card</h2>
+            <p class="subtitle">Pick an amount and fill in the details. After you pay, the card is activated and the code is emailed.</p>
+
+            <form id="giftForm" novalidate>
+                <label class="lbl" style="margin-top:0;">Amount</label>
+                <div class="amounts" id="amounts">
+                    <button type="button" class="amt-btn" data-amt="10" aria-pressed="false">$10</button>
+                    <button type="button" class="amt-btn" data-amt="15" aria-pressed="false">$15</button>
+                    <button type="button" class="amt-btn" data-amt="25" aria-pressed="false">$25</button>
+                    <button type="button" class="amt-btn" data-amt="50" aria-pressed="false">$50</button>
+                </div>
+                <div class="custom-amt">
+                    <span>Or enter your own: $</span>
+                    <input type="number" id="customAmt" min="5" max="200" step="1" inputmode="numeric" placeholder="5 to 200" aria-label="Custom amount in dollars">
+                </div>
+
+                <label class="lbl" for="buyerName">Your name</label>
+                <input type="text" id="buyerName" maxlength="100" autocomplete="name" required>
+
+                <label class="lbl" for="buyerEmail">Your email</label>
+                <input type="email" id="buyerEmail" maxlength="150" autocomplete="email" required>
+
+                <label class="lbl" for="recipientName">Who is it for? <span style="font-weight:400; color:var(--ink-soft);">(optional)</span></label>
+                <input type="text" id="recipientName" maxlength="100">
+
+                <label class="lbl" for="recipientEmail">Their email <span style="font-weight:400; color:var(--ink-soft);">(optional)</span></label>
+                <span class="hint">If you add it, the code is emailed to them. If you leave it blank, it is emailed to you so you can pass it along.</span>
+                <input type="email" id="recipientEmail" maxlength="150">
+
+                <label class="lbl" for="message">Message <span style="font-weight:400; color:var(--ink-soft);">(optional)</span></label>
+                <textarea id="message" maxlength="300" placeholder="Happy birthday!"></textarea>
+                <div class="counter"><span id="msgCount">0</span>/300</div>
+
+                <label class="lbl">How will you pay?</label>
+                <div class="radio-row">
+                    <label><input type="radio" name="payment" value="Venmo (@JenniferNeal1982, last 4 of phone 8675)"> Venmo (@JenniferNeal1982), last 4 of phone is 8675</label>
+                    <label><input type="radio" name="payment" value="Zelle (jks98765@gmail.com)"> Zelle (jks98765@gmail.com)</label>
+                    <label><input type="radio" name="payment" value="Cash when ready"> Cash when ready</label>
+                </div>
+
+                <div class="captcha-field"><div id="recaptcha-box"></div></div>
+
+                <p class="terms-note">By requesting a gift card you agree to the <a href="terms" target="_blank" rel="noopener">Terms of Service</a>.</p>
+                <button type="submit" class="submit" id="submitBtn">Request gift card</button>
+            </form>
+            <div id="status" role="status"></div>
+        </div>
+
+        <div id="done" aria-live="polite">
+            <h2>Request received</h2>
+            <div class="done-card">
+                <div class="small">Gift card</div>
+                <div class="big" id="doneAmount">$0</div>
+            </div>
+            <p>Now pay with <strong id="donePayment"></strong>.</p>
+            <p>The card turns on as soon as your payment is confirmed, and the code is emailed to <strong id="doneTo"></strong>. We also sent a copy of these details to <strong id="doneBuyer"></strong>.</p>
+            <button type="button" class="btn-again" id="againBtn">Buy another</button>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <a class="footer-link" href="index">Home</a>
+    &middot;
+    <a class="footer-link" href="testimonials">Testimonials</a>
+    &middot;
+    <a class="footer-link" href="contact">Contact Us</a>
+    &middot;
+    <a class="footer-link" href="terms">Terms</a>
+</footer>
+
+<script>
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzmi2FQogZ1putXsW448osorGNQWty7iPKgxGebOE2LaXJzBC5gLCk2ve_I9VxvUr0J/exec";
+const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
+const MIN_AMT = 5, MAX_AMT = 200;
+
+let captchaWidgetId = null;
+
+function fitCaptcha() {
+  const box = document.getElementById("recaptcha-box");
+  const wrap = box.parentElement;
+  const avail = wrap.clientWidth;
+  const scale = avail > 0 && avail < 304 ? avail / 304 : 1;
+  box.style.transform = scale < 1 ? "scale(" + scale + ")" : "";
+  wrap.style.height = scale < 1 ? Math.ceil(78 * scale) + "px" : "";
+}
+
+window.ensureCaptcha = function() {
+  if (captchaWidgetId !== null || !window.grecaptcha || !grecaptcha.render) return;
+  captchaWidgetId = grecaptcha.render("recaptcha-box", { sitekey: RECAPTCHA_SITE_KEY });
+  fitCaptcha();
+};
+window.addEventListener("resize", fitCaptcha);
+if (window.grecaptcha && grecaptcha.render) window.ensureCaptcha();
+
+function resetCaptcha() {
+  try { if (captchaWidgetId !== null) grecaptcha.reset(captchaWidgetId); } catch (err) {}
+}
+
+// ---- amount picker ----
+let amount = 0;
+const amtButtons = document.querySelectorAll(".amt-btn");
+const customAmt = document.getElementById("customAmt");
+
+function paintAmount() {
+  amtButtons.forEach(b => b.setAttribute("aria-pressed", String(Number(b.dataset.amt) === amount && customAmt.value === "")));
+}
+amtButtons.forEach(b => b.addEventListener("click", () => {
+  amount = Number(b.dataset.amt);
+  customAmt.value = "";
+  paintAmount();
+}));
+customAmt.addEventListener("input", () => {
+  amount = customAmt.value === "" ? 0 : Number(customAmt.value);
+  paintAmount();
+});
+
+const message = document.getElementById("message");
+message.addEventListener("input", () => { document.getElementById("msgCount").textContent = message.value.length; });
+
+// ---- submit ----
+const form = document.getElementById("giftForm");
+const statusEl = document.getElementById("status");
+const submitBtn = document.getElementById("submitBtn");
+
+function showError(text) {
+  statusEl.className = "error";
+  statusEl.textContent = text;
+}
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+  statusEl.className = "";
+  statusEl.textContent = "";
+
+  const buyerName = document.getElementById("buyerName").value.trim();
+  const buyerEmail = document.getElementById("buyerEmail").value.trim();
+  const recipientName = document.getElementById("recipientName").value.trim();
+  const recipientEmail = document.getElementById("recipientEmail").value.trim();
+  const payment = document.querySelector('input[name="payment"]:checked');
+  const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+  if (!(amount >= MIN_AMT && amount <= MAX_AMT) || Math.floor(amount) !== amount) {
+    return showError("Pick an amount, or enter a whole dollar amount from $" + MIN_AMT + " to $" + MAX_AMT + ".");
+  }
+  if (!buyerName) return showError("Add your name.");
+  if (!buyerEmail || !emailOk(buyerEmail)) return showError("Enter a valid email for yourself.");
+  if (recipientEmail && !emailOk(recipientEmail)) return showError("The recipient's email doesn't look right.");
+  if (!payment) return showError("Choose how you will pay.");
+
+  if (captchaWidgetId === null || !window.grecaptcha) {
+    return showError("The spam check didn't load. Refresh the page and try again.");
+  }
+  const captchaToken = grecaptcha.getResponse(captchaWidgetId);
+  if (!captchaToken) {
+    return showError('Please check the "I\'m not a robot" box before sending your request.');
+  }
+
+  statusEl.className = "loading";
+  statusEl.textContent = "Sending...";
+  submitBtn.disabled = true;
+
+  fetch(ORDERS_API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "buy_giftcard",
+      amount: amount,
+      buyerName: buyerName,
+      buyerEmail: buyerEmail,
+      recipientName: recipientName,
+      recipientEmail: recipientEmail,
+      message: message.value.trim(),
+      payment: payment.value,
+      recaptchaToken: captchaToken
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      resetCaptcha();
+      submitBtn.disabled = false;
+      if (!data.success) {
+        return showError(data.error || "Something went wrong. Please try again.");
+      }
+      statusEl.className = "";
+      statusEl.textContent = "";
+      document.getElementById("doneAmount").textContent = "$" + data.amount;
+      document.getElementById("donePayment").textContent = payment.value;
+      document.getElementById("doneTo").textContent = recipientEmail || buyerEmail;
+      document.getElementById("doneBuyer").textContent = buyerEmail;
+      document.getElementById("formWrap").style.display = "none";
+      document.getElementById("done").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    })
+    .catch(() => {
+      resetCaptcha();
+      submitBtn.disabled = false;
+      showError("Couldn't reach the server. Check your connection and try again.");
+    });
+});
+
+document.getElementById("againBtn").addEventListener("click", () => {
+  form.reset();
+  amount = 0;
+  document.getElementById("msgCount").textContent = "0";
+  paintAmount();
+  document.getElementById("done").style.display = "none";
+  document.getElementById("formWrap").style.display = "block";
+  fitCaptcha();
+});
+</script>
+
+</body>
+</html>
