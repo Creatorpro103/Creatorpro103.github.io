@@ -1361,8 +1361,9 @@ customizeForm.addEventListener('submit', e => {
 // ---- Promo codes ----
 // Codes are checked by the Orders script (they are never in this page), and the
 // script re-checks and applies the discount again when the order is placed.
-const PROMO_COOKIE = 'ipk_promo';
-let promo = null; // { code, type, value, minSubtotal, label }
+let promo = null; // { code, type, value, minSubtotal, label }. Kept in memory only, never saved.
+// Clear any promo cookie left over from an earlier version of the page.
+document.cookie = 'ipk_promo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
 
 function money(n) {
   return '$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, '');
@@ -1409,7 +1410,6 @@ function updatePromoUI() {
 
 function setPromo(p) {
   promo = p;
-  setCookie(PROMO_COOKIE, p ? p.code : '', p ? 7 : -1);
   updatePromoUI();
 }
 
@@ -1643,7 +1643,6 @@ checkoutForm.addEventListener('submit', e => {
       saveCart();
       if (usedPromo) {
         promo = null;
-        setCookie(PROMO_COOKIE, '', -1);
         ['home', 'cart'].forEach(w => {
           document.getElementById('promo-input-' + w).value = '';
           document.getElementById('promo-remove-' + w).hidden = true;
@@ -1661,18 +1660,6 @@ checkoutForm.addEventListener('submit', e => {
 });
 
 renderCartBadge();
-
-// Restore a promo code applied earlier (re-checked with the server first).
-(function() {
-  const saved = getCookie(PROMO_COOKIE);
-  if (!saved) return;
-  checkPromoCode(saved)
-    .then(data => {
-      if (data.success && data.valid) setPromo(data.promo);
-      else setCookie(PROMO_COOKIE, '', -1);
-    })
-    .catch(() => {});
-})();
 
 // ---- Google Form retirement notice ----
 (function() {
