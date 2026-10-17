@@ -401,7 +401,7 @@ form.addEventListener('submit', e => {
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = photos.length ? 'Sending photos...' : 'Sending...';
+  submitBtn.textContent = 'Sending message...';
 
   const payload = {
     name: document.getElementById('c-name').value,
