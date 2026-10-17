@@ -104,6 +104,41 @@ header.hero p { color: var(--ink-soft); margin-top: 10px; max-width: 48ch; }
     font-family: 'Inter', sans-serif;
 }
 
+.opt { font-weight: 500; color: var(--ink-soft); }
+
+.drop {
+    border: 2px dashed rgba(43,32,18,0.35);
+    border-radius: 10px;
+    background: var(--kraft);
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: background .15s ease, border-color .15s ease;
+}
+.drop small { display: block; margin-top: 4px; font-weight: 500; font-size: 0.78rem; color: var(--ink-soft); }
+.drop u { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.drop:hover, .drop.over { background: #E6D8BC; border-color: var(--rare); }
+.drop:focus-visible { outline: 3px solid var(--rare); outline-offset: 3px; }
+.drop.full { opacity: .55; cursor: not-allowed; }
+
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; margin-top: 12px; }
+.thumbs:empty { display: none; }
+.thumb { position: relative; aspect-ratio: 1; border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; background: var(--kraft); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb.busy::after { content: ""; position: absolute; inset: 0; background: rgba(255,253,247,.7); }
+.thumb .x {
+    position: absolute; top: 4px; right: 4px; z-index: 2;
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--ink); background: var(--face); color: var(--ink);
+    font-weight: 800; font-size: 14px; line-height: 1; cursor: pointer; padding: 0;
+}
+.thumb .x:hover { background: var(--gold); }
+.thumb .x:focus-visible { outline: 3px solid var(--rare); outline-offset: 2px; }
+.file-msg { font-size: 0.8rem; color: var(--ink-soft); margin-top: 8px; min-height: 1.1em; }
+.file-msg.err { color: #A33; font-weight: 600; }
+
 .captcha-field { overflow: hidden; }
 .captcha-field > div { transform-origin: 0 0; }
 
@@ -167,6 +202,16 @@ footer {
                 <label for="c-message">Message</label>
                 <textarea id="c-message" required></textarea>
             </div>
+            <div class="field">
+                <label for="c-files">Photos <span class="opt">(optional, up to 4)</span></label>
+                <div class="drop" id="drop" tabindex="0" role="button" aria-label="Add photos. Drop images here or choose files.">
+                    Drop images here or <u>choose files</u>
+                    <small>Photos and screenshots work. Large photos are resized automatically.</small>
+                </div>
+                <input type="file" id="c-files" accept="image/*" multiple hidden>
+                <div class="thumbs" id="thumbs"></div>
+                <div class="file-msg" id="file-msg" role="status"></div>
+            </div>
             <div class="field captcha-field"><div id="recaptcha-box"></div></div>
             <button type="submit" class="submit-btn" id="submit-btn">Send Message</button>
         </form>
@@ -182,9 +227,16 @@ footer {
 </footer>
 
 <script>
-// Script 1: checks the reCAPTCHA token. Script 2: emails the message.
-const VERIFY_API_URL = "https://script.google.com/macros/s/AKfycbyV25a1hJjEpSDqEDhnsHT1s4LLWK2Z-eBhxdTwP1ILM8nFJ5Pi5yJxRhVYPjRfe1a0/exec";
-const CONTACT_API_URL = "https://script.google.com/macros/s/AKfycbzd2AkBA_sDvBGyMqsnEDap4hKyJZ7ScC-EvEAUzWbIoixbR-V0JXGSjyvArMwUhnZOOw/exec";
+// One script now checks the reCAPTCHA token AND emails the message with any attached photos.
+// This must be the deployment of ContactCode.gs (the script with the reCAPTCHA secret).
+const CONTACT_API_URL = "https://script.google.com/macros/s/AKfycbysYi7kmgIx6iFL_vSlPQUJ1pxUSUsPKTtWpQspU_P_Rgo3XpZB-okI970f0qjjhntV3A/exec";
+
+// Photo limits (the script enforces the same limits again).
+const MAX_FILES = 4;
+const MAX_PICK_BYTES = 25 * 1024 * 1024;   // largest original photo we will even try to read
+const MAX_SIDE = 1600;                     // photos are scaled down to this many pixels on the long side
+const JPEG_QUALITY = 0.82;
+const MAX_SEND_BYTES = 9 * 1024 * 1024;    // all photos together, after resizing
 
 const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
 let captchaWidgetId = null;
@@ -214,10 +266,129 @@ const form = document.getElementById('contact-form');
 const status = document.getElementById('status');
 const submitBtn = document.getElementById('submit-btn');
 
+// ---------- photo attachments ----------
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('c-files');
+const thumbs = document.getElementById('thumbs');
+const fileMsg = document.getElementById('file-msg');
+let photos = [];          // { id, name, b64, mime, bytes, url, ready }
+let nextId = 1;
+
+function say(msg, isErr) { fileMsg.textContent = msg || ''; fileMsg.className = 'file-msg' + (isErr ? ' err' : ''); }
+function stripExt(n) { return String(n || 'photo').replace(/\.[^.]*$/, ''); }
+function readB64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1] || '');
+    r.onerror = () => reject(new Error('read'));
+    r.readAsDataURL(blob);
+  });
+}
+
+// Scales a photo down and turns it into a JPEG. If the browser can't read the image
+// (for example some iPhone HEIC files), a small original is sent as it is.
+async function prepare(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+    const w = Math.max(1, Math.round(bmp.width * scale)), h = Math.max(1, Math.round(bmp.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);   // so transparent PNGs don't turn black
+    ctx.drawImage(bmp, 0, 0, w, h);
+    if (bmp.close) bmp.close();
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', JPEG_QUALITY));
+    if (!blob) throw new Error('encode');
+    return { blob, mime: 'image/jpeg', name: stripExt(file.name) + '.jpg' };
+  } catch (err) {
+    if (file.size <= 4 * 1024 * 1024) return { blob: file, mime: file.type || 'image/jpeg', name: file.name };
+    throw new Error("Couldn't read " + (file.name || 'that image') + '. Try a JPG or PNG.');
+  }
+}
+
+function refreshDrop() { drop.classList.toggle('full', photos.length >= MAX_FILES); }
+
+function renderThumb(p) {
+  const el = document.createElement('div');
+  el.className = 'thumb busy'; el.dataset.id = p.id;
+  const img = document.createElement('img'); img.alt = ''; img.src = p.url;
+  const x = document.createElement('button');
+  x.type = 'button'; x.className = 'x'; x.textContent = '\u00d7'; x.setAttribute('aria-label', 'Remove ' + p.name);
+  x.addEventListener('click', () => removePhoto(p.id));
+  el.appendChild(img); el.appendChild(x);
+  thumbs.appendChild(el);
+  return el;
+}
+
+function removePhoto(id) {
+  const p = photos.find(q => q.id === id);
+  if (p && p.url) URL.revokeObjectURL(p.url);
+  photos = photos.filter(q => q.id !== id);
+  const el = thumbs.querySelector('[data-id="' + id + '"]');
+  if (el) el.remove();
+  refreshDrop();
+  say('');
+}
+
+async function addFiles(fileList) {
+  const files = Array.from(fileList || []);
+  say('');
+  for (const file of files) {
+    if (photos.length >= MAX_FILES) { say('You can attach up to ' + MAX_FILES + ' photos.', true); break; }
+    if (!/^image\//.test(file.type) && !/\.(heic|heif|jpe?g|png|gif|webp)$/i.test(file.name || '')) { say('Only images can be attached.', true); continue; }
+    if (file.size > MAX_PICK_BYTES) { say((file.name || 'That image') + ' is too large.', true); continue; }
+    const p = { id: nextId++, name: file.name || 'photo', ready: false, url: URL.createObjectURL(file) };
+    photos.push(p);
+    const el = renderThumb(p);
+    refreshDrop();
+    try {
+      const out = await prepare(file);
+      p.b64 = await readB64(out.blob);
+      p.mime = out.mime; p.name = out.name; p.bytes = out.blob.size; p.ready = true;
+      el.classList.remove('busy');
+    } catch (err) {
+      removePhoto(p.id);
+      say(err.message || "Couldn't read that image.", true);
+    }
+  }
+  fileInput.value = '';
+}
+
+drop.addEventListener('click', () => { if (photos.length < MAX_FILES) fileInput.click(); });
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); drop.click(); } });
+fileInput.addEventListener('change', () => addFiles(fileInput.files));
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => addFiles(e.dataTransfer && e.dataTransfer.files));
+// Pasting a screenshot into the message box works too.
+document.getElementById('c-message').addEventListener('paste', e => {
+  const items = (e.clipboardData && e.clipboardData.files) || [];
+  if (items.length) { addFiles(items); }
+});
+
+function clearPhotos() {
+  photos.forEach(p => p.url && URL.revokeObjectURL(p.url));
+  photos = []; thumbs.innerHTML = ''; refreshDrop(); say('');
+}
+
+// ---------- send ----------
 form.addEventListener('submit', e => {
   e.preventDefault();
   status.className = 'status-msg';
   status.textContent = '';
+
+  if (photos.some(p => !p.ready)) {
+    status.textContent = 'Your photos are still getting ready. Try again in a moment.';
+    status.className = 'status-msg error';
+    return;
+  }
+  const total = photos.reduce((n, p) => n + p.bytes, 0);
+  if (total > MAX_SEND_BYTES) {
+    status.textContent = 'Your photos are too large together. Remove one and try again.';
+    status.className = 'status-msg error';
+    return;
+  }
 
   let captchaToken = '';
   try { if (captchaWidgetId !== null) captchaToken = grecaptcha.getResponse(captchaWidgetId); } catch (err) {}
@@ -230,26 +401,18 @@ form.addEventListener('submit', e => {
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending...';
+  submitBtn.textContent = photos.length ? 'Sending photos...' : 'Sending...';
 
   const payload = {
     name: document.getElementById('c-name').value,
     email: document.getElementById('c-email').value,
-    message: document.getElementById('c-message').value
+    message: document.getElementById('c-message').value,
+    recaptchaToken: captchaToken,
+    attachments: photos.map(p => ({ name: p.name, type: p.mime, data: p.b64 }))
   };
 
-  fetch(VERIFY_API_URL, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'verify', recaptchaToken: captchaToken })
-  })
+  fetch(CONTACT_API_URL, { method: 'POST', body: JSON.stringify(payload) })
     .then(res => res.json())
-    .then(check => {
-      if (!check.success) return check;
-      return fetch(CONTACT_API_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      }).then(res => res.json());
-    })
     .then(data => {
       resetCaptcha();
       submitBtn.disabled = false;
@@ -264,6 +427,7 @@ form.addEventListener('submit', e => {
       status.textContent = "Message sent! I'll get back to you soon.";
       status.className = 'status-msg success';
       form.reset();
+      clearPhotos();
     })
     .catch(() => {
       resetCaptcha();
