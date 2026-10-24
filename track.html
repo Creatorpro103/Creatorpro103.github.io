@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Your Order - iPrint Keychains</title>
+<meta name="description" content="Check the status of your iPrint Keychains order with your email and tracking code.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%238B5FBF' width='100' height='100' rx='20'/><text x='50' y='68' font-size='58' font-weight='700' fill='white' text-anchor='middle' font-family='Arial'>I</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --kraft: #ECE0C8;
+    --kraft-line: rgba(43,32,18,0.14);
+    --ink: #2B2012;
+    --ink-soft: rgba(43,32,18,0.66);
+    --face: #FFFDF7;
+    --common: #4C9A63;
+    --rare: #3E7CB1;
+    --gold: #C9971F;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--kraft); color: var(--ink); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+h1, h2, .display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--rare); outline-offset: 3px; }
+
+nav.top { display: flex; align-items: center; justify-content: space-between; max-width: 1120px; margin: 0 auto; padding: 26px 24px; width: 100%; }
+.wordmark { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; text-decoration: none; color: inherit; font-weight: 600; }
+.logo-dot { width: 20px; height: 26px; border-radius: 4px; background: var(--rare); border: 2.5px solid var(--ink); }
+.navlink { text-decoration: none; font-weight: 600; font-size: 0.95rem; border-bottom: 2px solid transparent; }
+.navlink:hover { border-color: var(--ink); }
+
+header.hero { max-width: 720px; margin: 0 auto; padding: 20px 24px 34px; text-align: center; }
+header.hero h1 { font-size: clamp(2.2rem, 5vw, 3.3rem); line-height: 1.05; text-transform: uppercase; margin-bottom: 14px; }
+header.hero p { color: var(--ink-soft); font-size: 1.05rem; max-width: 46ch; margin: 0 auto; }
+
+main { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 0 24px 90px; }
+
+.card { width: 100%; max-width: 520px; background: var(--face); border: 4px solid var(--ink); border-radius: 16px; box-shadow: 4px 4px 0 rgba(43,32,18,0.3); padding: 32px 30px 34px; }
+label.lbl { display: block; margin-top: 18px; margin-bottom: 6px; font-weight: 700; font-size: 0.9rem; }
+label.lbl:first-of-type { margin-top: 0; }
+.hint { font-size: 0.78rem; font-weight: 400; color: var(--ink-soft); display: block; margin-top: 6px; }
+input[type="text"], input[type="email"] { width: 100%; padding: 12px 14px; border: 2px solid var(--kraft-line); border-radius: 10px; font-size: 1rem; font-family: 'Inter', sans-serif; color: var(--ink); background: var(--kraft); }
+input:focus { border-color: var(--rare); background: var(--face); }
+#code { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.08em; }
+
+.btn { width: 100%; margin-top: 22px; padding: 14px; border: 2.5px solid var(--ink); border-radius: 10px; background: var(--ink); color: var(--face); font-family: 'Anton', sans-serif; font-size: 1.15rem; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; box-shadow: 3px 3px 0 rgba(43,32,18,0.3); }
+.btn:hover:not(:disabled) { transform: translate(-1px,-1px); }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.error { margin-top: 16px; padding: 12px 14px; border: 2px solid #C1272D; border-radius: 10px; background: #FBEAEA; color: #7A1519; font-size: 0.92rem; display: none; }
+
+#result { display: none; }
+.res-top { text-align: center; margin-bottom: 24px; }
+.res-top .code { font-size: 0.78rem; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.res-top h2 { font-size: 1.9rem; text-transform: uppercase; margin: 4px 0 6px; }
+.res-top p { color: var(--ink-soft); font-size: 0.95rem; }
+
+.steps { list-style: none; margin: 0 0 26px; padding: 0; }
+.steps li { position: relative; padding: 0 0 22px 44px; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 13px; top: 28px; bottom: 0; width: 3px; background: var(--kraft-line); }
+.steps li:last-child::before { display: none; }
+.steps .dot { position: absolute; left: 0; top: 2px; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid var(--kraft-line); background: var(--face); display: flex; align-items: center; justify-content: center; }
+.steps .t { font-weight: 700; font-size: 0.98rem; color: var(--ink-soft); }
+.steps .d { font-size: 0.85rem; color: var(--ink-soft); }
+.steps li.done::before { background: var(--common); }
+.steps li.done .dot { background: var(--common); border-color: var(--ink); }
+.steps li.done .dot::after { content: ""; width: 7px; height: 12px; border: solid var(--face); border-width: 0 3px 3px 0; transform: rotate(45deg) translate(-1px,-1px); }
+.steps li.done .t, .steps li.now .t { color: var(--ink); }
+.steps li.now .dot { border-color: var(--ink); background: var(--gold); }
+.steps li.now .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(0.55); opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .steps li.now .dot::after { animation: none; } }
+
+.items { border-top: 2px solid var(--kraft-line); padding-top: 16px; }
+.items h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 8px; }
+.item { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 0.95rem; border-bottom: 1px solid var(--kraft-line); }
+.item:last-child { border-bottom: 0; }
+.item span:last-child { font-weight: 600; }
+.again { display: block; margin: 22px auto 0; background: none; border: 0; font: inherit; font-weight: 600; font-size: 0.9rem; text-decoration: underline; cursor: pointer; color: var(--ink); }
+.help { font-size: 0.88rem; color: var(--ink-soft); text-align: center; max-width: 46ch; }
+
+footer { text-align: center; padding: 26px 24px 40px; font-size: 0.88rem; color: var(--ink-soft); }
+.footer-link { text-decoration: none; font-weight: 600; margin: 0 6px; }
+.footer-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav class="top">
+    <a class="wordmark" href="index"><span class="logo-dot" aria-hidden="true"></span>iPrint Keychains</a>
+    <a class="navlink" href="index">Back to shop</a>
+</nav>
+
+<header class="hero">
+    <h1>Track your order</h1>
+    <p>Enter the email you ordered with and the tracking code from your confirmation email.</p>
+</header>
+
+<main>
+    <form class="card" id="form" novalidate>
+        <label class="lbl" for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" placeholder="you@example.com" required>
+
+        <label class="lbl" for="code">Tracking code</label>
+        <input type="text" id="code" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="40" placeholder="a1b2c3d4" required>
+        <span class="hint">It is the 8 character code in your order confirmation email. Pasting the full Order ID works too.</span>
+
+        <div class="error" id="err" role="alert"></div>
+        <button class="btn" id="go" type="submit">Find my order</button>
+    </form>
+
+    <section class="card" id="result" aria-live="polite">
+        <div class="res-top">
+            <div class="code" id="rCode"></div>
+            <h2 id="rTitle"></h2>
+            <p id="rSub"></p>
+        </div>
+        <ol class="steps" id="steps"></ol>
+        <div class="items">
+            <h3>In this order</h3>
+            <div id="rItems"></div>
+        </div>
+        <button class="again" id="again" type="button">Look up another order</button>
+    </section>
+
+    <p class="help">Questions about your order? <a href="contact">Contact us</a> and include your tracking code.</p>
+</main>
+
+<footer>
+    <a class="footer-link" href="index">Home</a>
+    &middot;
+    <a class="footer-link" href="testimonials">Testimonials</a>
+    &middot;
+    <a class="footer-link" href="contact">Contact Us</a>
+    &middot;
+    <a class="footer-link" href="terms">Terms</a>
+</footer>
+
+<script>
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzQZwq7fF1drNKVbHKi-z8HovTeYVyynuaqbCaKYpyMulKrtA9LP_2_MRzrejGhxgBztQ/exec";
+
+const $ = id => document.getElementById(id);
+const form = $("form"), result = $("result"), err = $("err"), go = $("go");
+
+// The sheet uses New / In Progress / Done. Anything else (for example
+// "Shipped") is shown as written, on the last step.
+const STEPS = [
+    { t: "Order received", d: "We have your order and will start on it soon." },
+    { t: "Being made",     d: "Your keychain is being designed and printed." },
+    { t: "Ready",          d: "Your order is finished and ready for you." }
+];
+
+function stageOf(status) {
+    const s = String(status || "").trim().toLowerCase();
+    if (s === "new" || s === "pending" || s === "") return 0;
+    if (s === "in progress" || s === "printing" || s === "making") return 1;
+    return 2; // done, ready, shipped, delivered, anything else
+}
+
+function titleFor(status, stage) {
+    const s = String(status || "").trim();
+    if (stage === 0) return "Order received";
+    if (stage === 1) return "Being made";
+    return /^done$/i.test(s) ? "Ready" : s;
+}
+
+function subFor(stage, name) {
+    const hi = name ? name + ", " : "";
+    if (stage === 0) return hi + "thank you. Your order is in the queue.";
+    if (stage === 1) return hi + "your order is being made right now.";
+    return hi + "your order is finished. Check your email for pickup or shipping details.";
+}
+
+function esc(s) {
+    return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function show(o) {
+    const stage = stageOf(o.status);
+    $("rCode").textContent = "Tracking code " + o.orderCode;
+    $("rTitle").textContent = titleFor(o.status, stage);
+    $("rSub").textContent = subFor(stage, o.firstName) + (o.placed ? " Ordered " + o.placed + "." : "");
+
+    $("steps").innerHTML = STEPS.map((s, i) => {
+        const cls = i < stage ? "done" : (i === stage ? (stage === 2 ? "done" : "now") : "");
+        const label = (i === 2 && stage === 2) ? titleFor(o.status, 2) : s.t;
+        return '<li class="' + cls + '"><span class="dot"></span><div class="t">' + esc(label) +
+               '</div><div class="d">' + esc(s.d) + '</div></li>';
+    }).join("");
+
+    $("rItems").innerHTML = o.items.map(i =>
+        '<div class="item"><span>' + esc(i.name) + '</span><span>' + esc(i.price) + '</span></div>'
+    ).join("");
+
+    form.style.display = "none";
+    result.style.display = "block";
+    result.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function fail(msg) { err.textContent = msg; err.style.display = "block"; }
+
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+    err.style.display = "none";
+    const email = $("email").value.trim();
+    const code = $("code").value.trim();
+    if (!email || email.indexOf("@") < 1) return fail("Enter the email you used for your order.");
+    if (code.replace(/[^a-fA-F0-9]/g, "").length < 8) return fail("Enter your tracking code from the confirmation email.");
+
+    go.disabled = true; go.textContent = "Looking...";
+    try {
+        const url = ORDERS_API_URL + "?action=track_order&email=" + encodeURIComponent(email) + "&id=" + encodeURIComponent(code);
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.success) show(data);
+        else fail((data && data.error) || "We could not find that order.");
+    } catch (ex) {
+        fail("Could not reach the server. Please try again in a moment.");
+    } finally {
+        go.disabled = false; go.textContent = "Find my order";
+    }
+});
+
+$("again").addEventListener("click", () => {
+    result.style.display = "none";
+    form.style.display = "block";
+    $("code").value = "";
+    $("code").focus();
+});
+
+// Optional prefill from a link such as /track?code=a1b2c3d4
+try {
+    const c = new URLSearchParams(location.search).get("code");
+    if (c) $("code").value = c.slice(0, 40);
+} catch (e) {}
+</script>
+</body>
+</html>
