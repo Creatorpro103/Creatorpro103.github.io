@@ -979,6 +979,8 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
     &middot;
     <a class="footer-link" href="giftcards">Gift Cards</a>
     &middot;
+    <a class="footer-link" href="track">Track Order</a>
+    &middot;
     <a class="footer-link" href="terms">Terms</a>
     <span class="secret" id="secret-dot" tabindex="0" role="button" aria-label=""></span>
 </footer>
@@ -998,7 +1000,7 @@ const COLORS = [
 const COLOR_CHART_URL = "images/color_options.png";
 
 // Real backend for order submissions.
-const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzmi2FQogZ1putXsW448osorGNQWty7iPKgxGebOE2LaXJzBC5gLCk2ve_I9VxvUr0J/exec";
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzbcUkqF2w4U9rnPWgLygRcQjBnsYkfh0w9QWJ9FGCVrXLSkvCxcUvRsH6F3qG7-32s/exec";
 
 function colorChart() {
   return `
@@ -1889,7 +1891,7 @@ renderCartBadge();
     konamiPos = (key === KONAMI[konamiPos]) ? konamiPos + 1 : (key === KONAMI[0] ? 1 : 0);
     if (konamiPos === KONAMI.length) {
       konamiPos = 0;
-      showEgg("Konami code, on a keychain site. Respect. You deserve $2 off now, here you go: KONAMICODE123");
+      showEgg("Konami code, on a keychain site. Respect. Five bucks off is tempting to offer but I'm just a static page.");
     }
   });
 
