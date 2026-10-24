@@ -145,32 +145,44 @@ const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzQZwq7fF1drNKVb
 const $ = id => document.getElementById(id);
 const form = $("form"), result = $("result"), err = $("err"), go = $("go");
 
-// The sheet uses New / In Progress / Done. Anything else (for example
-// "Shipped") is shown as written, on the last step.
+// The sheet uses New / In Progress / Done. Words that clearly mean the
+// order is finished (Ready, Shipped, ...) show as complete. Any other
+// custom status (for example "On hold" or "Waiting on design") is shown
+// as written and is NOT marked complete. Canceled orders hide the timeline.
 const STEPS = [
     { t: "Order received", d: "We have your order and will start on it soon." },
     { t: "Being made",     d: "Your keychain is being designed and printed." },
     { t: "Ready",          d: "Your order is finished and ready for you." }
 ];
 
-function stageOf(status) {
+const DONE_WORDS = ["done", "ready", "complete", "completed", "shipped", "delivered", "picked up", "fulfilled"];
+const CANCEL_WORDS = ["canceled", "cancelled", "refunded", "void", "voided"];
+
+function kindOf(status) {
     const s = String(status || "").trim().toLowerCase();
-    if (s === "new" || s === "pending" || s === "") return 0;
-    if (s === "in progress" || s === "printing" || s === "making") return 1;
-    return 2; // done, ready, shipped, delivered, anything else
+    if (s === "" || s === "new" || s === "pending") return { kind: "step", stage: 0 };
+    if (s === "in progress" || s === "printing" || s === "making") return { kind: "step", stage: 1 };
+    if (DONE_WORDS.indexOf(s) !== -1) return { kind: "step", stage: 2 };
+    if (CANCEL_WORDS.indexOf(s) !== -1) return { kind: "cancel" };
+    return { kind: "custom" };
 }
 
-function titleFor(status, stage) {
+function titleFor(status, k) {
     const s = String(status || "").trim();
-    if (stage === 0) return "Order received";
-    if (stage === 1) return "Being made";
-    return /^done$/i.test(s) ? "Ready" : s;
+    if (k.kind === "step") {
+        if (k.stage === 0) return "Order received";
+        if (k.stage === 1) return "Being made";
+        return /^(done|complete|completed|fulfilled)$/i.test(s) ? "Ready" : s;
+    }
+    return s;
 }
 
-function subFor(stage, name) {
+function subFor(k, name, status) {
     const hi = name ? name + ", " : "";
-    if (stage === 0) return hi + "thank you. Your order is in the queue.";
-    if (stage === 1) return hi + "your order is being made right now.";
+    if (k.kind === "cancel") return hi + "this order was canceled. If that is a surprise, please contact us.";
+    if (k.kind === "custom") return hi + "your order is currently marked \"" + String(status).trim() + "\". Contact us if you have any questions.";
+    if (k.stage === 0) return hi + "thank you. Your order is in the queue.";
+    if (k.stage === 1) return hi + "your order is being made right now.";
     return hi + "your order is finished. Check your email for pickup or shipping details.";
 }
 
@@ -179,17 +191,27 @@ function esc(s) {
 }
 
 function show(o) {
-    const stage = stageOf(o.status);
+    const k = kindOf(o.status);
     $("rCode").textContent = "Tracking code " + o.orderCode;
-    $("rTitle").textContent = titleFor(o.status, stage);
-    $("rSub").textContent = subFor(stage, o.firstName) + (o.placed ? " Ordered " + o.placed + "." : "");
+    $("rTitle").textContent = titleFor(o.status, k);
+    $("rSub").textContent = subFor(k, o.firstName, o.status) + (o.placed ? " Ordered " + o.placed + "." : "");
 
-    $("steps").innerHTML = STEPS.map((s, i) => {
-        const cls = i < stage ? "done" : (i === stage ? (stage === 2 ? "done" : "now") : "");
-        const label = (i === 2 && stage === 2) ? titleFor(o.status, 2) : s.t;
-        return '<li class="' + cls + '"><span class="dot"></span><div class="t">' + esc(label) +
-               '</div><div class="d">' + esc(s.d) + '</div></li>';
-    }).join("");
+    let html = "";
+    if (k.kind === "step") {
+        const stage = k.stage;
+        html = STEPS.map((s, i) => {
+            const cls = i < stage ? "done" : (i === stage ? (stage === 2 ? "done" : "now") : "");
+            const label = (i === 2 && stage === 2) ? titleFor(o.status, k) : s.t;
+            return '<li class="' + cls + '"><span class="dot"></span><div class="t">' + esc(label) +
+                   '</div><div class="d">' + esc(s.d) + '</div></li>';
+        }).join("");
+    } else if (k.kind === "custom") {
+        html = '<li class="done"><span class="dot"></span><div class="t">Order received</div><div class="d">' + esc(STEPS[0].d) + '</div></li>' +
+               '<li class="now"><span class="dot"></span><div class="t">' + esc(String(o.status).trim()) + '</div><div class="d">Current status of your order.</div></li>' +
+               '<li><span class="dot"></span><div class="t">Ready</div><div class="d">' + esc(STEPS[2].d) + '</div></li>';
+    }
+    $("steps").innerHTML = html;
+    $("steps").style.display = html ? "" : "none";
 
     $("rItems").innerHTML = o.items.map(i =>
         '<div class="item"><span>' + esc(i.name) + '</span><span>' + esc(i.price) + '</span></div>'
