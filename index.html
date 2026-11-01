@@ -1004,7 +1004,15 @@ fetch("https://script.google.com/macros/s/AKfycbxGV_bi18ADdYlFTuu6bTra7m6Q2a8S3P
     const n = parseInt(d.stock, 10);
     if (isNaN(n)) return;
     b.textContent = n <= 0 ? "Sold out" : "Only " + n + " left";
-    if (n <= 0) { const btn = document.querySelector(".elf-btn"); if (btn) btn.textContent = "Sold out"; }
+    if (n <= 0) {
+      const btn = document.querySelector(".elf-btn"); if (btn) btn.textContent = "Sold out";
+      const card = document.querySelector(".elf-card");
+      if (card) {
+        card.removeAttribute("href");
+        card.style.cursor = "default";
+        card.style.pointerEvents = "none";
+      }
+    }
   })
   .catch(() => {});
 
