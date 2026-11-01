@@ -562,8 +562,6 @@ footer {
 .gf-notice-dont-show label { cursor: pointer; }
 
 .field { margin-bottom: 16px; }
-.payment-note { font-weight: 700; font-size: 0.95rem; padding: 12px 14px; border: 2px solid var(--common); border-radius: 10px; background: rgba(76,154,99,0.12); }
-.payment-note[hidden], #payment-options[hidden] { display: none !important; }
 .field label { display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px; }
 .field .hint { font-weight: 400; color: var(--ink-soft); font-size: 0.78rem; }
 
@@ -832,7 +830,7 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
 <div class="elf-section">
     <a class="elf-card" href="preorder">
         <div class="elf-card-inner">
-            <span class="elf-badge">Limited availability</span>
+            <span class="elf-badge" id="elfBadge">Limited availability</span>
             <h3><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h3>
             <p class="elf-desc">Secure your preorder now and guarantee in time for your elf's return.</p>
             <div class="elf-price">$35</div>
@@ -949,10 +947,9 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
                 <label for="cust-email">Email <span class="hint">(I'll ask questions and let you know when it's ready)</span></label>
                 <input type="email" id="cust-email" required>
             </div>
-            <div class="field" id="payment-field">
-                <label id="payment-label">Payment</label>
-                <p class="payment-note" id="payment-covered" hidden>Card covers the cost</p>
-                <div class="radio-row" id="payment-options">
+            <div class="field">
+                <label>Payment</label>
+                <div class="radio-row">
                     <label><input type="radio" name="payment" value="Venmo (@JenniferNeal1982, last 4 of phone 8675)" required> Venmo (@JenniferNeal1982), last 4 of phone is 8675</label>
                     <label><input type="radio" name="payment" value="Zelle (jks98765@gmail.com)"> Zelle (jks98765@gmail.com)</label>
                     <label><input type="radio" name="payment" value="Cash when ready"> Cash when ready</label>
@@ -979,8 +976,6 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
     &middot;
     <a class="footer-link" href="giftcards">Gift Cards</a>
     &middot;
-    <a class="footer-link" href="track">Track Order</a>
-    &middot;
     <a class="footer-link" href="terms">Terms</a>
     <span class="secret" id="secret-dot" tabindex="0" role="button" aria-label=""></span>
 </footer>
@@ -1000,55 +995,20 @@ const COLORS = [
 const COLOR_CHART_URL = "images/color_options.png";
 
 // Real backend for order submissions.
-const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzUTZEWEcpC5H0OsxmgsFrvwiczPLon1vMxHEjLmX22chmafWYgS_99IJeVXFTUfib3/exec";
+// Elf Box live stock badge
+fetch("https://script.google.com/macros/s/AKfycbxGV_bi18ADdYlFTuu6bTra7m6Q2a8S3PQuCHi69AN-VbD8IbqxbZCBCXbx1jaRZwbr/exec?action=stock")
+  .then(r => r.json())
+  .then(d => {
+    const b = document.getElementById("elfBadge");
+    if (!b || !d || !d.success) return;
+    const n = parseInt(d.stock, 10);
+    if (isNaN(n)) return;
+    b.textContent = n <= 0 ? "Sold out" : "Only " + n + " left";
+    if (n <= 0) { const btn = document.querySelector(".elf-btn"); if (btn) btn.textContent = "Sold out"; }
+  })
+  .catch(() => {});
 
-// ---- Visitor IP + ban check -------------------------------------------------
-// The browser looks up its own public IP (the site is static, so it cannot
-// see it any other way), asks the orders script if it is banned, and shows a
-// blocked screen if so. Orders are ALSO checked on the server.
-let visitorIp = "";
-function showBanned() {
-  if (document.getElementById("ban-screen")) return;
-  const ipLine = visitorIp
-    ? '<div style="margin:18px 0 6px;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(43,32,18,0.6);">Banned IP address</div>' +
-      '<div id="ban-ip" style="display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.15rem;font-weight:700;background:#ECE0C8;border:2px solid #2B2012;border-radius:8px;padding:8px 14px;"></div>'
-    : '';
-  const d = document.createElement("div");
-  d.id = "ban-screen";
-  d.setAttribute("role", "alert");
-  d.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#ECE0C8;color:#2B2012;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:Inter,Arial,sans-serif;overflow:auto;";
-  d.innerHTML = '<div style="max-width:440px;width:100%;background:#FFFDF7;border:4px solid #B3261E;border-radius:16px;box-shadow:4px 4px 0 rgba(43,32,18,0.3);overflow:hidden;">' +
-    '<div style="background:#B3261E;color:#FFFDF7;padding:12px 16px;font-weight:700;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;">Warning</div>' +
-    '<div style="padding:30px 28px 32px;">' +
-    '<svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true" style="display:block;margin:0 auto 14px;"><path d="M27 4 L51 47 H3 Z" fill="#B3261E" stroke="#2B2012" stroke-width="3" stroke-linejoin="round"/><rect x="25" y="19" width="4" height="15" rx="2" fill="#FFFDF7"/><circle cx="27" cy="40" r="2.6" fill="#FFFDF7"/></svg>' +
-    '<h1 style="font-family:Anton,Arial,sans-serif;font-weight:400;font-size:2.2rem;line-height:1.05;text-transform:uppercase;margin-bottom:12px;color:#B3261E;">You were banned</h1>' +
-    '<p style="line-height:1.6;color:rgba(43,32,18,0.75);">You have been banned from iPrint Keychains. You cannot place orders or buy gift cards from this connection.</p>' +
-    ipLine +
-    '<p style="line-height:1.6;color:rgba(43,32,18,0.75);margin-top:20px;font-size:0.92rem;">If you think this is a mistake, email <a href="mailto:email@isaacneal.com" style="color:#2B2012;font-weight:700;">email@isaacneal.com</a> and include the IP address above.</p>' +
-    '</div></div>';
-  document.body.appendChild(d);
-  const ipEl = document.getElementById("ban-ip");
-  if (ipEl) ipEl.textContent = visitorIp;
-  document.body.style.overflow = "hidden";
-}
-const ipReady = (async function () {
-  const timed = (url) => {
-    const c = new AbortController();
-    const t = setTimeout(() => c.abort(), 5000);
-    return fetch(url, { signal: c.signal }).finally(() => clearTimeout(t));
-  };
-  try {
-    const r = await timed("https://api.ipify.org?format=json");
-    const j = await r.json();
-    visitorIp = String((j && j.ip) || "").slice(0, 45);
-  } catch (e) {}
-  if (!visitorIp) return;
-  try {
-    const r = await timed(ORDERS_API_URL + "?action=check_ban&ip=" + encodeURIComponent(visitorIp));
-    const j = await r.json();
-    if (j && j.banned) showBanned();
-  } catch (e) {}
-})();
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzmi2FQogZ1putXsW448osorGNQWty7iPKgxGebOE2LaXJzBC5gLCk2ve_I9VxvUr0J/exec";
 
 function colorChart() {
   return `
@@ -1244,7 +1204,7 @@ const TYPES = [
     desc: "A custom bow design with a name.",
     price: 5,
     frame: "var(--rare)",
-    img: "images/BowHomepage.jpg",
+    img: "images/Bow.png",
     fields: `
       <div class="field">
         <label for="bow-text">What would you like the name to be?</label>
@@ -1609,31 +1569,8 @@ const cartOverlay = document.getElementById('cart-overlay');
 const cartItemsEl = document.getElementById('cart-items');
 const cartTotalEl = document.getElementById('cart-total');
 
-// A gift card that covers everything hides the payment choices; a partial one says how much is left.
-function applyPaymentMode(t) {
-  const radios = document.querySelectorAll('input[name="payment"]');
-  const label = document.getElementById('payment-label');
-  const note = document.getElementById('payment-covered');
-  const options = document.getElementById('payment-options');
-  const partial = !t.covered && t.giftUse > 0;
-  note.hidden = !t.covered;
-  options.hidden = !!t.covered;
-  radios.forEach((r, i) => {
-    r.disabled = !!t.covered;
-    r.required = (i === 0) && !t.covered;
-  });
-  if (t.covered) {
-    label.textContent = 'Payment';
-  } else if (partial) {
-    label.textContent = t.hasTbd || !(t.due > 0)
-      ? "Your card doesn't cover the full balance, pay the rest with the following payment methods"
-      : "Your card doesn't cover the full balance, pay " + money(t.due) + " with the following payment methods";
-  } else {
-    label.textContent = 'Payment';
-  }
-}
-
 function renderCart() {
+  const payFirst = document.querySelector('input[name="payment"]');
   if (!cart.length) {
     cartItemsEl.innerHTML = '<p class="cart-empty">Your cart is empty. Close this and add something from the lineup.</p>';
     cartTotalEl.textContent = '$0';
@@ -1641,7 +1578,7 @@ function renderCart() {
     document.getElementById('cart-discount-row').hidden = true;
     document.getElementById('cart-gift-row').hidden = true;
     document.getElementById('place-order-btn').disabled = true;
-    applyPaymentMode({ covered: false, giftUse: 0, due: 0, hasTbd: false });
+    if (payFirst) payFirst.required = true;
     return;
   }
   document.getElementById('place-order-btn').disabled = false;
@@ -1680,7 +1617,8 @@ function renderCart() {
   const adjusted = t.discount > 0 || t.giftUse > 0;
   document.getElementById('cart-total-label').textContent = adjusted ? 'Total due' : 'Total';
   cartTotalEl.textContent = (adjusted ? money(t.due) : '$' + t.total) + (t.hasTbd ? ' + TBD' : '');
-  applyPaymentMode(t);
+  // A gift card that covers everything means no payment method is needed.
+  if (payFirst) payFirst.required = !t.covered;
   if (promo) setPromoMsg(promoStatusText(), 'ok');
   if (giftCard) setGiftMsg(giftStatusText(), 'ok');
 }
@@ -1783,8 +1721,7 @@ checkoutForm.addEventListener('submit', e => {
     items: cart,
     promoCode: promo ? promo.code : '',
     giftCardCode: giftCard ? giftCard.code : '',
-    recaptchaToken: captchaToken,
-    ip: visitorIp
+    recaptchaToken: captchaToken
   };
   const usedPromo = promo;
   const usedDiscount = promoDiscount();
@@ -1800,7 +1737,6 @@ checkoutForm.addEventListener('submit', e => {
       placeOrderBtn.textContent = 'Place Order';
       resetCaptcha();
 
-      if (data && data.banned) { showBanned(); return; }
       if (!data.success) {
         checkoutError.textContent = data.error || 'Something went wrong sending your order. Try again.';
         checkoutError.style.display = 'block';
@@ -1941,7 +1877,7 @@ renderCartBadge();
     konamiPos = (key === KONAMI[konamiPos]) ? konamiPos + 1 : (key === KONAMI[0] ? 1 : 0);
     if (konamiPos === KONAMI.length) {
       konamiPos = 0;
-      showEgg("Konami code, on a keychain site. Respect. Five bucks off is tempting to offer but I'm just a static page.");
+      showEgg("Konami code, on a keychain site. Respect. You deserve some kind of discount. Don't tell anyone but here is a secret code for $1 off. KONAMICODE123");
     }
   });
 
