@@ -154,6 +154,28 @@ main {
     margin-bottom: 18px;
 }
 
+.stock-note {
+  display: table;
+  margin: 2px auto 18px;
+  padding: 10px 24px;
+  border: 3px solid #2B2012;
+  border-radius: 10px;
+  background: #C1272D;
+  color: #FFFDF7;
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #2B2012;
+  animation: stockPulse 2s ease-in-out infinite;
+}
+.stock-note.out { background: #2B2012; animation: none; }
+@keyframes stockPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) { .stock-note { animation: none; } }
 .price-tag {
     display: block;
     text-align: center;
@@ -603,6 +625,7 @@ footer {
         <h2>Place your preorder</h2>
         <p class="subtitle">Fill out the form below and we'll follow up by email to confirm.</p>
         <p class="price-tag">$35<span>price per Elf Box</span></p>
+        <p class="stock-note" id="stockNote">Checking availability...</p>
         <p class="shipping-note">Shipping is an additional $7 for postage and a padded envelope.</p>
 
         <form id="preorderForm">
@@ -706,7 +729,7 @@ footer {
       "https://script.google.com/macros/s/AKfycbzyL1nsc-K7huoHmWT_qmR_NZZpx_gJzxcA_0-DKNu_xjjQWhaCPdfgOrSjFe0t-PdA/exec";
 
     // Script 2 (new): checks the reCAPTCHA token. Paste its /exec URL here.
-    const VERIFY_URL = "https://script.google.com/macros/s/AKfycbxvJauAztu28zOCE5CwDOCexgEDITmEVRcFm95nkXZ756EdheVbM3ibNRtV7jquQ5DK/exec";
+    const VERIFY_URL = "https://script.google.com/macros/s/AKfycbxGV_bi18ADdYlFTuu6bTra7m6Q2a8S3PQuCHi69AN-VbD8IbqxbZCBCXbx1jaRZwbr/exec";
     const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
     let captchaWidgetId = null;
 
@@ -731,12 +754,41 @@ footer {
       try { if (captchaWidgetId !== null) grecaptcha.reset(captchaWidgetId); } catch (err) {}
     }
 
+    // Live stock count
+    var stockNote = document.getElementById("stockNote");
+    const quantityInput = document.getElementById("quantity");
+    function applyStock(n) {
+      n = parseInt(n, 10);
+      if (isNaN(n)) { stockNote.style.display = "none"; return; }
+      if (n <= 0) {
+        stockNote.textContent = "Sold out";
+        stockNote.className = "stock-note out";
+        quantityInput.max = 0;
+        quantityInput.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Sold out";
+      } else {
+        stockNote.textContent = "Only " + n + " left";
+        stockNote.className = "stock-note";
+        quantityInput.max = n;
+        quantityInput.disabled = false;
+        if (parseInt(quantityInput.value, 10) > n) quantityInput.value = n;
+      }
+    }
+    function loadStock() {
+      fetch(VERIFY_URL + "?action=stock")
+        .then(r => r.json())
+        .then(d => { if (d && d.success) applyStock(d.stock); else stockNote.style.display = "none"; })
+        .catch(() => { stockNote.style.display = "none"; });
+    }
+
     // Warm up the checker script so the first submit isn't slowed by a cold start.
     try { fetch(VERIFY_URL + "?action=warmup", { mode: "no-cors" }).catch(() => {}); } catch (err) {}
 
     const form = document.getElementById("preorderForm");
     const status = document.getElementById("status");
     const submitBtn = document.getElementById("submitBtn");
+    loadStock();
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -878,13 +930,14 @@ footer {
 
         const checkRes = await fetch(VERIFY_URL, {
           method: "POST",
-          body: JSON.stringify({ action: "verify", recaptchaToken: captchaToken })
+          body: JSON.stringify({ action: "verify", recaptchaToken: captchaToken, quantity: quantityValue })
         });
         const check = await checkRes.json();
         if (!check.success) {
           successAudio.pause();
           status.className = "error";
           status.textContent = check.error || "Spam check failed. Check the box and try again.";
+          if (typeof check.stock !== "undefined") applyStock(check.stock);
           return;
         }
 
@@ -912,6 +965,7 @@ footer {
         document.getElementById("tyEmail").textContent = emailValue;
 
         form.reset();
+        if (typeof check.stock !== "undefined") applyStock(check.stock);
         playSuccessSequence();
 
       } catch (error) {
@@ -925,7 +979,7 @@ footer {
       } finally {
 
         resetCaptcha();
-        submitBtn.disabled = false;
+        if (!(stockNote.className.indexOf("out") > -1)) submitBtn.disabled = false;
 
       }
 
