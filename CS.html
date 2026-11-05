@@ -3,86 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>National Beta CS Comprehensive Test</title>
+<title>National Beta CS Comprehensive Test: Advanced</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root{--indigo:#4338ca;--indigo-dark:#312e81;--cyan:#06b6d4;--cyan-soft:#ecfeff;--cyan-ink:#0e7490}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh;display:flex}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#f8fafc;color:#0f172a;min-height:100vh;display:flex}
 #main-col{flex:1;min-width:0;padding:1.5rem;overflow-y:auto;height:100vh}
-#annot-panel{width:290px;flex-shrink:0;background:#fff;border-left:1px solid #e5e5e5;display:flex;flex-direction:column;height:100vh}
-#annot-toolbar{padding:10px;border-bottom:1px solid #e5e5e5;display:flex;flex-direction:column;gap:7px}
-#annot-toolbar h2{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em}
+#annot-panel{width:290px;flex-shrink:0;background:#fff;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;height:100vh}
+#annot-toolbar{padding:10px;border-bottom:1px solid #e2e8f0;display:flex;flex-direction:column;gap:7px}
+#annot-toolbar h2{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em}
 .tool-row{display:flex;gap:4px;flex-wrap:wrap}
-.tool-btn{padding:5px 8px;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#1a1a1a;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background .1s}
-.tool-btn:hover{background:#f3f4f6}
-.tool-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.tool-btn{padding:5px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background .1s}
+.tool-btn:hover{background:#f1f5f9}
+.tool-btn.active{background:var(--indigo);color:#fff;border-color:var(--indigo)}
 .tool-btn svg{width:13px;height:13px;flex-shrink:0;pointer-events:none}
 .color-row{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
-.color-row span{font-size:12px;color:#555}
+.color-row span{font-size:12px;color:#475569}
 .cswatch{width:19px;height:19px;border-radius:50%;cursor:pointer;border:2px solid transparent;flex-shrink:0;transition:border-color .1s}
-.cswatch.active{border-color:#1a1a1a}
-.size-row{display:flex;align-items:center;gap:6px;font-size:12px;color:#555}
-#stroke-size{flex:1;accent-color:#1a1a1a}
+.cswatch.active{border-color:#0f172a}
+.size-row{display:flex;align-items:center;gap:6px;font-size:12px;color:#475569}
+#stroke-size{flex:1;accent-color:var(--indigo)}
 .ann-btns{display:flex;gap:4px}
-.ann-btns button{flex:1;padding:4px 4px;border-radius:6px;border:1px solid #d1d5db;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
-.ann-btns button:hover{background:#f3f4f6}
-#annot-canvas-wrap{flex:1;position:relative;overflow:hidden;background:repeating-linear-gradient(0deg,transparent,transparent 24px,#f0f0f0 24px,#f0f0f0 25px),repeating-linear-gradient(90deg,transparent,transparent 24px,#f0f0f0 24px,#f0f0f0 25px)}
+.ann-btns button{flex:1;padding:4px 4px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.ann-btns button:hover{background:#f1f5f9}
+#annot-canvas-wrap{flex:1;position:relative;overflow:hidden;background:repeating-linear-gradient(0deg,transparent,transparent 24px,#f1f5f9 24px,#f1f5f9 25px),repeating-linear-gradient(90deg,transparent,transparent 24px,#f1f5f9 24px,#f1f5f9 25px)}
 #annot-canvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;touch-action:none}
 #annot-canvas.sel{cursor:default}
-.container{max-width:680px;margin:0 auto}
-h1{font-size:20px;font-weight:600;margin-bottom:4px}
-.subtitle{font-size:14px;color:#666;margin-bottom:1.5rem}
+.container{max-width:720px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+.brand i{width:10px;height:10px;border-radius:50%;background:var(--cyan);display:inline-block}
+h1{font-size:22px;font-weight:700;margin-bottom:4px;color:var(--indigo-dark)}
+.subtitle{font-size:14px;color:#475569;margin-bottom:1.5rem}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem}
-.stat{background:#fff;border-radius:10px;padding:.75rem 1rem;text-align:center;border:1px solid #e5e5e5}
-.stat-label{font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.stat{background:#fff;border-radius:10px;padding:.75rem 1rem;text-align:center;border:1px solid #e2e8f0}
+.stat-label{font-size:11px;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
 .stat-val{font-size:22px;font-weight:600}
-.stat-val.green{color:#16a34a}.stat-val.red{color:#dc2626}
-.progress-bar{height:6px;background:#e5e5e5;border-radius:3px;margin-bottom:1.25rem;overflow:hidden}
-.progress-fill{height:100%;background:#2563eb;border-radius:3px;transition:width .4s ease}
-.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
-.q-meta{font-size:12px;color:#999;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center}
-.topic-badge{background:#eff6ff;color:#1d4ed8;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.stat-val.green{color:#15803d}.stat-val.red{color:#dc2626}
+.progress-bar{height:6px;background:#e2e8f0;border-radius:3px;margin-bottom:1.25rem;overflow:hidden}
+.progress-fill{height:100%;background:var(--cyan);border-radius:3px;transition:width .4s ease}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+.q-meta{font-size:12px;color:#64748b;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center}
+.topic-badge{background:var(--cyan-soft);color:var(--cyan-ink);padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
 .q-text{font-size:15px;line-height:1.6;margin-bottom:1.25rem;font-weight:500}
 .choices{display:flex;flex-direction:column;gap:8px}
-.choice{display:flex;align-items:flex-start;gap:10px;padding:.7rem 1rem;border:1px solid #e5e5e5;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.5;transition:background .15s,border-color .15s;background:#fff;text-align:left;width:100%}
-.choice:hover:not(.locked){background:#f8f8f8;border-color:#ccc}
-.choice.correct-ans{border-color:#16a34a!important;background:#f0fdf4!important}
+.choice{display:flex;align-items:flex-start;gap:10px;padding:.7rem 1rem;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.5;transition:background .15s,border-color .15s;background:#fff;text-align:left;width:100%}
+.choice:hover:not(.locked){background:#f8fafc;border-color:var(--indigo)}
+.choice.correct-ans{border-color:#15803d!important;background:#f0fdf4!important}
 .choice.wrong-ans{border-color:#dc2626!important;background:#fef2f2!important}
-.choice-letter{font-weight:600;min-width:20px;color:#888;padding-top:1px;flex-shrink:0}
+.choice-letter{font-weight:600;min-width:20px;color:#64748b;padding-top:1px;flex-shrink:0}
 .explanation{margin-top:1rem;padding:.9rem 1.1rem;border-radius:8px;font-size:14px;line-height:1.6;display:none}
 .explanation.wrong-exp{background:#fef2f2;border-left:3px solid #dc2626;color:#991b1b}
-.explanation.correct-exp{background:#f0fdf4;border-left:3px solid #16a34a;color:#166534}
+.explanation.correct-exp{background:#f0fdf4;border-left:3px solid #15803d;color:#166534}
 .explanation.show{display:block}
 .exp-title{font-weight:600;margin-bottom:4px;display:block;font-size:13px}
 .actions{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap}
-button{padding:.55rem 1.1rem;border-radius:8px;border:1px solid #d1d5db;background:#fff;color:#1a1a1a;font-size:14px;cursor:pointer;font-family:inherit;transition:background .15s,opacity .15s}
-button:hover:not(:disabled){background:#f3f4f6}
-button.primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
-button.primary:hover:not(:disabled){opacity:.85}
+button{padding:.55rem 1.1rem;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;font-size:14px;cursor:pointer;font-family:inherit;transition:background .15s,opacity .15s}
+button:hover:not(:disabled){background:#f1f5f9}
+button.primary{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+button.primary:hover:not(:disabled){background:var(--indigo-dark)}
 button:disabled{opacity:.35;cursor:default}
 button.dbtn{border-color:#dc2626;color:#dc2626}
 button.dbtn:hover{background:#fef2f2}
 .rw{text-align:center;padding:2rem 1rem}
-.rscore{font-size:64px;font-weight:700;line-height:1;margin-bottom:.4rem}
-.rlabel{font-size:15px;color:#666;margin-bottom:.5rem}
+.rscore{font-size:64px;font-weight:700;line-height:1;margin-bottom:.4rem;color:var(--indigo)}
+.rlabel{font-size:15px;color:#475569;margin-bottom:.5rem}
 .rgrade{font-size:20px;font-weight:600;margin-bottom:2rem}
 .test-selector{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem}
-.test-btn{padding:.4rem .9rem;border-radius:20px;border:1px solid #d1d5db;background:#fff;color:#1a1a1a;font-size:13px;cursor:pointer;font-family:inherit}
-.test-btn:hover{background:#f3f4f6}
-.test-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.test-btn{padding:.4rem .9rem;border-radius:20px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;font-size:13px;cursor:pointer;font-family:inherit}
+.test-btn:hover{background:#f1f5f9}
+.test-btn.active{background:var(--indigo);color:#fff;border-color:var(--indigo)}
 .filter-row{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
-.filter-row label{font-size:13px;color:#555;font-weight:500}
-select{padding:.4rem .7rem;border-radius:8px;border:1px solid #d1d5db;background:#fff;color:#1a1a1a;font-size:13px;font-family:inherit}
+.filter-row label{font-size:13px;color:#475569;font-weight:500}
+select{padding:.4rem .7rem;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;font-size:13px;font-family:inherit}
 .sbw{margin-top:1rem}.sbw button{width:100%;padding:.9rem;font-size:15px;font-weight:500}
 .stitle{font-size:15px;font-weight:600;margin-bottom:1rem}
-.ri{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:12px}
+.ri{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:12px}
 .rq{font-size:14px;font-weight:500;margin-bottom:.75rem;line-height:1.5}
 .ra{font-size:13px;padding:.5rem .75rem;border-radius:6px;margin-bottom:6px;line-height:1.5}
 .ra.wrong{background:#fef2f2;color:#991b1b}.ra.correct{background:#f0fdf4;color:#166534}
-.re{font-size:13px;padding:.5rem .75rem;border-radius:6px;background:#f8f8f8;color:#444;line-height:1.6}
-.divider{height:1px;background:#e5e5e5;margin:1.5rem 0}
+.re{font-size:13px;padding:.5rem .75rem;border-radius:6px;background:#f8fafc;color:#334155;line-height:1.6}
+.divider{height:1px;background:#e2e8f0;margin:1.5rem 0}
 .rstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;text-align:left}
-.rmeta{font-size:12px;color:#999;display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
-@media(max-width:600px){body{flex-direction:column}#annot-panel{width:100%;height:300px;border-left:none;border-top:1px solid #e5e5e5}.stats,.rstats{grid-template-columns:repeat(2,1fr)}}
+.rmeta{font-size:12px;color:#64748b;display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+@media(max-width:600px){body{flex-direction:column}#annot-panel{width:100%;height:300px;border-left:none;border-top:2px solid #2B2012}.stats,.rstats{grid-template-columns:repeat(2,1fr)}}
+
+/* ---- iPrint Keychains styling (matches the storefront) ---- */
+:root{
+  --kraft:#ECE0C8;--kraft-line:rgba(43,32,18,0.14);--ink:#2B2012;--ink-soft:rgba(43,32,18,0.66);
+  --face:#FFFDF7;--rare:#3E7CB1;--gold:#C9971F;
+  --indigo:#3E7CB1;--indigo-dark:#2B2012;--cyan:#3E7CB1;--cyan-soft:#ECE0C8;--cyan-ink:#2B2012;
+}
+body{font-family:'Inter',sans-serif;background:var(--kraft);color:var(--ink);line-height:1.6}
+#main-col{background:transparent}
+#annot-panel{background:var(--face);border-left:2px solid var(--ink)}
+#annot-toolbar{border-bottom:2px solid var(--ink)}
+#annot-toolbar h2,.stat-label,.q-meta,.subtitle,.rmeta,.filter-row label{color:var(--ink-soft)}
+#annot-canvas-wrap{background:var(--face)}
+h1,.stitle{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.01em;color:var(--ink)}
+h1{font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.05;margin-bottom:8px}
+.brand{color:var(--ink);font-weight:700;font-size:1.05rem;letter-spacing:0;text-transform:none;margin-bottom:12px}
+.brand i{width:20px;height:26px;border-radius:4px;background:var(--rare);border:2.5px solid var(--ink);display:inline-block}
+.stat{background:var(--face);border:2.5px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 rgba(43,32,18,0.3)}
+.stat-val{font-family:'Anton',sans-serif;font-weight:400;color:var(--ink)}
+.stat-val.green{color:#2E5B3E}.stat-val.red{color:#7A2A21}
+.progress-bar{background:var(--kraft-line);border:2px solid var(--ink);border-radius:999px;height:12px}
+.progress-fill{background:var(--rare);border-radius:999px}
+.card{background:var(--face);border:2.5px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 rgba(43,32,18,0.3)}
+.topic-badge{background:var(--kraft);color:var(--ink);border:2px solid var(--ink);border-radius:6px;font-weight:700}
+.q-text{font-weight:600}
+.choice{background:var(--face);border:2px solid var(--kraft-line);border-radius:10px;color:var(--ink);box-shadow:none}
+.choice:hover:not(.locked){background:var(--kraft);border-color:var(--ink);transform:none;box-shadow:none}
+.choice.correct-ans{border-color:#2E5B3E!important;background:#E3F1E7!important}
+.choice.wrong-ans{border-color:#7A2A21!important;background:#F8E3E1!important}
+.choice-letter{color:var(--ink-soft)}
+.explanation.wrong-exp{background:#F8E3E1;border-left:3px solid #7A2A21;color:#7A2A21}
+.explanation.correct-exp{background:#E3F1E7;border-left:3px solid #2E5B3E;color:#2E5B3E}
+button{background:var(--face);color:var(--ink);border:2.5px solid var(--ink);border-radius:10px;box-shadow:3px 3px 0 var(--ink);font-family:'Inter',sans-serif;font-weight:700;transition:transform .15s ease,box-shadow .15s ease}
+button:hover:not(:disabled){background:var(--face);transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+button:active:not(:disabled){transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+button:disabled{box-shadow:none}
+button.primary{background:var(--rare);color:var(--face)}
+button.primary:hover:not(:disabled){background:var(--rare);opacity:1}
+button.dbtn{border-color:var(--ink);color:#7A2A21}
+button.dbtn:hover:not(:disabled){background:#F8E3E1}
+.ann-btns button{box-shadow:none;border-width:2px;border-radius:8px;transform:none}
+.tool-btn{background:var(--face);color:var(--ink);border:2px solid var(--ink);border-radius:8px;box-shadow:none}
+.tool-btn.active{background:var(--ink);color:var(--face)}
+.tool-btn:hover{background:var(--kraft)}
+.cswatch.active{border-color:var(--ink)}
+.rscore{font-family:'Anton',sans-serif;font-weight:400;color:var(--ink)}
+.rlabel{color:var(--ink-soft)}
+.test-btn{background:var(--face);color:var(--ink);border:2px solid var(--ink);border-radius:999px;box-shadow:2px 2px 0 var(--ink);transform:none}
+.test-btn:hover{background:var(--kraft);transform:none}
+.test-btn.active{background:var(--ink);color:var(--face)}
+select{background:var(--face);border:2px solid var(--ink);border-radius:8px;color:var(--ink)}
+.ri{background:var(--face);border:2.5px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 rgba(43,32,18,0.3)}
+.ra.wrong{background:#F8E3E1;color:#7A2A21}.ra.correct{background:#E3F1E7;color:#2E5B3E}
+.re{background:var(--kraft);color:var(--ink)}
+.divider{background:var(--kraft-line)}
+.stitle{font-size:1.1rem}
 </style>
 </head>
 <body>
@@ -90,8 +152,9 @@ select{padding:.4rem .7rem;border-radius:8px;border:1px solid #d1d5db;background
 <div id="main-col"><div class="container">
 
 <div id="view-start">
+<div class="brand"><i></i>iPrint Keychains</div>
 <h1>National Beta CS Comprehensive Tests</h1>
-<p class="subtitle">6th Grade Computer Science — 250 questions (50 per test)</p>
+<p class="subtitle">Advanced level · 50 questions per test · 5 tests · 15 topics</p>
 <div class="test-selector" id="test-selector"></div>
 <div class="filter-row"><label>Topic:</label><select id="topic-filter"><option value="all">All topics</option></select></div>
 <div class="sbw"><button class="primary" onclick="startTest()">Start Test</button></div>
@@ -127,7 +190,8 @@ select{padding:.4rem .7rem;border-radius:8px;border:1px solid #d1d5db;background
 <div class="color-row"><span>Color:</span>
 <div class="cswatch active" data-c="#1a1a1a" style="background:#1a1a1a" onclick="setColor(this)"></div>
 <div class="cswatch" data-c="#dc2626" style="background:#dc2626" onclick="setColor(this)"></div>
-<div class="cswatch" data-c="#2563eb" style="background:#2563eb" onclick="setColor(this)"></div>
+<div class="cswatch" data-c="#4338ca" style="background:#4338ca" onclick="setColor(this)"></div>
+<div class="cswatch" data-c="#06b6d4" style="background:#06b6d4" onclick="setColor(this)"></div>
 <div class="cswatch" data-c="#16a34a" style="background:#16a34a" onclick="setColor(this)"></div>
 <div class="cswatch" data-c="#d97706" style="background:#d97706" onclick="setColor(this)"></div>
 </div>
@@ -143,60 +207,276 @@ select{padding:.4rem .7rem;border-radius:8px;border:1px solid #d1d5db;background
 
 <script>
 var ALL_QUESTIONS=[
-{t:1,topic:"Binary",q:"Convert decimal 13 to binary.",c:["1011","1100","1101","1010"],a:2,e:"13 = 8+4+1 = 1101 in binary."},
-{t:1,topic:"Hardware",q:"What does CPU stand for?",c:["Central Programming Unit","Computer Processing Utility","Central Processing Unit","Core Processing Unit"],a:2,e:"CPU = Central Processing Unit — the brain of the computer."},
-{t:1,topic:"Flowcharts",q:"What shape represents a DECISION in a flowchart?",c:["Rectangle","Oval","Diamond","Parallelogram"],a:2,e:"The diamond shape represents a decision point with YES/NO branches."},
-{t:1,topic:"Coding",q:"A VARIABLE is best described as:",c:["A fixed value that never changes","A named storage location that holds a value","A function that performs a calculation","An error in the code"],a:1,e:"A variable is a named container in memory that can store and change values."},
-{t:1,topic:"Sorting",q:"Which sorting algorithm compares adjacent items and swaps them?",c:["Binary sort","Merge sort","Bubble sort","Linear sort"],a:2,e:"Bubble sort repeatedly compares adjacent pairs and swaps them until sorted."},
-{t:1,topic:"Hardware",q:"RAM is best described as:",c:["Permanent storage when power is off","Temporary memory that loses data when power is off","An external hard drive","Read-only memory for BIOS"],a:1,e:"RAM is volatile—it loses data when the computer powers off."},
-{t:1,topic:"Digital Citizenship",q:"What is a digital footprint?",c:["A virus tracking your location","The power your computer uses","The trail of data you leave online","An electronic signature"],a:2,e:"Your digital footprint is all the data created by your online activity."},
-{t:1,topic:"Networking",q:"Rules for data transmission across the internet are called:",c:["Algorithms","Protocols","Bandwidth","Firmware"],a:1,e:"A protocol is a set of rules for data communication. TCP/IP is the main one."},
-{t:1,topic:"Web/Internet",q:"What does HTML stand for?",c:["HyperText Markup Language","High-Tech Media Language","HyperText Management Level","Hyper Transfer Markup Language"],a:0,e:"HTML = HyperText Markup Language — the standard language for web pages."},
-{t:1,topic:"Sorting",q:"Why is Quick Sort fast?",c:["It is simple","It uses divide-and-conquer with a pivot","It uses little memory","It works on any data"],a:1,e:"Quick Sort divides the list using a pivot, making it much faster."},
-{t:1,topic:"Coding",q:"Which causes code to repeat?",c:["Sequence","Selection","Iteration","Function"],a:2,e:"Iteration (loops) repeats code—either FOR or WHILE loops."},
-{t:1,topic:"History",q:"Ada Lovelace is recognized as:",c:["The transistor inventor","The first computer programmer","The Web creator","The first microprocessor developer"],a:1,e:"Ada Lovelace wrote the first algorithm for a mechanical computing engine."},
-{t:1,topic:"Data",q:"In a database, a RECORD is:",c:["A column of data","A copy of the database","One complete row of data","A search query"],a:2,e:"A record is one complete row in a table with all field values."},
-{t:1,topic:"Networking",q:"Which device connects home network to internet?",c:["Switch","Hub","Router","Bridge"],a:2,e:"A router directs traffic between your local network and the internet."},
-{t:1,topic:"Sorting",q:"Insertion Sort is like:",c:["Picking smallest items","Comparing adjacent items","Organizing cards in your hand","Dividing into groups"],a:2,e:"Insertion Sort is like organizing cards—you pick one and insert it in the right position."},
-{t:1,topic:"Coding",q:"Debugging means:",c:["Writing first draft code","Testing with users","Finding and fixing errors","Converting to machine language"],a:2,e:"Debugging is identifying and correcting bugs (errors) in a program."},
-{t:1,topic:"Hardware",q:"Which is an OUTPUT device?",c:["Keyboard","Webcam","Microphone","Monitor"],a:3,e:"A monitor displays information FROM the computer—it outputs data."},
-{t:1,topic:"Binary",q:"What is binary 1010 in decimal?",c:["8","10","12","14"],a:1,e:"1010 = 8+0+2+0 = 10 in decimal."},
-{t:1,topic:"Digital Citizenship",q:"Cyberbullying is:",c:["Spreading computer viruses","Using technology to harass others","Accessing systems without permission","Downloading copyrighted material"],a:1,e:"Cyberbullying is using digital platforms to harass or intimidate someone."},
-{t:1,topic:"Networking",q:"What does DNS do?",c:["Stores files in cloud","Translates web addresses to IP addresses","Routes data packets","Assigns IP addresses"],a:1,e:"DNS converts google.com into the numerical IP address."},
-{t:1,topic:"Sorting",q:"What is the first step in Merge Sort?",c:["Find pivot","Compare adjacent items","Divide list in half","Find smallest item"],a:2,e:"Merge Sort starts by dividing the list repeatedly until pieces are size 1."},
-{t:1,topic:"Coding",q:"IF statements run code:",c:["Always","Only if condition is true","Only if condition is false","A random number of times"],a:1,e:"IF statements check a condition and run code only if it is true."},
-{t:1,topic:"Hardware",q:"What stores startup instructions?",c:["RAM","Cache","ROM","SSD"],a:2,e:"ROM stores firmware/BIOS—the startup instructions before OS loads."},
-{t:1,topic:"History",q:"ENIAC was:",c:["A programming language","One of the first electronic computers","The internet organization","The first personal computer"],a:1,e:"ENIAC (1945) was one of the first general-purpose electronic computers."},
-{t:1,topic:"Sorting",q:"Selection Sort moves smallest to:",c:["End of list","Middle of list","Beginning of list","Random position"],a:2,e:"Selection Sort finds the smallest and moves it to the beginning."},
-{t:1,topic:"Binary",q:"How many bits in 1 byte?",c:["4","16","8","2"],a:2,e:"1 byte = 8 bits. This is fundamental to digital storage."},
-{t:1,topic:"Web/Internet",q:"HTTPS means:",c:["Government-owned site","Encrypted and secure","Requires login","Hosted in USA"],a:1,e:"HTTPS means the connection is encrypted. Look for the padlock icon!"},
-{t:1,topic:"Coding",q:"FOR i=1 TO 5 executes how many times?",c:["4","6","5","1"],a:2,e:"i goes 1,2,3,4,5—that is exactly 5 times."},
-{t:1,topic:"Data",q:"BINARY SEARCH works by:",c:["Checking left to right","Random checking","Splitting sorted list in half","Sorting first then checking ends"],a:2,e:"Binary search repeatedly halves the search space—very fast!"},
-{t:1,topic:"Sorting",q:"MERGE SORT is best for:",c:["Simple understanding","Speed guaranteed","Large unsorted datasets","Very small lists only"],a:2,e:"Merge Sort is always fast and reliable for large datasets."},
-{t:1,topic:"Hardware",q:"ROM key characteristic:",c:["Permanent, not erased","Changed by any program","Works with one OS only","Used in DVDs"],a:0,e:"ROM is non-volatile—data stays permanent without power."},
-{t:1,topic:"Digital Citizenship",q:"2FA stands for:",c:["Two-File Authentication","Two-Factor Authentication","Two-Firewall Auth","Two-Frequency Access"],a:1,e:"2FA requires a second proof of identity beyond password."},
-{t:1,topic:"Flowcharts",q:"OVAL shape represents:",c:["Process step","Input or output","Decision","Start or Stop"],a:3,e:"Ovals mark the Start and Stop of a flowchart."},
-{t:1,topic:"Sorting",q:"Which is SLOWEST but SIMPLEST?",c:["Merge Sort","Quick Sort","Bubble Sort","Linear Sort"],a:2,e:"Bubble Sort is simple but very slow for large lists."},
-{t:1,topic:"Coding",q:"Boolean data type stores:",c:["Whole numbers","Text","TRUE or FALSE","Decimal numbers"],a:2,e:"Boolean has exactly two values: TRUE or FALSE."},
-{t:1,topic:"Hardware",q:"ALU performs:",c:["Stores the OS","Controls I/O","Math and logic operations","Manages internet"],a:2,e:"The ALU handles all math and logical operations."},
-{t:1,topic:"Networking",q:"LAN stands for:",c:["Large Area Network","Local Area Network","Long-range Access Network","Link and Node"],a:1,e:"LAN covers a small area like a school or home."},
-{t:1,topic:"Sorting",q:"Quick Sort's 'pivot' is:",c:["Smallest number","Largest number","A dividing number","The middle position"],a:2,e:"The pivot divides the list into smaller and bigger items."},
-{t:1,topic:"History",q:"2nd Gen computers used:",c:["Vacuum tubes","Transistors","Integrated circuits","Microprocessors"],a:1,e:"2nd Generation (1950s-60s) replaced tubes with transistors."},
-{t:1,topic:"Web/Internet",q:"A web browser is used for:",c:["Creating websites","Translating languages","Displaying web pages","Blocking viruses"],a:2,e:"Browsers retrieve and display web pages from the internet."},
-{t:1,topic:"Coding",q:"Concatenation means:",c:["Dividing strings","Joining strings together","Converting to string","Searching in string"],a:1,e:"Concatenation joins strings end-to-end: Hello + World = HelloWorld."},
-{t:1,topic:"Sorting",q:"Selection Sort finds:",c:["Pairs to compare","Smallest item each iteration","Middle position","Largest value"],a:1,e:"Selection finds the smallest remaining item each time."},
-{t:1,topic:"Hardware",q:"Motherboard is the:",c:["CPU only","Main connecting circuit board","Power supply","Hard drive holder"],a:1,e:"The motherboard is the main circuit board connecting everything."},
-{t:1,topic:"Digital Citizenship",q:"Open source means:",c:["Free from bugs","Code is publicly available","Linux only","Volunteers only"],a:1,e:"Open source has publicly available code anyone can view and modify."},
-{t:1,topic:"Flowcharts",q:"PARALLELOGRAM represents:",c:["Decision","Process","Input or output","Start/end"],a:2,e:"Parallelograms show input/output steps like reading or displaying data."},
-{t:1,topic:"Sorting",q:"Bubble Sort named because:",c:["Bubbling sounds","Big items float to top like bubbles","Cleans data","Needs memory"],a:1,e:"Large items 'bubble up' to the end like bubbles in water."},
-{t:1,topic:"Binary",q:"Binary 11111111 equals:",c:["128","256","255","127"],a:2,e:"11111111 = 128+64+32+16+8+4+2+1 = 255 (max 1 byte value)."},
-{t:1,topic:"Networking",q:"A WAN covers:",c:["One building","A small area","Large distances","Just one city"],a:2,e:"WAN = Wide Area Network covering large distances."},
-{t:1,topic:"Coding",q:"A FUNCTION is also called:",c:["A class","A procedure or method","A variable","A loop"],a:1,e:"Functions = procedures = methods = subroutines."},
-{t:1,topic:"Hardware",q:"Cache memory is:",c:["On the motherboard","Inside the CPU","On the hard drive","In the power supply"],a:1,e:"Cache is the fastest memory built directly into the CPU."}
+/* ---------- Binary ---------- */
+{t:1,topic:"Binary",q:"Convert decimal 183 to 8-bit binary.",c:["10110111","10101111","11010111","10111011"],a:0,e:"183 = 128 + 32 + 16 + 4 + 2 + 1, so the bits are 10110111."},
+{t:2,topic:"Binary",q:"Add the binary numbers 1011 and 0110.",c:["10001","10011","11001","10101"],a:0,e:"11 + 6 = 17, which is 10001 in binary."},
+{t:3,topic:"Binary",q:"In 8-bit two's complement, how is -1 represented?",c:["10000001","11111111","11111110","01111111"],a:1,e:"Two's complement flips every bit of 1 (00000001 becomes 11111110) and adds 1, giving 11111111."},
+{t:4,topic:"Binary",q:"What is the largest unsigned value that fits in 4 bits?",c:["8","15","16","7"],a:1,e:"1111 = 8 + 4 + 2 + 1 = 15. Four bits give 2^4 = 16 patterns, from 0 to 15."},
+{t:5,topic:"Binary",q:"How many bits are needed to represent 256 distinct values?",c:["6","7","8","9"],a:2,e:"2^8 = 256, so 8 bits are required."},
+{t:1,topic:"Binary",q:"Shifting the binary number 0011 one place to the left gives:",c:["0110","0111","1100","1001"],a:0,e:"A left shift doubles the value: 3 becomes 6, which is 0110."},
+{t:2,topic:"Binary",q:"In the binary convention, how many bytes is one kilobyte?",c:["1000","1024","1012","2048"],a:1,e:"Computing uses powers of two, so 1 KB = 2^10 = 1024 bytes."},
+{t:3,topic:"Binary",q:"Convert the binary number 11001 to decimal.",c:["21","23","25","27"],a:2,e:"16 + 8 + 1 = 25."},
+/* ---------- Hexadecimal ---------- */
+{t:4,topic:"Hexadecimal",q:"Convert the hexadecimal number 1F to decimal.",c:["25","29","31","35"],a:2,e:"1F = 1 × 16 + 15 = 31."},
+{t:5,topic:"Hexadecimal",q:"What is the decimal value of hexadecimal FF?",c:["240","255","256","511"],a:1,e:"F = 15, so FF = 15 × 16 + 15 = 255."},
+{t:1,topic:"Hexadecimal",q:"Convert hexadecimal A3 to binary.",c:["10100011","10110010","11010011","10100110"],a:0,e:"A = 1010 and 3 = 0011, so A3 = 10100011."},
+{t:2,topic:"Hexadecimal",q:"Which HTML/CSS color code represents pure red?",c:["#00FF00","#FF0000","#0000FF","#FFFFFF"],a:1,e:"In #RRGGBB, FF in the red slot with 00 in green and blue gives pure red."},
+{t:3,topic:"Hexadecimal",q:"Hexadecimal is a number system with what base?",c:["8","10","16","32"],a:2,e:"Hexadecimal is base 16, using digits 0–9 and letters A–F."},
+{t:4,topic:"Hexadecimal",q:"Convert decimal 255 to hexadecimal.",c:["F0","FF","EF","FE"],a:1,e:"255 = 15 × 16 + 15, which is FF."},
+{t:5,topic:"Hexadecimal",q:"In the color #RRGGBB, what does 00 in the green slot mean?",c:["Maximum green","No green","Half green","Green is ignored"],a:1,e:"00 is the lowest value (0 of 255), so there is no green in the color."},
+{t:1,topic:"Hexadecimal",q:"Why do programmers often write binary values in hexadecimal?",c:["Hex is faster for the CPU to compute","Each hex digit represents exactly four binary bits","Hex is the only number system computers understand","Hex stores data more densely in RAM"],a:1,e:"Each hex digit maps to four bits, so long binary strings become short and easy to read."},
+/* ---------- Sorting Algorithms ---------- */
+{t:2,topic:"Sorting Algorithms",q:"What is the worst-case time complexity of bubble sort?",c:["O(n)","O(n log n)","O(n²)","O(2ⁿ)"],a:2,e:"Bubble sort makes roughly n² comparisons when the list is in reverse order."},
+{t:3,topic:"Sorting Algorithms",q:"What is the time complexity of merge sort in all cases?",c:["O(n)","O(n log n)","O(n²)","O(log n)"],a:1,e:"Merge sort always splits the list in half (log n levels) and does about n work per level."},
+{t:4,topic:"Sorting Algorithms",q:"Which sorting algorithm performs best on a list that is already nearly sorted?",c:["Quick sort","Selection sort","Insertion sort","Heap sort"],a:2,e:"Insertion sort moves each item only a short distance, so nearly sorted data needs very few steps."},
+{t:5,topic:"Sorting Algorithms",q:"When does quick sort hit its worst case?",c:["When the pivot is always the median","When the pivot is always the smallest or largest element","When the list has no duplicates","When the list is very short"],a:1,e:"A pivot that always splits off one element leads to n levels of recursion, giving O(n²)."},
+{t:1,topic:"Sorting Algorithms",q:"Which statement about selection sort is true?",c:["It is faster than insertion sort on nearly sorted lists","It makes about n²/2 comparisons regardless of input order","It sorts by recursively splitting the list","It is stable by default"],a:1,e:"Selection sort always scans the remaining items to find the minimum, so its comparison count does not depend on input order."},
+{t:2,topic:"Sorting Algorithms",q:"A binary search on a sorted list of 1,024 items needs about how many comparisons at most?",c:["10","32","512","1024"],a:0,e:"Each comparison halves the search space, and log₂(1024) = 10."},
+{t:3,topic:"Sorting Algorithms",q:"What is the main extra cost of merge sort?",c:["It uses extra memory to hold the merged sublists","It cannot sort numbers","It only works on text","It needs the list pre-sorted"],a:0,e:"Standard merge sort needs a temporary array of about n items for merging."},
+{t:4,topic:"Sorting Algorithms",q:"Which algorithm splits a list, sorts the halves, and then merges them?",c:["Bubble sort","Insertion sort","Merge sort","Selection sort"],a:2,e:"This divide-and-conquer approach is the defining feature of merge sort."},
+/* ---------- Data & Analysis ---------- */
+{t:5,topic:"Data & Analysis",q:"What is the mean of the values 2, 4, 6, 8, and 10?",c:["5","6","7","30"],a:1,e:"The sum is 30, and 30 ÷ 5 = 6."},
+{t:1,topic:"Data & Analysis",q:"What is the median of 3, 9, 4, 12, and 7?",c:["4","7","9","8"],a:1,e:"Sorted, the values are 3, 4, 7, 9, 12. The middle value is 7."},
+{t:2,topic:"Data & Analysis",q:"What is the mode of 2, 3, 3, 5, 7, 3, and 5?",c:["3","5","7","2"],a:0,e:"3 appears three times, more than any other value."},
+{t:3,topic:"Data & Analysis",q:"What is the range of 15, 22, 8, and 30?",c:["15","22","30","8"],a:1,e:"Range = maximum − minimum = 30 − 8 = 22."},
+{t:4,topic:"Data & Analysis",q:"Which measure of center is least affected by an extreme outlier?",c:["Mean","Median","Range","Sum"],a:1,e:"The median depends only on the middle position, so one very large value barely moves it."},
+{t:5,topic:"Data & Analysis",q:"In a spreadsheet, what does =AVERAGE(A1:A5) return?",c:["The sum of cells A1 to A5","The highest value in the range","The arithmetic mean of cells A1 to A5","The count of text cells in the range"],a:2,e:"AVERAGE adds the numbers in the range and divides by how many there are."},
+{t:1,topic:"Data & Analysis",q:"Which of these is categorical (qualitative) data?",c:["Height in centimeters","Number of pets","Favorite color","Temperature in °F"],a:2,e:"Categorical data describes a category or quality rather than a measured quantity."},
+{t:2,topic:"Data & Analysis",q:"Which chart is best for showing how parts make up a whole?",c:["Line graph","Pie chart","Scatter plot","Histogram"],a:1,e:"Pie charts show each category as a share of the total, which suits part-to-whole comparisons."},
+/* ---------- Computing Systems ---------- */
+{t:3,topic:"Computing Systems",q:"What is the main job of the control unit inside a CPU?",c:["Perform arithmetic","Direct and coordinate the instructions the CPU executes","Store data permanently","Display graphics"],a:1,e:"The control unit fetches and decodes instructions and directs the other CPU parts to carry them out."},
+{t:4,topic:"Computing Systems",q:"What is the correct order of the instruction cycle?",c:["Decode, fetch, execute","Fetch, decode, execute","Execute, fetch, decode","Fetch, execute, decode"],a:1,e:"The CPU fetches an instruction, decodes it, and then executes it."},
+{t:5,topic:"Computing Systems",q:"What are registers?",c:["Large hard drive storage","Small, very fast storage located inside the CPU","Storage reserved for the BIOS","External memory slots"],a:1,e:"Registers hold the values the CPU is working on right now and are the fastest memory in the system."},
+{t:1,topic:"Computing Systems",q:"A CPU rated at 3 GHz completes roughly how many clock cycles per second?",c:["3 thousand","3 million","3 billion","3 trillion"],a:2,e:"GHz means gigahertz, or billions of cycles per second."},
+{t:2,topic:"Computing Systems",q:"What is a GPU primarily designed to do?",c:["Store the operating system","Run many parallel calculations, mainly for graphics","Convert binary to decimal","Connect the computer to Wi-Fi"],a:1,e:"GPUs contain thousands of small cores that handle many calculations at once, which suits graphics and parallel workloads."},
+{t:3,topic:"Computing Systems",q:"What is a bus in a computer?",c:["A type of storage device","A set of wires that carries data between components","A power supply connector only","A type of CPU core"],a:1,e:"A bus is a shared communication pathway that moves data between the CPU, memory, and other parts."},
+{t:4,topic:"Computing Systems",q:"Which type of memory is typically the fastest?",c:["Hard drive","RAM","Registers","SSD"],a:2,e:"Registers sit inside the CPU, so they are faster than cache, RAM, and storage devices."},
+{t:5,topic:"Computing Systems",q:"Why is an SSD faster than a traditional hard disk drive?",c:["It uses spinning platters","It has no moving mechanical parts","It stores more data per dollar","It uses a wider bus"],a:1,e:"Flash memory reads and writes electronically, so it avoids the delay of a spinning disk and read head."},
+/* ---------- Networking & the Internet ---------- */
+{t:1,topic:"Networking & the Internet",q:"What does an IP address identify?",c:["A software program","A device on a network","A file type","The design of a web page"],a:1,e:"An IP address is the numerical address that lets devices find and send data to each other."},
+{t:2,topic:"Networking & the Internet",q:"Which protocol guarantees delivery and correct order of data?",c:["UDP","TCP","ICMP","ARP"],a:1,e:"TCP checks delivery, reorders packets, and resends lost data. UDP skips those checks to stay fast."},
+{t:3,topic:"Networking & the Internet",q:"What is packet switching?",c:["Sending a whole file as one piece on a dedicated line","Breaking data into small packets that can take different routes","Connecting each user to a dedicated circuit","Sending data only over fiber cables"],a:1,e:"Packets are routed independently and reassembled at the destination, which lets the network share capacity efficiently."},
+{t:4,topic:"Networking & the Internet",q:"Which port is normally used for HTTPS?",c:["25","443","21","53"],a:1,e:"HTTPS uses port 443. Port 25 is for email, 21 for FTP, and 53 for DNS."},
+{t:5,topic:"Networking & the Internet",q:"What is a MAC address?",c:["An address assigned by your ISP each time you connect","A hardware identifier for a network interface","The domain name of a website","A password for Wi-Fi"],a:1,e:"A MAC address is burned into a network card and identifies that interface on a local network."},
+{t:1,topic:"Networking & the Internet",q:"How does a network switch differ from a hub?",c:["A switch sends every packet to all devices","A switch sends data only to the device it is addressed to","A switch converts signals to light","A switch assigns domain names"],a:1,e:"A hub repeats traffic to every port. A switch learns which MAC address is on which port and forwards frames only where needed."},
+{t:2,topic:"Networking & the Internet",q:"Which best describes cloud computing?",c:["Storing data only on a local hard drive","Using remote servers accessed over the internet","A type of computer virus","A programming language"],a:1,e:"Cloud computing lets you store and run software on servers you reach over a network."},
+{t:3,topic:"Networking & the Internet",q:"What is the difference between bandwidth and latency?",c:["Bandwidth is delay, and latency is data capacity","Bandwidth is data capacity per second, and latency is delay","Both measure the number of devices on a network","Both measure CPU speed"],a:1,e:"Bandwidth is how much data can move per second. Latency is how long a packet takes to get there."},
+/* ---------- Internet Usage ---------- */
+{t:4,topic:"Internet Usage",q:"What does a search engine do before it can show a page in results?",c:["Encrypts it","Crawls and indexes it","Deletes its cookies","Compiles it into machine code"],a:1,e:"Crawlers visit pages and record their content in an index. Search results come from that index."},
+{t:5,topic:"Internet Usage",q:"What is a cookie in web browsing?",c:["Malware that steals passwords","A small text file a website saves on your device to remember information","An advertisement embedded in a video","An encrypted email attachment"],a:1,e:"Cookies store small pieces of data such as login state and preferences."},
+{t:1,topic:"Internet Usage",q:"In https://www.example.com/page, what is the domain?",c:["https","www","example.com","page"],a:2,e:"The domain is the name that identifies the site, here example.com. www is a common subdomain prefix."},
+{t:2,topic:"Internet Usage",q:"What is the most reliable sign that a site is using a valid HTTPS connection?",c:["The site uses lots of colors","The address bar shows a padlock and a valid certificate","The site has a .net extension","The page loads quickly"],a:1,e:"The padlock and certificate confirm the connection is encrypted and the server's identity was verified."},
+{t:3,topic:"Internet Usage",q:"What does clearing your browser cache mainly do?",c:["Deletes all bookmarks","Removes stored copies of web files, which can fix loading problems","Uninstalls the browser","Changes your IP address"],a:1,e:"Cached files can become outdated or corrupted, so clearing them forces the browser to download fresh copies."},
+{t:4,topic:"Internet Usage",q:"Private browsing mode mainly prevents what?",c:["Your ISP from seeing your traffic","Your browser from saving history and cookies on that device","Websites from loading","Viruses from existing"],a:1,e:"Private mode does not hide your activity from websites, your employer, or your ISP."},
+{t:5,topic:"Internet Usage",q:"What does a 404 error mean?",c:["The server is overloaded","The requested page could not be found","The password was incorrect","The internet connection is down"],a:1,e:"404 means the server responded, but no page exists at that address."},
+{t:1,topic:"Internet Usage",q:"Which search technique finds an exact phrase?",c:["Asterisk","Quotation marks","Ampersand","Tilde"],a:1,e:"Putting words in quotation marks tells most search engines to match the phrase as written."},
+/* ---------- Communications ---------- */
+{t:2,topic:"Communications",q:"When you send an email with BCC, what happens?",c:["Every recipient can see the copy","Recipients are hidden from one another","The message is saved to a backup","The message is sent in a special format"],a:1,e:"BCC (blind carbon copy) keeps the other recipients from seeing who received the message."},
+{t:3,topic:"Communications",q:"Which protocol is used to send outgoing email?",c:["IMAP","SMTP","POP3","FTP"],a:1,e:"SMTP sends mail. IMAP and POP3 are used by the recipient's client to retrieve it."},
+{t:4,topic:"Communications",q:"Which is an example of asynchronous communication?",c:["A live video call","Email","A phone call","A live chat with a tutor"],a:1,e:"Asynchronous communication does not require both people to be present at the same time."},
+{t:5,topic:"Communications",q:"What does VoIP allow you to do?",c:["Send text messages only","Make voice calls over the internet","Watch movies offline","Encrypt email"],a:1,e:"Voice over IP carries phone calls as data packets over an internet connection."},
+{t:1,topic:"Communications",q:"Which is an example of good netiquette in email?",c:["Writing everything in ALL CAPS","Using a clear subject line and a respectful tone","Replying all to every message","Forwarding chain messages to everyone"],a:1,e:"Clear subjects and respectful tone help readers understand and act on a message."},
+{t:2,topic:"Communications",q:"What is an advantage of text-based chat over a voice call?",c:["Tone of voice is always conveyed","Messages can be saved and reviewed later","It works without any network","It requires no typing"],a:1,e:"Written messages leave a record, so people can re-read them and respond when ready."},
+{t:3,topic:"Communications",q:"Which problem most noticeably causes delays between speaking and hearing on a video call?",c:["Better compression","Latency","Larger file storage","Fewer participants"],a:1,e:"Latency is the delay in transmission. High latency makes conversations feel out of sync."},
+{t:4,topic:"Communications",q:"What does compressing files into a .zip archive mainly accomplish?",c:["Encrypts all content","Reduces file size and bundles multiple files together","Converts files to video","Makes files executable"],a:1,e:"Zip archives shrink files and group them into one container that is easier to share."},
+/* ---------- Multimedia ---------- */
+{t:5,topic:"Multimedia",q:"What is a pixel?",c:["A vector shape","The smallest addressable element of a digital image","A single video frame","A color palette"],a:1,e:"A pixel is one dot in a raster image, and each has its own color value."},
+{t:1,topic:"Multimedia",q:"Which image format scales to any size without losing quality?",c:["JPEG","PNG","SVG","GIF"],a:2,e:"SVG is a vector format that stores shapes as math, so it stays sharp at any size."},
+{t:2,topic:"Multimedia",q:"How many distinct intensity levels does one channel have at 8-bit color depth?",c:["8","64","256","16,777,216"],a:2,e:"8 bits give 2^8 = 256 levels per channel. Three channels together produce about 16.7 million colors."},
+{t:3,topic:"Multimedia",q:"What does an audio sample rate describe?",c:["The number of audio channels","The number of samples taken per second","The loudness of the sound","The file type"],a:1,e:"CD audio uses 44.1 kHz, meaning 44,100 samples per second."},
+{t:4,topic:"Multimedia",q:"Which is a lossy compression format?",c:["PNG","FLAC","JPEG","WAV"],a:2,e:"JPEG discards some image detail to save space. PNG, FLAC, and WAV keep all of their data."},
+{t:5,topic:"Multimedia",q:"What does frame rate measure in video?",c:["Frames per second","Pixels per inch","Bits per second","Samples per frame"],a:0,e:"Frame rate is how many still images are shown each second. 30 fps and 60 fps are common."},
+{t:1,topic:"Multimedia",q:"Which display resolution is commonly called Full HD?",c:["3840 × 2160","1920 × 1080","1280 × 720","7680 × 4320"],a:1,e:"Full HD is 1920 × 1080, also called 1080p."},
+{t:2,topic:"Multimedia",q:"Which software is best suited for editing audio waveforms?",c:["Audacity","Microsoft Excel","Google Forms","Windows Explorer"],a:0,e:"Audacity is a free audio editor that shows waveforms and supports cutting, filtering, and mixing."},
+/* ---------- Online Safety ---------- */
+{t:3,topic:"Online Safety",q:"Which password is the strongest?",c:["password123","Your pet's name","correct-horse-battery-staple-9!","Your birthday"],a:2,e:"Length and randomness matter most. Long, unique passphrases resist guessing and cracking."},
+{t:4,topic:"Online Safety",q:"What is the goal of a phishing email?",c:["To speed up your computer","To trick you into revealing sensitive information","To back up your files","To improve spam filters"],a:1,e:"Phishing imitates a trusted source to get passwords, account numbers, or other private data."},
+{t:5,topic:"Online Safety",q:"Why is it safer not to reuse passwords across sites?",c:["It makes passwords easier to remember","If one site is breached, your other accounts stay protected","It speeds up logging in","The law requires unique passwords everywhere"],a:1,e:"Attackers try leaked passwords on other sites, so reuse lets one breach open many accounts."},
+{t:1,topic:"Online Safety",q:"What is the main risk of using public Wi-Fi without protection?",c:["Faster charging","Other people on the network intercepting your data","Losing your hardware warranty","Automatic software updates"],a:1,e:"On an open network, traffic can be intercepted. A VPN or HTTPS helps protect it."},
+{t:2,topic:"Online Safety",q:"Which best describes social engineering?",c:["Building social media apps","Manipulating people into revealing information or bypassing security","Analyzing social networks with AI","Designing user interfaces"],a:1,e:"Social engineering exploits human trust rather than technical flaws."},
+{t:3,topic:"Online Safety",q:"Which type of malware locks your files and demands payment to release them?",c:["Ransomware","Spyware","Adware","Firmware"],a:0,e:"Ransomware encrypts files and demands payment, usually in cryptocurrency, for the decryption key."},
+{t:4,topic:"Online Safety",q:"Why should software updates be installed promptly?",c:["They add new wallpapers","They patch known security vulnerabilities","They intentionally slow down old devices","They delete unused files"],a:1,e:"Updates close vulnerabilities that attackers actively exploit."},
+{t:5,topic:"Online Safety",q:"What is a reasonable precaution when posting photos online?",c:["Share your school name and home address in captions","Remove location metadata and avoid revealing your home or school","Post at full resolution with GPS always on","Share your passwords with close friends"],a:1,e:"Photos can contain GPS metadata, and captions can reveal where you live or study."},
+/* ---------- Digital Citizenship ---------- */
+{t:1,topic:"Digital Citizenship",q:"Which is an example of fair use?",c:["Copying an entire textbook to share with friends","Quoting a short passage in a review, with credit to the author","Downloading a movie to resell","Using a company's logo to sell your own merchandise"],a:1,e:"Fair use allows limited quotation for purposes like criticism and commentary. Other uses in this list are not fair use."},
+{t:2,topic:"Digital Citizenship",q:"What does a CC BY (Creative Commons Attribution) license require?",c:["No credit is necessary","Credit to the original creator","Payment for every use","Permission to resell only"],a:1,e:"CC BY lets others share and adapt work, as long as they give credit to the creator."},
+{t:3,topic:"Digital Citizenship",q:"Paraphrasing a source without citing it is:",c:["Proper research","Plagiarism, even if you reword it","A form of citation","Allowed for personal notes only"],a:1,e:"Rewording an idea still counts as using someone else's work, so it needs credit."},
+{t:4,topic:"Digital Citizenship",q:"What does the digital divide refer to?",c:["The gap between fast and slow processors","The gap in access to technology and the internet between groups","The division of code into modules","The separation of hardware and software"],a:1,e:"The digital divide describes unequal access to devices, connectivity, and digital skills."},
+{t:5,topic:"Digital Citizenship",q:"What is alt text on an image used for?",c:["Compressing the image","Describing the image for screen readers and people who cannot see it","Adding a watermark","Linking to a download"],a:1,e:"Alt text makes images accessible by describing them in words."},
+{t:1,topic:"Digital Citizenship",q:"What is a major ethical concern with deepfake video?",c:["It produces lower file sizes","Realistic fake media can spread misinformation about real people","It encodes video faster","It is incompatible with older devices"],a:1,e:"Deepfakes can make people appear to say or do things they never did, which can damage reputations and trust."},
+{t:2,topic:"Digital Citizenship",q:"Why is responsible disposal of old electronics important?",c:["They contain only valuable gold","They contain hazardous materials that harm the environment","They explode in landfills","They are always recycled automatically"],a:1,e:"E-waste can release lead, mercury, and other toxic materials if it is thrown away."},
+{t:3,topic:"Digital Citizenship",q:"Digital citizenship is best described as:",c:["Owning a computer","Responsible, ethical, and safe use of technology","A government-issued digital ID","Being a software developer"],a:1,e:"Digital citizenship covers how people behave ethically and safely in online spaces."},
+/* ---------- Impacts of Computing ---------- */
+{t:4,topic:"Impacts of Computing",q:"How does automation mainly affect society?",c:["It eliminates the need for electricity","It changes the kinds of jobs available and can raise productivity","It makes all software free","It ends internet use"],a:1,e:"Automation shifts work toward some tasks and skills while reducing demand for others."},
+{t:5,topic:"Impacts of Computing",q:"How do data centers affect the environment?",c:["They produce oxygen","Through high energy use and cooling water consumption","They automatically reduce global CO₂","They create new soil"],a:1,e:"Large data centers use significant electricity and often large amounts of water for cooling."},
+{t:1,topic:"Impacts of Computing",q:"Why is data aggregation a privacy concern?",c:["It makes files smaller","Combining data sets can reveal sensitive personal details","It always requires government approval","It deletes old files"],a:1,e:"Individually harmless data can identify or expose a person when combined."},
+{t:2,topic:"Impacts of Computing",q:"What is algorithmic bias?",c:["The algorithm runs too quickly","Biased training data or design choices produce unfair results for some groups","The code is written in Python","The computer refuses to run the code"],a:1,e:"Algorithms learn patterns from data, so unfair patterns in the data can be repeated or amplified."},
+{t:3,topic:"Impacts of Computing",q:"How does open-source software benefit society?",c:["It hides code from reviewers","It lets anyone inspect, modify, and share the code","It guarantees zero bugs","It eliminates all licenses"],a:1,e:"Open access to code allows review, learning, and community improvement."},
+{t:4,topic:"Impacts of Computing",q:"How has remote work affected cities?",c:["It increased commuting for everyone","It reduced commuting for some workers","It eliminated the internet","It increased daily traffic"],a:1,e:"Remote work reduces trips for workers who do not need to be in an office every day, with effects that vary by place."},
+{t:5,topic:"Impacts of Computing",q:"How has online shopping affected traditional stores?",c:["It had no effect","It shifted consumer spending toward online channels","It made stores cheaper to build","It requires cash-only transactions"],a:1,e:"Many retailers have had to change their business models as spending moved online."},
+{t:1,topic:"Impacts of Computing",q:"What most accelerates the spread of misinformation online?",c:["Slower internet speeds","Rapid sharing across platforms and engagement-driven recommendation algorithms","Printed newspapers","A lack of electricity"],a:1,e:"Content that generates engagement is often promoted, so false claims can reach large audiences quickly."},
+/* ---------- File Extensions ---------- */
+{t:2,topic:"File Extensions",q:"What does a .html file contain?",c:["A Python script","A web page written in HyperText Markup Language","A Windows executable program","A compressed archive"],a:1,e:".html files hold markup that browsers render as web pages."},
+{t:3,topic:"File Extensions",q:"What kind of file is a .py?",c:["A video file","A Python source code file","A spreadsheet","A PDF document"],a:1,e:".py files contain Python source code that the Python interpreter runs."},
+{t:4,topic:"File Extensions",q:"What does a .exe file usually contain?",c:["An executable program for Windows","Plain text","An image","A database table"],a:0,e:".exe files are runnable programs on Windows."},
+{t:5,topic:"File Extensions",q:"Which extension stores tabular data as plain text, with values separated by commas?",c:[".pdf",".csv",".jpg",".zip"],a:1,e:"CSV stands for comma-separated values, which spreadsheets and databases can open."},
+{t:1,topic:"File Extensions",q:"What is a .zip file?",c:["An image format","A compressed archive","A video codec","A word processor document"],a:1,e:"A .zip file packages and compresses one or more files."},
+{t:2,topic:"File Extensions",q:"Which extension is typically used for compressed audio?",c:[".mp3",".bmp",".docx",".sql"],a:0,e:".mp3 is a common lossy audio format."},
+{t:3,topic:"File Extensions",q:"JSON files are commonly used for what?",c:["Editing photos","Storing and exchanging structured data","Compiling programs","Playing video"],a:1,e:"JSON (.json) is a text format for structured data, widely used by web APIs."},
+{t:4,topic:"File Extensions",q:"A file named budget.pptx is most likely a:",c:["Word document","PowerPoint presentation","Spreadsheet","Web page"],a:1,e:"The .pptx extension belongs to Microsoft PowerPoint presentations."},
+/* ---------- History of Computing ---------- */
+{t:5,topic:"History of Computing",q:"Who designed the Analytical Engine, an early design for a general-purpose mechanical computer?",c:["Charles Babbage","Alan Turing","John von Neumann","Grace Hopper"],a:0,e:"Babbage conceived the Analytical Engine in the 1830s, though it was never completed."},
+{t:1,topic:"History of Computing",q:"Alan Turing is best known for what?",c:["Inventing the transistor","Developing the theoretical model of computation and helping break Enigma codes","Creating the first web browser","Designing the first hard drive"],a:1,e:"The Turing machine formalized computation, and Turing's work at Bletchley Park helped break Enigma."},
+{t:2,topic:"History of Computing",q:"Transistors replaced vacuum tubes because they were:",c:["Larger and hotter","Smaller, more reliable, and more energy efficient","Able to hold programs in memory","Required for punch cards"],a:1,e:"Transistors (1947) were far smaller and generated less heat, which made computers more reliable."},
+{t:3,topic:"History of Computing",q:"What was the first commercial microprocessor?",c:["Intel 4004","Apple II","IBM 701","ENIAC"],a:0,e:"The Intel 4004 (1971) put a CPU on a single chip."},
+{t:4,topic:"History of Computing",q:"Grace Hopper is known for developing what?",c:["The first web server","One of the first compilers","The first transistor","The first laptop"],a:1,e:"Hopper developed early compilers, and her work helped lead to COBOL."},
+{t:5,topic:"History of Computing",q:"ARPANET is best described as:",c:["A search engine","An early packet-switched network that led to the modern internet","A mobile operating system","A programming language"],a:1,e:"ARPANET (1969) demonstrated packet switching and is considered a direct ancestor of the internet."},
+{t:1,topic:"History of Computing",q:"Who invented the World Wide Web?",c:["Tim Berners-Lee","Bill Gates","Steve Wozniak","Linus Torvalds"],a:0,e:"Berners-Lee proposed and built the Web around 1989–1991 at CERN."},
+{t:2,topic:"History of Computing",q:"Which technology defined first-generation computers?",c:["Transistors","Vacuum tubes","Integrated circuits","Microprocessors"],a:1,e:"Machines like ENIAC relied on vacuum tubes, which were large, hot, and failure-prone."},
+/* ---------- Software Uses ---------- */
+{t:3,topic:"Software Uses",q:"What is Microsoft Sway best used for?",c:["Editing video frames","Creating interactive presentations, reports, and newsletters","Writing compiled code","Managing spreadsheets with formulas"],a:1,e:"Sway is a Microsoft app for building visually rich, web-based presentations and stories."},
+{t:4,topic:"Software Uses",q:"Which software is best for calculations across large tables?",c:["Microsoft Excel","Adobe Photoshop","Audacity","Microsoft Sway"],a:0,e:"Excel is a spreadsheet program built for formulas, tables, and data analysis."},
+{t:5,topic:"Software Uses",q:"Adobe Photoshop is mainly used for:",c:["Image editing and photo manipulation","Writing HTML","Managing email servers","Compiling Python"],a:0,e:"Photoshop is a raster image editor for photo retouching and graphic design."},
+{t:1,topic:"Software Uses",q:"Google Forms is designed to:",c:["Edit 3D models","Create surveys and collect responses","Stream video","Compile source code"],a:1,e:"Google Forms builds surveys and quizzes and collects the responses in a spreadsheet."},
+{t:2,topic:"Software Uses",q:"Scratch is best described as:",c:["A visual, block-based programming environment for learners","A spreadsheet application","An antivirus program","An image compression tool"],a:0,e:"Scratch lets beginners build programs by snapping blocks together."},
+{t:3,topic:"Software Uses",q:"Which tool is best for designing posters and graphics from templates?",c:["Canva","Excel","Notepad","Command Prompt"],a:0,e:"Canva offers drag-and-drop templates for posters, social graphics, and presentations."},
+{t:4,topic:"Software Uses",q:"Which program is best for plain text with no formatting?",c:["Microsoft Word","Notepad","Adobe Premiere","PowerPoint"],a:1,e:"Notepad saves plain text. Word and PowerPoint add formatting, which may not be wanted."},
+{t:5,topic:"Software Uses",q:"Which software tracks changes to code over time?",c:["Git","Paint","Audacity","Calculator"],a:0,e:"Git is a version-control system that records each change and lets you revert or compare them."},
+/* ---------- Additional questions (to reach 50 per test) ---------- */
+{t:1,topic:"Binary",q:"Convert decimal 96 to 8-bit binary.",c:["01100000","01010000","10010000","01000110"],a:0,e:"96 = 64 + 32, so the bits are 01100000."},
+{t:2,topic:"Binary",q:"Add the binary numbers 1111 and 0001.",c:["10000","11111","10010","1100"],a:0,e:"15 + 1 = 16, which is 10000 in binary."},
+{t:3,topic:"Binary",q:"What is the 4-bit binary number 1001 in decimal?",c:["7","8","9","11"],a:2,e:"1001 = 8 + 0 + 0 + 1 = 9."},
+{t:4,topic:"Binary",q:"Shifting 0110 one place to the right gives:",c:["1100","0011","0111","0101"],a:1,e:"A right shift halves the value: 6 becomes 3, which is 0011."},
+{t:5,topic:"Binary",q:"How many distinct values can 6 bits represent?",c:["6","32","64","128"],a:2,e:"2^6 = 64 distinct patterns."},
+{t:1,topic:"Binary",q:"What is the logical AND of 1100 and 1010?",c:["1110","1000","0110","1111"],a:1,e:"AND keeps a 1 only where both bits are 1. Only the first position matches, giving 1000."},
+{t:2,topic:"Binary",q:"What is the logical OR of 1100 and 1010?",c:["1000","0110","1110","1111"],a:2,e:"OR gives a 1 where either bit is 1, giving 1110."},
+{t:3,topic:"Binary",q:"What is the largest positive value in 8-bit two's complement?",c:["127","128","255","256"],a:0,e:"The sign bit is 0 for positive numbers, leaving 7 bits: 01111111 = 127."},
+{t:4,topic:"Binary",q:"What is the ASCII code for the letter 'A' in decimal?",c:["55","65","75","97"],a:1,e:"Uppercase A is 65 in ASCII, which is 01000001 in binary."},
+{t:5,topic:"Hexadecimal",q:"Convert hexadecimal 7C to decimal.",c:["112","120","124","128"],a:2,e:"7C = 7 × 16 + 12 = 124."},
+{t:1,topic:"Hexadecimal",q:"Convert hexadecimal 2A to binary.",c:["00101010","00100101","10100010","00111010"],a:0,e:"2 = 0010 and A = 1010, so 2A = 00101010."},
+{t:2,topic:"Hexadecimal",q:"What color is the hex code #00FF00?",c:["Blue","Green","Red","Black"],a:1,e:"Only the green slot is at maximum, so the color is pure green."},
+{t:3,topic:"Hexadecimal",q:"What color is the hex code #000000?",c:["White","Black","Gray","Yellow"],a:1,e:"All three slots are 00, meaning no red, green, or blue light, which is black."},
+{t:4,topic:"Hexadecimal",q:"What is decimal 16 written in hexadecimal?",c:["F","10","16","20"],a:1,e:"16 = 1 × 16 + 0, which is written as 10 in hexadecimal."},
+{t:5,topic:"Hexadecimal",q:"Why are memory addresses often displayed in hexadecimal?",c:["Hex is shorter to read than binary for the same value","The CPU requires hexadecimal input","Hex uses less memory","Hex is only used in decimal systems"],a:0,e:"Each hex digit stands for four bits, so long binary addresses fit in a few characters."},
+{t:1,topic:"Hexadecimal",q:"What is the decimal value of hexadecimal B?",c:["10","11","12","13"],a:1,e:"The digits A through F represent 10 through 15, so B = 11."},
+{t:2,topic:"Hexadecimal",q:"Convert the binary number 11010110 to hexadecimal.",c:["C6","D6","E6","D5"],a:1,e:"1101 = D and 0110 = 6, so the result is D6."},
+{t:3,topic:"Hexadecimal",q:"What is the ASCII code for the lowercase letter 'a' in hexadecimal?",c:["41","61","71","A1"],a:1,e:"Lowercase a is 97 in decimal, which is 61 in hexadecimal."},
+{t:4,topic:"Sorting Algorithms",q:"What is the average-case time complexity of quick sort?",c:["O(n)","O(n log n)","O(n²)","O(log n)"],a:1,e:"With reasonable pivots, quick sort splits the work into about log n levels, each taking about n comparisons."},
+{t:5,topic:"Sorting Algorithms",q:"Which sort works by inserting each element into its correct position in a sorted portion of the list?",c:["Bubble sort","Insertion sort","Quick sort","Radix sort"],a:1,e:"Insertion sort grows a sorted section one element at a time."},
+{t:1,topic:"Sorting Algorithms",q:"Which optimization lets bubble sort finish early?",c:["Stop when a full pass makes no swaps","Skip every other item","Use a random pivot","Sort the list in reverse first"],a:0,e:"If a pass finds nothing to swap, the list is already sorted, so the algorithm can stop."},
+{t:2,topic:"Sorting Algorithms",q:"Roughly how much slower is an O(n²) sort than an O(n log n) sort on 1,000 items?",c:["About 2 times","About 10 times","About 100 times","About 1,000 times"],a:2,e:"n² = 1,000,000, while n log₂ n is about 10,000. The ratio is roughly 100."},
+{t:3,topic:"Sorting Algorithms",q:"What does it mean for a sorting algorithm to be stable?",c:["It always runs in O(n) time","It keeps equal items in their original relative order","It uses no extra memory","It only sorts numbers"],a:1,e:"A stable sort never reorders items that compare as equal."},
+{t:4,topic:"Sorting Algorithms",q:"Which sort has a best-case time of O(n) when the list is already sorted?",c:["Merge sort","Heap sort","Bubble sort with early exit","Selection sort"],a:2,e:"One pass with no swaps confirms the list is sorted, so the algorithm finishes in linear time."},
+{t:5,topic:"Sorting Algorithms",q:"Which data structure does heap sort use?",c:["Stack","Queue","Binary heap","Hash table"],a:2,e:"Heap sort builds a binary heap and repeatedly removes the largest or smallest item."},
+{t:1,topic:"Sorting Algorithms",q:"What is the worst-case number of comparisons for linear search on an unsorted list of n items?",c:["1","log n","n","n²"],a:2,e:"Linear search may need to check every item once, which is n comparisons."},
+{t:2,topic:"Sorting Algorithms",q:"Which sorting method processes numbers one digit place at a time?",c:["Radix sort","Bubble sort","Selection sort","Quick sort"],a:0,e:"Radix sort groups values by each digit, from least to most significant, without comparing whole numbers."},
+{t:3,topic:"Data & Analysis",q:"Which measure describes how spread out the values in a data set are?",c:["Mean","Median","Standard deviation","Mode"],a:2,e:"Standard deviation measures how far values typically sit from the mean."},
+{t:4,topic:"Data & Analysis",q:"What is the mean of 12, 18, 24, and 30?",c:["18","21","24","30"],a:1,e:"The sum is 84, and 84 ÷ 4 = 21."},
+{t:5,topic:"Data & Analysis",q:"What is the probability of rolling an even number on a fair six-sided die?",c:["1/6","1/3","1/2","2/3"],a:2,e:"Three of the six faces (2, 4, 6) are even, so the probability is 3/6 = 1/2."},
+{t:1,topic:"Data & Analysis",q:"What does a correlation of 0 between two variables indicate?",c:["The variables are identical","There is no linear relationship between them","One variable causes the other","The variables have the same mean"],a:1,e:"A correlation near zero means the variables do not move together in a straight-line pattern."},
+{t:2,topic:"Data & Analysis",q:"Which statement about correlation is correct?",c:["Correlation proves causation","Two variables can move together without one causing the other","Correlation only appears in controlled experiments","A correlation of zero means one variable causes the other"],a:1,e:"Correlation shows that variables are associated, but a third factor or coincidence can explain the link."},
+{t:3,topic:"Data & Analysis",q:"In a spreadsheet, what does =SUM(A1:A3) return if the cells hold 4, 5, and 6?",c:["11","15","456","5"],a:1,e:"4 + 5 + 6 = 15."},
+{t:4,topic:"Data & Analysis",q:"Which chart is best for showing change over time?",c:["Pie chart","Line graph","Word cloud","Bubble map"],a:1,e:"Line graphs connect data points across time, making trends easy to see."},
+{t:5,topic:"Data & Analysis",q:"What is a sample in statistics?",c:["The entire population","A subset of a population used for analysis","A type of chart","A data entry error"],a:1,e:"Samples are smaller groups studied to draw conclusions about the larger population."},
+{t:1,topic:"Data & Analysis",q:"What is the median of 1, 2, 3, and 4?",c:["2","2.5","3","2.25"],a:1,e:"With an even count, the median is the average of the two middle values: (2 + 3) ÷ 2 = 2.5."},
+{t:2,topic:"Computing Systems",q:"What is a key feature of the von Neumann architecture?",c:["Programs and data are stored in the same memory","Separate memories are required for programs and data","Only one bit can be processed at a time","It has no CPU"],a:0,e:"The stored-program design keeps instructions and data in one shared memory."},
+{t:3,topic:"Computing Systems",q:"Why is cache memory faster than RAM?",c:["It is larger","It sits closer to the CPU and uses faster technology","It is stored on the hard drive","It is cheaper"],a:1,e:"Cache sits physically closer to the processor and is built with faster, more expensive memory."},
+{t:4,topic:"Computing Systems",q:"What does a computer power supply do?",c:["Converts binary to decimal","Converts wall AC power into DC power for components","Converts analog audio to digital","Stores data permanently"],a:1,e:"Components run on steady DC voltages, so the power supply converts household AC."},
+{t:5,topic:"Computing Systems",q:"What does virtual memory use to extend available RAM?",c:["Hard drive or SSD space","The CPU clock","The GPU's cores","The BIOS chip"],a:0,e:"The operating system moves inactive data to disk, making it seem like there is more memory."},
+{t:1,topic:"Computing Systems",q:"How does instruction pipelining improve performance?",c:["It runs instructions in reverse","It overlaps the stages of several instructions","It deletes unused instructions","It stores instructions on the GPU"],a:1,e:"While one instruction is executing, the next can be decoding, so the CPU finishes more work per cycle."},
+{t:2,topic:"Computing Systems",q:"What does a quad-core CPU have?",c:["Four processing cores","Four clock cycles","Four buses","Four hard drives"],a:0,e:"Each core can run its own instruction stream, so four cores can work on four tasks at once."},
+{t:3,topic:"Computing Systems",q:"What is firmware?",c:["Temporary user files","Software stored on a hardware chip that controls the device","A web browser","A type of cable"],a:1,e:"Firmware, such as BIOS, is stored in ROM or flash memory and tells hardware how to start and operate."},
+{t:4,topic:"Computing Systems",q:"What does RAM stand for?",c:["Read Access Memory","Random Access Memory","Rapid Application Module","Remote Access Machine"],a:1,e:"RAM is Random Access Memory, meaning any location can be read or written directly."},
+{t:5,topic:"Computing Systems",q:"What is the main role of an operating system?",c:["To manage hardware and software resources","To replace the CPU","To store files only","To display web pages"],a:0,e:"The OS schedules tasks, manages memory, and controls access to devices."},
+{t:1,topic:"Networking & the Internet",q:"What does a subnet mask do?",c:["Encrypts network traffic","Separates the network portion of an IP address from the host portion","Assigns domain names","Limits bandwidth"],a:1,e:"The subnet mask tells a device which part of its IP address identifies the network and which identifies the device."},
+{t:2,topic:"Networking & the Internet",q:"What is a default gateway?",c:["A device that sends traffic beyond the local network","A router password","A type of network cable","A web server"],a:0,e:"Traffic addressed to other networks goes to the default gateway, usually the router."},
+{t:3,topic:"Networking & the Internet",q:"What does DHCP do on a network?",c:["Translates domain names","Assigns IP addresses to devices automatically","Assigns MAC addresses","Stores passwords"],a:1,e:"DHCP leases IP addresses to devices so they do not need to be set by hand."},
+{t:4,topic:"Networking & the Internet",q:"Which protocol maps IP addresses to MAC addresses on a local network?",c:["ARP","DNS","FTP","SMTP"],a:0,e:"ARP (Address Resolution Protocol) finds the MAC address for a known IP address on the local network."},
+{t:5,topic:"Networking & the Internet",q:"What is a firewall's main job?",c:["Speeding up downloads","Filtering network traffic based on security rules","Storing backups","Converting analog signals"],a:1,e:"Firewalls allow or block traffic according to configured rules."},
+{t:1,topic:"Networking & the Internet",q:"How many layers does the OSI model have?",c:["5","6","7","8"],a:2,e:"The OSI reference model has seven layers, from physical to application."},
+{t:2,topic:"Networking & the Internet",q:"Which connector is most common for wired Ethernet?",c:["USB-C","RJ-45","HDMI","Lightning"],a:1,e:"RJ-45 connectors plug into Ethernet cables and network ports."},
+{t:3,topic:"Networking & the Internet",q:"What does the S in HTTPS add?",c:["Faster speeds","Encryption using TLS","Extra storage","Video streaming"],a:1,e:"HTTPS wraps HTTP traffic in TLS encryption, protecting data in transit."},
+{t:4,topic:"Networking & the Internet",q:"What does Wi-Fi primarily use to carry data?",c:["Light pulses","Radio waves","Sound waves","Magnetic tape"],a:1,e:"Wi-Fi transmits data using radio waves on specific frequency bands."},
+{t:5,topic:"Internet Usage",q:"Why should you be careful installing browser extensions?",c:["They always make pages faster","They can read and change data on the pages you visit","They are required for HTTPS","They automatically block all ads"],a:1,e:"Extensions can often access page content, so a malicious one can capture information you enter."},
+{t:1,topic:"Internet Usage",q:"Which web address uses a secure connection?",c:["http://example.com","https://example.com","ftp://example.com","file://example.com"],a:1,e:"The https:// prefix indicates an encrypted connection."},
+{t:2,topic:"Internet Usage",q:"What does a DNS lookup translate?",c:["An IP address into a MAC address","A domain name into an IP address","A file into a URL","A password into a hash"],a:1,e:"DNS converts names like example.com into the numeric IP addresses computers use to connect."},
+{t:3,topic:"Internet Usage",q:"What is a hyperlink?",c:["A type of virus","A reference that links one web resource to another","A password reset tool","A file compression format"],a:1,e:"Hyperlinks let users move from one page or resource to another by clicking."},
+{t:4,topic:"Internet Usage",q:"Which HTTP status code means a request succeeded?",c:["200","301","404","500"],a:0,e:"200 OK means the server returned the requested content."},
+{t:5,topic:"Internet Usage",q:"What does a 500 status code indicate?",c:["A client error, page not found","An internal server error","A successful request","A redirect"],a:1,e:"500 means the server hit an error while handling a valid request."},
+{t:1,topic:"Internet Usage",q:"What does a 301 redirect mean?",c:["The page has moved permanently","The page was deleted forever","The server is down","A password is needed"],a:0,e:"A 301 tells browsers and search engines that the address has permanently changed."},
+{t:2,topic:"Internet Usage",q:"Which search operator excludes a word from the results?",c:["+","-","*","~"],a:1,e:"Placing a minus sign before a word tells most search engines to leave out pages containing it."},
+{t:3,topic:"Internet Usage",q:"What does the www in a web address usually indicate?",c:["A secure connection","A common subdomain prefix for websites","A file type","A country code"],a:1,e:"www is a conventional subdomain, though many sites work without it."},
+{t:4,topic:"Communications",q:"What does Reply All do in an email?",c:["Sends only to the sender","Sends to everyone on the original message","Sends to the email administrator","Sends only to BCC recipients"],a:1,e:"Reply All includes every recipient of the original message, so use it only when everyone needs the reply."},
+{t:5,topic:"Communications",q:"What is a key advantage of IMAP over POP3?",c:["Mail stays synced across devices on the server","It uses no internet connection","It encrypts all files","It works with printers"],a:0,e:"IMAP keeps messages on the server, so reading or deleting on one device updates the others."},
+{t:1,topic:"Communications",q:"Which is an example of a synchronous communication event?",c:["A live webinar","An email newsletter","A recorded voicemail","A printed letter"],a:0,e:"A live webinar happens in real time with participants present together."},
+{t:2,topic:"Communications",q:"Before sending a large file to a group chat, what should you consider?",c:["Sending it to everyone regardless","The file size and whether everyone needs it","Always using the largest format","Leaving out a description"],a:1,e:"Large files can clog inboxes and slow devices, so consider who needs them and whether a link is better."},
+{t:3,topic:"Communications",q:"Which email field holds a short summary of the message's topic?",c:["To","Subject","CC","BCC"],a:1,e:"The subject line tells recipients what the message is about before they open it."},
+{t:4,topic:"Communications",q:"What is a common cause of poor video call quality?",c:["High bandwidth","Low bandwidth or high latency","Too many emojis","A dark background"],a:1,e:"Limited bandwidth and high latency cause freezing, lag, and dropped audio."},
+{t:5,topic:"Communications",q:"What is a thread in messaging?",c:["A type of virus","A series of related messages grouped together","A file attachment","A video codec"],a:1,e:"Threads keep a conversation about one topic in one place."},
+{t:1,topic:"Communications",q:"What should you do if you receive a message that was meant for someone else?",c:["Forward it to everyone","Tell the sender and delete it","Post it online","Reply with its contents"],a:1,e:"Letting the sender know and deleting the message respects their privacy."},
+{t:2,topic:"Communications",q:"What is a common way to reduce spam email?",c:["Turn off all notifications permanently","Use spam filters and avoid clicking unknown links","Share your inbox publicly","Forward every email to friends"],a:1,e:"Filters catch much spam, and avoiding unknown links keeps your address from being confirmed."},
+{t:3,topic:"Multimedia",q:"What does bitrate measure?",c:["Frames per second","Bits of data transmitted per second","Pixels per inch","Samples per frame"],a:1,e:"Bitrate is the amount of data used per second of audio or video. Higher bitrate usually means better quality and larger files."},
+{t:4,topic:"Multimedia",q:"What are vector graphics made of?",c:["Pixels","Mathematical paths and shapes","Audio samples","Video frames"],a:1,e:"Vector graphics store shapes as equations, which is why they scale without losing sharpness."},
+{t:5,topic:"Multimedia",q:"Which of these is a raster image format?",c:["SVG","PNG","Vector EPS","Vector PDF"],a:1,e:"PNG stores images as a grid of pixels, making it a raster format."},
+{t:1,topic:"Multimedia",q:"What is a codec?",c:["A video game","Software or hardware that encodes or decodes media","A type of monitor","A password tool"],a:1,e:"Codecs compress media for storage and decompress it for playback, such as H.264 for video."},
+{t:2,topic:"Multimedia",q:"How many channels does stereo audio use?",c:["One","Two","Four","Eight"],a:1,e:"Stereo uses a left and a right channel."},
+{t:3,topic:"Multimedia",q:"What does a 16:9 aspect ratio describe?",c:["A square image","Widescreen video","A vertical phone photo","Stereo audio"],a:1,e:"16:9 is the standard widescreen ratio for most video."},
+{t:4,topic:"Multimedia",q:"Which program is designed for editing video timelines?",c:["Adobe Premiere Pro","Microsoft Paint","Google Keep","Calculator"],a:0,e:"Premiere Pro, like DaVinci Resolve, arranges clips, audio, and effects on a timeline."},
+{t:5,topic:"Multimedia",q:"What are blocky or blurry distortions caused by heavy compression called?",c:["Aliasing","Compression artifacts","Saturation","Interlacing"],a:1,e:"Compression artifacts appear when too much data is discarded, especially in fast-moving or detailed areas."},
+{t:1,topic:"Multimedia",q:"What is a frame in a video?",c:["A single still image in a video sequence","An audio codec","A pixel color value","A container file type"],a:0,e:"A video is a rapid sequence of frames, each one a still image."},
+{t:2,topic:"Online Safety",q:"Which is a common second factor in two-factor authentication?",c:["A text or app code","Your username","Your home address","Your favorite song"],a:0,e:"A second factor is something you have, like a phone that receives a code."},
+{t:3,topic:"Online Safety",q:"What is a keylogger?",c:["Software that records keystrokes","A keyboard shortcut","A type of printer","A password manager"],a:0,e:"Keyloggers capture typed input, which can expose passwords and messages."},
+{t:4,topic:"Online Safety",q:"What is a key benefit of a password manager?",c:["It shares passwords publicly","It generates and securely stores unique passwords","It deletes your accounts","It sends passwords to websites"],a:1,e:"Password managers let you use a different strong password for every account."},
+{t:5,topic:"Online Safety",q:"What is spear phishing?",c:["A random mass email","Targeted phishing aimed at a specific person","A virus that spreads by USB","A type of firewall"],a:1,e:"Spear phishing uses personal details to make a scam more convincing."},
+{t:1,topic:"Online Safety",q:"What is phishing carried out by text message called?",c:["Smishing","Vishing","Pharming","Spoofing"],a:0,e:"Smishing combines SMS and phishing."},
+{t:2,topic:"Online Safety",q:"What is phishing carried out by phone call called?",c:["Vishing","Smishing","Keylogging","Adware"],a:0,e:"Vishing (voice phishing) uses phone calls to trick people into sharing information."},
+{t:3,topic:"Online Safety",q:"After a data breach, what is a good first step?",c:["Ignore the notice","Change affected passwords and turn on two-factor authentication","Delete all your accounts","Post your password publicly"],a:1,e:"Changing passwords and adding two-factor authentication limits damage from stolen credentials."},
+{t:4,topic:"Online Safety",q:"If you see cyberbullying happening, what is a good response?",c:["Join in","Report it and support the person targeted","Share it with more people","Ignore it and delete the app"],a:1,e:"Reporting through the platform and supporting the target helps stop harm."},
+{t:5,topic:"Online Safety",q:"What is the purpose of a VPN?",c:["To speed up gaming","To encrypt your connection to a VPN server","To store passwords","To block all cookies"],a:1,e:"A VPN encrypts traffic between your device and the VPN server, which helps on public networks."},
+{t:1,topic:"Digital Citizenship",q:"What does a CC0 license mean?",c:["Attribution is required","No rights are reserved; the work is dedicated to the public domain","Commercial use is prohibited","It must be shared under the same license"],a:1,e:"CC0 lets anyone use the work for any purpose without asking permission or giving credit."},
+{t:2,topic:"Digital Citizenship",q:"What does copyright generally protect?",c:["Ideas only","Original creative works fixed in a tangible form","Facts only","Common phrases"],a:1,e:"Copyright protects expression, not the underlying ideas or facts."},
+{t:3,topic:"Digital Citizenship",q:"What is the best way to avoid plagiarism?",c:["Copy and change a few words","Cite the sources of ideas and quotations","Hide where your ideas came from","Use only images"],a:1,e:"Citing sources gives credit to the original authors and shows your research."},
+{t:4,topic:"Digital Citizenship",q:"Why is accessible design important?",c:["It makes sites load faster for everyone","So people with disabilities can access and use digital content","It removes the need for passwords","It reduces storage costs"],a:1,e:"Accessible design lets people with disabilities perceive, understand, and use online content."},
+{t:5,topic:"Digital Citizenship",q:"Who uses a screen reader?",c:["People who want faster video","People with visual impairments who use it to read on-screen content aloud","Only software developers","Printer technicians"],a:1,e:"Screen readers convert on-screen text and labels into speech or braille."},
+{t:1,topic:"Digital Citizenship",q:"What does digital literacy mean?",c:["Owning many devices","The ability to find, evaluate, and use digital information responsibly","Writing code in any language","Knowing all keyboard shortcuts"],a:1,e:"Digital literacy includes judging whether information is reliable and using tools safely."},
+{t:2,topic:"Digital Citizenship",q:"Which is the best sign that a source may be unreliable?",c:["It has an identifiable author and citations","It has no author, date, or sources","It links to primary documents","It has a clear date"],a:1,e:"Anonymous content with no date or sources is hard to verify."},
+{t:3,topic:"Digital Citizenship",q:"Why is searching your own name online useful?",c:["It deletes your computer's files","It shows what is publicly visible about you","It increases your bandwidth","It changes your IP address"],a:1,e:"Reviewing your digital footprint helps you decide what to remove or adjust."},
+{t:4,topic:"Impacts of Computing",q:"What is planned obsolescence?",c:["Designing products to last forever","Designing products to become outdated or fail sooner","Recycling old products","Selling used products"],a:1,e:"Planned obsolescence can increase electronic waste and consumer spending."},
+{t:5,topic:"Impacts of Computing",q:"How can a lack of home internet access affect students?",c:["It makes them faster learners","It limits access to online homework and learning resources","It improves their grades automatically","It removes the need for textbooks"],a:1,e:"Students without reliable access can fall behind on assignments that require online resources."},
+{t:1,topic:"Impacts of Computing",q:"Why does facial recognition raise privacy concerns?",c:["It makes photos bigger","It can identify people without their knowledge or consent","It requires no computers","It only works in daylight"],a:1,e:"Identifying people from images at scale can enable tracking that people never agreed to."},
+{t:2,topic:"Impacts of Computing",q:"What is a commonly discussed risk of social media for mental health?",c:["Improved sleep for all users","Comparison and social pressure that can affect well-being","Reduced screen time","Increased physical fitness"],a:1,e:"Researchers continue to study social media's effects, and comparison is one often-raised concern."},
+{t:3,topic:"Impacts of Computing",q:"Which kind of work is most vulnerable to automation?",c:["Creative and interpersonal roles","Highly repetitive, rule-based tasks","Care work that requires physical presence","Art therapy"],a:1,e:"Tasks with clear rules and repetition are easiest to automate."},
+{t:4,topic:"Impacts of Computing",q:"What is the main goal of a smart city?",c:["Eliminating public transportation","Using data and sensors to improve services and efficiency","Removing internet access","Replacing all roads"],a:1,e:"Smart city projects use connected sensors and data to improve traffic, utilities, and public services."},
+{t:5,topic:"Impacts of Computing",q:"Who benefits from captions on videos?",c:["Only people who are deaf","Deaf and hard-of-hearing viewers, and others watching without sound","Only video editors","Only people with slow internet"],a:1,e:"Captions help many viewers, including people watching in noisy or silent environments."},
+{t:1,topic:"Impacts of Computing",q:"What is a significant environmental cost of training large AI models?",c:["Almost no electricity","Large amounts of computing power and energy","Only paper use","No data centers"],a:1,e:"Training large models requires many processors running for long periods, consuming significant electricity."},
+{t:2,topic:"File Extensions",q:"What type of file is a .txt?",c:["Plain text file","Compressed archive","Executable program","Spreadsheet"],a:0,e:".txt files hold unformatted plain text that almost any editor can open."},
+{t:3,topic:"File Extensions",q:"A .md file is most likely:",c:["A Markdown-formatted text document","A Microsoft Word file","A video","An executable"],a:0,e:"Markdown files use simple symbols such as # for headings and are plain text underneath."},
+{t:4,topic:"File Extensions",q:"What does a .js file contain?",c:["JavaScript source code","Java executable code","An image","A spreadsheet"],a:0,e:".js files hold JavaScript, which runs in browsers or on servers such as Node.js."},
+{t:5,topic:"File Extensions",q:"Which extension is used for stylesheets that control how web pages look?",c:[".css",".csv",".cfg",".cpp"],a:0,e:"CSS (Cascading Style Sheets) files define colors, fonts, and layout."},
+{t:1,topic:"File Extensions",q:"Which format is usually better for photographs with many colors?",c:[".png",".jpg",".gif",".svg"],a:1,e:"JPEG compression is designed for photographic images, though it discards some detail."},
+{t:2,topic:"File Extensions",q:"What does a .svg file store?",c:["Vector graphics as XML text","Raw audio samples","A compressed archive","A database"],a:0,e:"SVG files describe shapes in XML, so they scale without losing quality."},
+{t:3,topic:"File Extensions",q:"What does a .sql file usually contain?",c:["Database queries and commands","Music","Windows executable code","Web images"],a:0,e:".sql files hold statements for creating, reading, and changing database tables."},
+{t:4,topic:"File Extensions",q:"Which extension is a shell script on Linux and macOS?",c:[".sh",".bat",".ps1",".dll"],a:0,e:".sh files are run by a shell such as bash. .bat and .ps1 are Windows scripts, and .dll is a library."},
+{t:5,topic:"History of Computing",q:"Konrad Zuse is known for building what?",c:["The first web browser","The Z3, an early programmable electromechanical computer","The Apple I","The first transistor"],a:1,e:"Zuse completed the Z3 in 1941, one of the first working programmable computers."},
+{t:1,topic:"History of Computing",q:"Who designed most of the Apple I?",c:["Alan Turing","Steve Wozniak","Ada Lovelace","Charles Babbage"],a:1,e:"Steve Wozniak designed the Apple I, released in 1976."},
+{t:2,topic:"History of Computing",q:"The IBM PC was introduced in which year?",c:["1945","1961","1981","2001"],a:2,e:"The IBM PC debuted in 1981 and shaped the personal computer market."},
+{t:3,topic:"History of Computing",q:"Who created the Linux kernel?",c:["Linus Torvalds","Tim Berners-Lee","Grace Hopper","Dennis Ritchie"],a:0,e:"Linus Torvalds released the first Linux kernel in 1991."},
+{t:4,topic:"History of Computing",q:"What does Moore's Law observe?",c:["Transistor counts roughly double about every two years","Computers double in weight","Internet speed doubles yearly","RAM prices double yearly"],a:0,e:"Gordon Moore's observation described steady growth in the number of transistors on chips."},
+{t:5,topic:"History of Computing",q:"In which year was the transistor invented at Bell Labs?",c:["1927","1947","1967","1987"],a:1,e:"Bell Labs researchers demonstrated the transistor in 1947."},
+{t:1,topic:"History of Computing",q:"In which year was ENIAC completed?",c:["1925","1945","1965","1985"],a:1,e:"ENIAC was completed in 1945 and was one of the first general-purpose electronic computers."},
+{t:2,topic:"History of Computing",q:"In which year was the first iPhone released?",c:["2001","2003","2007","2010"],a:2,e:"Apple released the first iPhone in 2007."},
+{t:3,topic:"Software Uses",q:"Which program is best for writing a formatted essay?",c:["Microsoft Word","Audacity","Git","Scratch"],a:0,e:"Word processors such as Microsoft Word handle fonts, headings, and layout for documents."},
+{t:4,topic:"Software Uses",q:"Which program is designed mainly for slide presentations?",c:["Microsoft PowerPoint","Adobe Photoshop","Notepad","Excel"],a:0,e:"PowerPoint organizes content into slides with speaker notes and transitions."},
+{t:5,topic:"Software Uses",q:"Which software is best for tracking a monthly budget with formulas?",c:["Microsoft Excel","Audacity","Scratch","Canva"],a:0,e:"Spreadsheets calculate totals and update automatically when values change."},
+{t:1,topic:"Software Uses",q:"What is VLC Media Player mainly used for?",c:["Playing audio and video files","Editing HTML","Compiling code","Designing circuit boards"],a:0,e:"VLC plays most audio and video formats without extra codecs."},
+{t:2,topic:"Software Uses",q:"Which tool lets several people edit one document online at the same time?",c:["Google Docs","Notepad","Calculator","Paint"],a:0,e:"Google Docs supports real-time collaboration with comments and version history."},
+{t:3,topic:"Software Uses",q:"Which tool is best for tracking tasks on a Kanban board?",c:["Trello","Photoshop","Audacity","Notepad"],a:0,e:"Trello uses cards and columns to show work moving from to-do to done."},
+{t:4,topic:"Software Uses",q:"Blender is best known for what?",c:["3D modeling and animation","Spreadsheet calculations","Email hosting","Web hosting"],a:0,e:"Blender is a free, open-source 3D creation suite."},
+{t:5,topic:"Software Uses",q:"What kind of software is Microsoft Teams?",c:["Video conferencing and collaboration","Image editing","Compilers","Database administration"],a:0,e:"Teams combines video calls, chat, and file sharing in one app."}
 ];
 
 var testQuestions={};for(var t=1;t<=5;t++){testQuestions[t]=[];}
-var currentTest=1,topicFilter="all";
+var currentTest=0,topicFilter="all";
 var activeQuestions=[],currentIndex=0,answers=[],correct=0,wrong=0;
 
 function shuffle(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=a[i];a[i]=a[j];a[j]=tmp;}return a;}
@@ -209,7 +489,7 @@ function initQuiz(){
   var tf=document.getElementById("topic-filter");
   topics.forEach(function(t){var o=document.createElement("option");o.value=t;o.textContent=t;tf.appendChild(o);});
   tf.addEventListener("change",function(e){topicFilter=e.target.value;});
-  
+
   var ts=document.getElementById("test-selector");
   ["All Tests","Test 1","Test 2","Test 3","Test 4","Test 5"].forEach(function(label,i){
     var b=document.createElement("button");
@@ -218,13 +498,8 @@ function initQuiz(){
     b.onclick=function(){document.querySelectorAll(".test-btn").forEach(function(x){x.classList.remove("active");});b.classList.add("active");currentTest=i;};
     ts.appendChild(b);
   });
-  
+
   for(var t=1;t<=5;t++){testQuestions[t]=allQuestions.filter(function(q){return q.t===t;});}
-  console.log("Test 1:",testQuestions[1].length,"questions");
-  console.log("Test 2:",testQuestions[2].length,"questions");
-  console.log("Test 3:",testQuestions[3].length,"questions");
-  console.log("Test 4:",testQuestions[4].length,"questions");
-  console.log("Test 5:",testQuestions[5].length,"questions");
 }
 
 function startTest(){
@@ -233,7 +508,7 @@ function startTest(){
     for(var t=1;t<=5;t++){
       var testQs=testQuestions[t].slice();
       if(topicFilter!=="all")testQs=testQs.filter(function(q){return q.topic===topicFilter;});
-      pool=pool.concat(shuffle(testQs).slice(0,10));
+      pool=pool.concat(testQs);
     }
   }else{
     pool=testQuestions[currentTest].slice();
@@ -303,8 +578,8 @@ function showResults(){
   document.getElementById("r-skp").textContent=skipped;
   document.getElementById("r-tot").textContent=total;
   var grade,color;
-  if(pct>=90){grade="A — Excellent!";color="#16a34a";}
-  else if(pct>=80){grade="B — Good job!";color="#2563eb";}
+  if(pct>=90){grade="A — Excellent!";color="#15803d";}
+  else if(pct>=80){grade="B — Good job!";color="#4338ca";}
   else if(pct>=70){grade="C — Keep studying!";color="#d97706";}
   else{grade="Keep practicing!";color="#dc2626";}
   var g=document.getElementById("r-grade");g.textContent=grade;g.style.color=color;
@@ -324,8 +599,8 @@ function reviewWrong(){
     var badge=document.createElement("span");badge.className="topic-badge";badge.textContent=m.q.topic;
     meta.appendChild(sp);meta.appendChild(badge);
     var qd=document.createElement("div");qd.className="rq";qd.textContent=m.q.q;
-    var wa=document.createElement("div");wa.className="ra wrong";wa.innerHTML="Your answer: "+String.fromCharCode(65+m.userAnswer)+") "+m.q.c[m.userAnswer];
-    var ca=document.createElement("div");ca.className="ra correct";ca.innerHTML="Correct: "+String.fromCharCode(65+m.q.a)+") "+m.q.c[m.q.a];
+    var wa=document.createElement("div");wa.className="ra wrong";wa.textContent="Your answer: "+String.fromCharCode(65+m.userAnswer)+") "+m.q.c[m.userAnswer];
+    var ca=document.createElement("div");ca.className="ra correct";ca.textContent="Correct: "+String.fromCharCode(65+m.q.a)+") "+m.q.c[m.q.a];
     var ex=document.createElement("div");ex.className="re";ex.textContent=m.q.e;
     div.appendChild(meta);div.appendChild(qd);div.appendChild(wa);div.appendChild(ca);div.appendChild(ex);
     list.appendChild(div);
@@ -336,7 +611,7 @@ function showStart(){document.getElementById("view-start").style.display="block"
 
 var canvas=document.getElementById("annot-canvas");var ctx=canvas.getContext("2d");var wrap=document.getElementById("annot-canvas-wrap");var tool="select",strokeColor="#1a1a1a",strokeW=2;var isDrawing=false,startX=0,startY=0;var strokes=[],currentPath=[],snapShot=null;
 
-function resizeCanvas(){var w=wrap.clientWidth,h=wrap.clientHeight;canvas.width=w;canvas.height=h;}
+function resizeCanvas(){var w=wrap.clientWidth,h=wrap.clientHeight;canvas.width=w;canvas.height=h;redraw();}
 function setTool(t){tool=t;document.querySelectorAll(".tool-btn").forEach(function(b){b.classList.remove("active");});document.getElementById("tool-"+t).classList.add("active");canvas.className=t==="select"?"sel":"";}
 function setColor(el){document.querySelectorAll(".cswatch").forEach(function(s){s.classList.remove("active");});el.classList.add("active");strokeColor=el.getAttribute("data-c");}
 function getPos(e){var r=canvas.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return {x:src.clientX-r.left,y:src.clientY-r.top};}
@@ -345,7 +620,7 @@ canvas.addEventListener("pointerdown",function(e){e.preventDefault();var pos=get
 canvas.addEventListener("pointermove",function(e){e.preventDefault();if(!isDrawing)return;var pos=getPos(e);if(tool==="pen"||tool==="highlight"){currentPath.push({x:pos.x,y:pos.y});ctx.save();ctx.strokeStyle=strokeColor;ctx.lineWidth=tool==="highlight"?strokeW*6:strokeW;ctx.globalAlpha=tool==="highlight"?0.35:1;ctx.lineCap="round";ctx.beginPath();if(currentPath.length>1)ctx.moveTo(currentPath[currentPath.length-2].x,currentPath[currentPath.length-2].y);ctx.lineTo(pos.x,pos.y);ctx.stroke();ctx.restore();}else{ctx.putImageData(snapShot,0,0);ctx.strokeStyle=strokeColor;ctx.lineWidth=strokeW;if(tool==="line"){ctx.beginPath();ctx.moveTo(startX,startY);ctx.lineTo(pos.x,pos.y);ctx.stroke();}else if(tool==="rect"){ctx.strokeRect(Math.min(startX,pos.x),Math.min(startY,pos.y),Math.abs(pos.x-startX),Math.abs(pos.y-startY));}else if(tool==="circle"){var cx=(startX+pos.x)/2,cy=(startY+pos.y)/2,rx=Math.abs(pos.x-startX)/2||1,ry=Math.abs(pos.y-startY)/2||1;ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);ctx.stroke();}}},{passive:false});
 canvas.addEventListener("pointerup",function(e){if(!isDrawing)return;isDrawing=false;if(tool==="pen"||tool==="highlight"){strokes.push({type:tool,color:strokeColor,width:strokeW,pts:currentPath.slice()});}else if(tool==="line"){strokes.push({type:"line",color:strokeColor,width:strokeW,x1:startX,y1:startY,x2:e.clientX-canvas.getBoundingClientRect().left,y2:e.clientY-canvas.getBoundingClientRect().top});}else if(tool==="rect"){var pos=getPos(e);strokes.push({type:"rect",color:strokeColor,width:strokeW,x:Math.min(startX,pos.x),y:Math.min(startY,pos.y),w:Math.abs(pos.x-startX),h:Math.abs(pos.y-startY)});}else if(tool==="circle"){var pos=getPos(e);var cx=(startX+pos.x)/2,cy=(startY+pos.y)/2,rx=Math.abs(pos.x-startX)/2||1,ry=Math.abs(pos.y-startY)/2||1;strokes.push({type:"circle",color:strokeColor,width:strokeW,cx:cx,cy:cy,rx:rx,ry:ry});}redraw();},{passive:false});
 function undoLast(){if(strokes.length>0){strokes.pop();redraw();}}
-function clearCanvas(){if(confirm("Clear all?"))strokes=[];redraw();}
+function clearCanvas(){if(confirm("Clear all?")){strokes=[];redraw();}}
 function savePNG(){var off=document.createElement("canvas");off.width=canvas.width;off.height=canvas.height;var oc=off.getContext("2d");oc.fillStyle="#fff";oc.fillRect(0,0,off.width,off.height);oc.drawImage(canvas,0,0);var a=document.createElement("a");a.download="cs-test-notes.png";a.href=off.toDataURL();a.click();}
 
 window.addEventListener("resize",resizeCanvas);
