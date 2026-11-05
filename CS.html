@@ -145,6 +145,12 @@ select{background:var(--face);border:2px solid var(--ink);border-radius:8px;colo
 .re{background:var(--kraft);color:var(--ink)}
 .divider{background:var(--kraft-line)}
 .stitle{font-size:1.1rem}
+.timer-display{font-family:'Anton',sans-serif;font-size:1.15rem;text-align:right;margin-bottom:.6rem;color:var(--ink)}
+.overlay{position:fixed;inset:0;background:rgba(43,32,18,0.45);display:none;align-items:center;justify-content:center;z-index:300;padding:16px}
+.overlay.open{display:flex}
+.modal-card{background:var(--face);border:2.5px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 rgba(43,32,18,0.3);max-width:420px;width:100%;padding:24px}
+#dialog-msg{font-size:15px;font-weight:600;line-height:1.5;margin-bottom:20px;color:var(--ink)}
+.dialog-actions{display:flex;justify-content:flex-end;gap:10px}
 </style>
 </head>
 <body>
@@ -157,11 +163,13 @@ select{background:var(--face);border:2px solid var(--ink);border-radius:8px;colo
 <p class="subtitle">Advanced level · 50 questions per test · 5 tests · 15 topics</p>
 <div class="test-selector" id="test-selector"></div>
 <div class="filter-row"><label>Topic:</label><select id="topic-filter"><option value="all">All topics</option></select></div>
+<div class="filter-row"><label><input type="checkbox" id="timer-toggle" style="margin-right:6px;accent-color:var(--rare)">Timed test (30 minutes)</label></div>
 <div class="sbw"><button class="primary" onclick="startTest()">Start Test</button></div>
 </div>
 
 <div id="view-test" style="display:none">
 <div class="stats"><div class="stat"><div class="stat-label">Question</div><div class="stat-val" id="s-cur">1</div></div><div class="stat"><div class="stat-label">Correct</div><div class="stat-val green" id="s-cor">0</div></div><div class="stat"><div class="stat-label">Wrong</div><div class="stat-val red" id="s-wrg">0</div></div><div class="stat"><div class="stat-label">Score</div><div class="stat-val" id="s-pct">&mdash;</div></div></div>
+<div class="timer-display" id="timer-display" style="display:none"></div>
 <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
 <div class="card"><div class="q-meta"><span id="q-num"></span><span class="topic-badge" id="q-topic"></span></div><div class="q-text" id="q-text"></div><div class="choices" id="choices"></div><div class="explanation" id="explanation"><span class="exp-title" id="exp-icon"></span><span id="exp-text"></span></div></div>
 <div class="actions"><button onclick="goBack()" id="btn-back" disabled>&larr; Back</button><button class="primary" onclick="nextQ()" id="btn-next" disabled>Next &rarr;</button><button class="dbtn" onclick="finishEarly()" style="margin-left:auto">Finish Test</button></div>
@@ -205,7 +213,34 @@ select{background:var(--face);border:2px solid var(--ink);border-radius:8px;colo
 <div id="annot-canvas-wrap"><canvas id="annot-canvas"></canvas></div>
 </div>
 
+<div class="overlay" id="dialog-overlay">
+<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="dialog-msg">
+<p id="dialog-msg"></p>
+<div class="dialog-actions">
+<button type="button" id="dialog-cancel">Cancel</button>
+<button type="button" class="primary" id="dialog-ok">OK</button>
+</div>
+</div>
+</div>
+
 <script>
+// In-page dialog that replaces the browser's alert() and confirm() popups.
+// opts.confirm: show a Cancel button; opts.onOk / opts.onCancel: callbacks.
+function showDialog(msg, opts){
+  opts=opts||{};
+  var ov=document.getElementById("dialog-overlay");
+  var okBtn=document.getElementById("dialog-ok");
+  var cancelBtn=document.getElementById("dialog-cancel");
+  document.getElementById("dialog-msg").textContent=msg;
+  okBtn.textContent=opts.okText||"OK";
+  cancelBtn.style.display=opts.confirm?"":"none";
+  function close(){ov.classList.remove("open");okBtn.onclick=null;cancelBtn.onclick=null;}
+  okBtn.onclick=function(){close();if(opts.onOk)opts.onOk();};
+  cancelBtn.onclick=function(){close();if(opts.onCancel)opts.onCancel();};
+  ov.classList.add("open");
+  okBtn.focus();
+}
+
 var ALL_QUESTIONS=[
 /* ---------- Binary ---------- */
 {t:1,topic:"Binary",q:"Convert decimal 183 to 8-bit binary.",c:["10110111","10101111","11010111","10111011"],a:0,e:"183 = 128 + 32 + 16 + 4 + 2 + 1, so the bits are 10110111."},
@@ -514,14 +549,32 @@ function startTest(){
     pool=testQuestions[currentTest].slice();
     if(topicFilter!=="all")pool=pool.filter(function(q){return q.topic===topicFilter;});
   }
-  if(pool.length===0){alert("No questions match your filters.");return;}
+  if(pool.length===0){showDialog("No questions match your filters.");return;}
   activeQuestions=shuffle(pool);
   answers=[];for(var i=0;i<activeQuestions.length;i++)answers.push(null);
   correct=0;wrong=0;currentIndex=0;
   document.getElementById("view-start").style.display="none";
   document.getElementById("view-test").style.display="block";
   document.getElementById("view-results").style.display="none";
+  if(document.getElementById("timer-toggle").checked)startTimer();
+  else document.getElementById("timer-display").style.display="none";
   renderQ();
+}
+
+var timerInterval=null,timeLeft=0;
+function fmtTime(s){var m=Math.floor(s/60),r=s%60;return m+":"+(r<10?"0":"")+r;}
+function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function startTimer(){
+  stopTimer();
+  timeLeft=30*60;
+  var el=document.getElementById("timer-display");
+  el.style.display="block";
+  el.textContent="Time left: "+fmtTime(timeLeft);
+  timerInterval=setInterval(function(){
+    timeLeft--;
+    el.textContent="Time left: "+fmtTime(timeLeft);
+    if(timeLeft<=0){stopTimer();showDialog("Time is up!",{onOk:function(){showResults();}});}
+  },1000);
 }
 
 function renderQ(){
@@ -565,9 +618,10 @@ function renderQ(){
 function selectAnswer(i){if(answers[currentIndex]!==null)return;var q=activeQuestions[currentIndex];answers[currentIndex]=i;if(i===q.a)correct++;else wrong++;renderQ();}
 function nextQ(){if(answers[currentIndex]===null)return;if(currentIndex<activeQuestions.length-1){currentIndex++;renderQ();}else showResults();}
 function goBack(){if(currentIndex>0){currentIndex--;renderQ();}}
-function finishEarly(){if(confirm("Finish test? Unanswered = skipped."))showResults();}
+function finishEarly(){showDialog("Finish test? Unanswered questions will count as skipped.",{confirm:true,okText:"Finish",onOk:function(){showResults();}});}
 
 function showResults(){
+  stopTimer();
   document.getElementById("view-test").style.display="none";
   document.getElementById("view-results").style.display="block";
   var total=activeQuestions.length,skipped=total-correct-wrong,pct=total>0?Math.round(correct/total*100):0;
@@ -589,7 +643,7 @@ function reviewWrong(){
   var missed=[];
   activeQuestions.forEach(function(q,i){if(answers[i]!==null&&answers[i]!==q.a)missed.push({q:q,userAnswer:answers[i],idx:i});});
   var sec=document.getElementById("review-section"),list=document.getElementById("review-list");
-  if(missed.length===0){alert("Perfect! No wrong answers!");return;}
+  if(missed.length===0){showDialog("Perfect! No wrong answers!");return;}
   document.getElementById("review-title").textContent="Wrong answers ("+missed.length+")";
   list.innerHTML="";
   missed.forEach(function(m){
@@ -607,7 +661,7 @@ function reviewWrong(){
   });
   sec.style.display="block";sec.scrollIntoView({behavior:"smooth"});
 }
-function showStart(){document.getElementById("view-start").style.display="block";document.getElementById("view-test").style.display="none";document.getElementById("view-results").style.display="none";}
+function showStart(){stopTimer();document.getElementById("view-start").style.display="block";document.getElementById("view-test").style.display="none";document.getElementById("view-results").style.display="none";}
 
 var canvas=document.getElementById("annot-canvas");var ctx=canvas.getContext("2d");var wrap=document.getElementById("annot-canvas-wrap");var tool="select",strokeColor="#1a1a1a",strokeW=2;var isDrawing=false,startX=0,startY=0;var strokes=[],currentPath=[],snapShot=null;
 
@@ -620,7 +674,7 @@ canvas.addEventListener("pointerdown",function(e){e.preventDefault();var pos=get
 canvas.addEventListener("pointermove",function(e){e.preventDefault();if(!isDrawing)return;var pos=getPos(e);if(tool==="pen"||tool==="highlight"){currentPath.push({x:pos.x,y:pos.y});ctx.save();ctx.strokeStyle=strokeColor;ctx.lineWidth=tool==="highlight"?strokeW*6:strokeW;ctx.globalAlpha=tool==="highlight"?0.35:1;ctx.lineCap="round";ctx.beginPath();if(currentPath.length>1)ctx.moveTo(currentPath[currentPath.length-2].x,currentPath[currentPath.length-2].y);ctx.lineTo(pos.x,pos.y);ctx.stroke();ctx.restore();}else{ctx.putImageData(snapShot,0,0);ctx.strokeStyle=strokeColor;ctx.lineWidth=strokeW;if(tool==="line"){ctx.beginPath();ctx.moveTo(startX,startY);ctx.lineTo(pos.x,pos.y);ctx.stroke();}else if(tool==="rect"){ctx.strokeRect(Math.min(startX,pos.x),Math.min(startY,pos.y),Math.abs(pos.x-startX),Math.abs(pos.y-startY));}else if(tool==="circle"){var cx=(startX+pos.x)/2,cy=(startY+pos.y)/2,rx=Math.abs(pos.x-startX)/2||1,ry=Math.abs(pos.y-startY)/2||1;ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);ctx.stroke();}}},{passive:false});
 canvas.addEventListener("pointerup",function(e){if(!isDrawing)return;isDrawing=false;if(tool==="pen"||tool==="highlight"){strokes.push({type:tool,color:strokeColor,width:strokeW,pts:currentPath.slice()});}else if(tool==="line"){strokes.push({type:"line",color:strokeColor,width:strokeW,x1:startX,y1:startY,x2:e.clientX-canvas.getBoundingClientRect().left,y2:e.clientY-canvas.getBoundingClientRect().top});}else if(tool==="rect"){var pos=getPos(e);strokes.push({type:"rect",color:strokeColor,width:strokeW,x:Math.min(startX,pos.x),y:Math.min(startY,pos.y),w:Math.abs(pos.x-startX),h:Math.abs(pos.y-startY)});}else if(tool==="circle"){var pos=getPos(e);var cx=(startX+pos.x)/2,cy=(startY+pos.y)/2,rx=Math.abs(pos.x-startX)/2||1,ry=Math.abs(pos.y-startY)/2||1;strokes.push({type:"circle",color:strokeColor,width:strokeW,cx:cx,cy:cy,rx:rx,ry:ry});}redraw();},{passive:false});
 function undoLast(){if(strokes.length>0){strokes.pop();redraw();}}
-function clearCanvas(){if(confirm("Clear all?")){strokes=[];redraw();}}
+function clearCanvas(){showDialog("Clear all drawings?",{confirm:true,okText:"Clear",onOk:function(){strokes=[];redraw();}});}
 function savePNG(){var off=document.createElement("canvas");off.width=canvas.width;off.height=canvas.height;var oc=off.getContext("2d");oc.fillStyle="#fff";oc.fillRect(0,0,off.width,off.height);oc.drawImage(canvas,0,0);var a=document.createElement("a");a.download="cs-test-notes.png";a.href=off.toDataURL();a.click();}
 
 window.addEventListener("resize",resizeCanvas);
