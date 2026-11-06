@@ -976,6 +976,8 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
     &middot;
     <a class="footer-link" href="giftcards">Gift Cards</a>
     &middot;
+    <a class="footer-link" href="track">Track Order</a>
+    &middot;
     <a class="footer-link" href="terms">Terms</a>
     <span class="secret" id="secret-dot" tabindex="0" role="button" aria-label=""></span>
 </footer>
@@ -1016,7 +1018,30 @@ fetch("https://script.google.com/macros/s/AKfycbxGV_bi18ADdYlFTuu6bTra7m6Q2a8S3P
   })
   .catch(() => {});
 
-const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzmi2FQogZ1putXsW448osorGNQWty7iPKgxGebOE2LaXJzBC5gLCk2ve_I9VxvUr0J/exec";
+
+// Visitor IP (sent with orders so banned visitors can be blocked)
+let visitorIp = "";
+let ipReady = fetch("https://api.ipify.org?format=json")
+  .then(r => r.json())
+  .then(d => { visitorIp = (d && d.ip) || ""; })
+  .catch(() => {});
+
+function showBanned() {
+  if (document.getElementById("banOverlay")) return;
+  const o = document.createElement("div");
+  o.id = "banOverlay";
+  o.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(43,32,18,0.94);display:flex;align-items:center;justify-content:center;padding:20px;";
+  o.innerHTML = '<div style="max-width:460px;width:100%;background:#FFFDF7;border:4px solid #C1272D;border-radius:16px;box-shadow:6px 6px 0 #2B2012;padding:34px 28px;text-align:center;font-family:Inter,sans-serif;color:#2B2012;">'
+    + '<div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C1272D;border:2px solid #C1272D;border-radius:999px;display:inline-block;padding:4px 12px;margin-bottom:16px;">Warning</div>'
+    + '<h2 style="font-family:Anton,sans-serif;font-weight:400;font-size:2rem;text-transform:uppercase;margin:0 0 12px;">You have been banned</h2>'
+    + '<p style="line-height:1.7;margin:0 0 14px;color:rgba(43,32,18,0.8);">You are no longer able to place orders with iPrint Keychains.</p>'
+    + '<p style="margin:0 0 14px;font-size:14px;">Your IP address: <strong>' + (visitorIp || "unavailable") + '</strong></p>'
+    + '<p style="line-height:1.7;margin:0;font-size:14px;color:rgba(43,32,18,0.75);">If you think this is a mistake, email <a href="mailto:email@isaacneal.com" style="color:#2B2012;font-weight:700;">email@isaacneal.com</a>.</p>'
+    + '</div>';
+  document.body.appendChild(o);
+}
+
+const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzUTZEWEcpC5H0OsxmgsFrvwiczPLon1vMxHEjLmX22chmafWYgS_99IJeVXFTUfib3/exec";
 
 function colorChart() {
   return `
@@ -1729,21 +1754,24 @@ checkoutForm.addEventListener('submit', e => {
     items: cart,
     promoCode: promo ? promo.code : '',
     giftCardCode: giftCard ? giftCard.code : '',
-    recaptchaToken: captchaToken
+    recaptchaToken: captchaToken,
+    ip: visitorIp
   };
   const usedPromo = promo;
   const usedDiscount = promoDiscount();
   const usedGift = giftCard;
 
-  fetch(ORDERS_API_URL, {
+  ipReady.then(() => { orderPayload.ip = visitorIp; return fetch(ORDERS_API_URL, {
     method: 'POST',
     body: JSON.stringify(orderPayload)
-  })
+  }); })
     .then(res => res.json())
     .then(data => {
       placeOrderBtn.disabled = false;
       placeOrderBtn.textContent = 'Place Order';
       resetCaptcha();
+
+      if (data && data.banned) { showBanned(); return; }
 
       if (!data.success) {
         checkoutError.textContent = data.error || 'Something went wrong sending your order. Try again.';
