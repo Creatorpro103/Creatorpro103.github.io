@@ -2550,7 +2550,7 @@ renderCartBadge();
       if (!d || !d.success) { say((d && d.error) || 'Something went wrong. Please try again.', false); return; }
       if (d.status === 'approved') {
         say('Thank you! Your note is on the wall.', true);
-        notes.unshift({ note: note, name: document.getElementById('wall-name').value.trim() });
+        notes.unshift({ note: d.text || note, name: (d.name !== undefined ? d.name : document.getElementById('wall-name').value.trim()) });
         idx = 0; show();
       } else if (d.status === 'pending') {
         say('Thank you! Your note will appear once it has been reviewed.', true);
