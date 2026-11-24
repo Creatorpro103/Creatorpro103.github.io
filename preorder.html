@@ -200,6 +200,8 @@ main {
   50% { transform: scale(1.05); }
 }
 @media (prefers-reduced-motion: reduce) { .stock-note { animation: none; } }
+.was { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; text-decoration: line-through; color: var(--ink-soft); margin-right: 8px; }
+.off-tag { display: inline-block; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 10px; margin-left: 8px; border: 2px solid var(--ink); border-radius: 999px; background: var(--face); color: var(--ink); vertical-align: middle; }
 .price-tag {
     display: block;
     text-align: center;
@@ -209,7 +211,7 @@ main {
     margin-bottom: 2px;
 }
 
-.price-tag span {
+.price-tag span.per {
     font-size: 0.8rem;
     font-weight: 400;
     font-family: 'Inter', sans-serif;
@@ -662,8 +664,8 @@ footer {
         </div>
 
         <h2>Place your preorder</h2>
-        <p class="subtitle">Fill out the form below and we'll follow up by email to confirm.</p>
-        <p class="price-tag">$35<span>price per Elf Box</span></p>
+        <p class="subtitle">Fifteen accessories, a whole season of elf stories, now $20 instead of $35. It is a limited run, and right now there are <strong id="leftNum">a few</strong> left, so grab yours before they go. Fill out the form below and we'll follow up by email to confirm.</p>
+        <p class="price-tag"><span class="was">$35</span>$20<span class="off-tag">43% off</span><span class="per">price per Elf Box, about $1.33 per accessory</span></p>
         <p class="stock-note" id="stockNote">Checking availability...</p>
         <p class="shipping-note">Shipping is an additional $7 for postage and a padded envelope.</p>
 
@@ -755,7 +757,7 @@ footer {
             <div class="success-summary">
                 <div class="ty-row"><span>Quantity</span><strong id="tySummaryQty">1</strong></div>
                 <div class="ty-row"><span>Payment</span><strong id="tySummaryPayment">-</strong></div>
-                <div class="ty-row"><span>Total</span><strong id="tySummaryTotal">$35</strong></div>
+                <div class="ty-row"><span>Total</span><strong id="tySummaryTotal">$20</strong></div>
             </div>
             <p class="success-note">A confirmation email is on its way to <strong id="tyEmail"></strong>.</p>
             <a class="btn-back" href="/">Back to the shop</a>
@@ -771,6 +773,51 @@ footer {
     const VERIFY_URL = "https://script.google.com/macros/s/AKfycbxGV_bi18ADdYlFTuu6bTra7m6Q2a8S3PQuCHi69AN-VbD8IbqxbZCBCXbx1jaRZwbr/exec";
     const RECAPTCHA_SITE_KEY = "6Ldio-ctAAAAAMrlHN-HKv2LE8O5QZ55akxkEn4I";
     let captchaWidgetId = null;
+
+    // ---- Ban system (same list as the main shop) ----
+    const ORDERS_API_URL = "https://script.google.com/macros/s/AKfycbzUTZEWEcpC5H0OsxmgsFrvwiczPLon1vMxHEjLmX22chmafWYgS_99IJeVXFTUfib3/exec";
+    let visitorIp = "";
+    let bannedShown = false;
+    const ipReady = fetch("https://api.ipify.org?format=json")
+      .then(r => r.json())
+      .then(d => { visitorIp = (d && d.ip) || ""; })
+      .catch(() => {});
+
+    function bannedMarkup() {
+      return '<div id="banOverlay" style="position:fixed;inset:0;z-index:2147483647;background:#2B2012;display:flex;align-items:center;justify-content:center;padding:20px;">'
+        + '<div style="max-width:460px;width:100%;background:#FFFDF7;border:4px solid #C1272D;border-radius:16px;box-shadow:6px 6px 0 #000;padding:34px 28px;text-align:center;font-family:Inter,sans-serif;color:#2B2012;">'
+        + '<div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C1272D;border:2px solid #C1272D;border-radius:999px;display:inline-block;padding:4px 12px;margin-bottom:16px;">Warning</div>'
+        + '<h2 style="font-family:Anton,sans-serif;font-weight:400;font-size:2rem;text-transform:uppercase;margin:0 0 12px;">You have been banned</h2>'
+        + '<p style="line-height:1.7;margin:0 0 14px;color:rgba(43,32,18,0.8);">You are no longer able to place orders with iPrint Keychains.</p>'
+        + '<p style="margin:0 0 14px;font-size:14px;">Your IP address: <strong>' + (visitorIp || "unavailable") + '</strong></p>'
+        + '<p style="line-height:1.7;margin:0;font-size:14px;color:rgba(43,32,18,0.75);">If you think this is a mistake, email <a href="mailto:email@isaacneal.com" style="color:#2B2012;font-weight:700;">email@isaacneal.com</a>.</p>'
+        + '</div></div>';
+    }
+    function renderBanned() {
+      document.documentElement.style.cssText = "overflow:hidden;background:#2B2012;";
+      document.body.style.cssText = "overflow:hidden;background:#2B2012;margin:0;";
+      document.body.innerHTML = bannedMarkup();
+    }
+    function showBanned() {
+      window.__banned = true;
+      if (bannedShown) return;
+      bannedShown = true;
+      renderBanned();
+      new MutationObserver(() => {
+        if (!document.getElementById("banOverlay") || document.body.children.length !== 1) renderBanned();
+      }).observe(document.documentElement, { childList: true, subtree: true, attributes: true });
+    }
+    function checkBan() {
+      return ipReady.then(() => {
+        if (!visitorIp) return false;
+        return fetch(ORDERS_API_URL + "?action=check_ban&ip=" + encodeURIComponent(visitorIp))
+          .then(r => r.json())
+          .then(d => { if (d && d.banned) { showBanned(); return true; } return false; })
+          .catch(() => false);
+      });
+    }
+    checkBan();
+
 
     function fitCaptcha() {
       const box = document.getElementById("recaptcha-box");
@@ -812,6 +859,7 @@ footer {
         submitBtn.textContent = "Sold out";
       } else {
         stockNote.textContent = "Only " + n + " left";
+        var ln = document.getElementById("leftNum"); if (ln) ln.textContent = "only " + n + (n === 1 ? " box" : " boxes");
         stockNote.className = "stock-note";
         quantityInput.max = n;
         quantityInput.disabled = false;
@@ -937,6 +985,9 @@ footer {
 
       event.preventDefault();
 
+      if (window.__banned) { showBanned(); return; }
+      if (await checkBan()) return;
+
       let captchaToken = "";
       try { if (captchaWidgetId !== null) captchaToken = grecaptcha.getResponse(captchaWidgetId); } catch (err) {}
       if (!captchaToken) {
@@ -963,10 +1014,11 @@ footer {
         name: nameValue,
         email: emailValue,
         product: "Elf Box",
-        price: "$35",
+        price: "$20",
         quantity: quantityValue,
         payment: paymentValue,
-        address: document.getElementById("address").value
+        address: document.getElementById("address").value,
+        ip: visitorIp
       };
 
       try {
@@ -1003,7 +1055,7 @@ footer {
         document.getElementById("successName").textContent = firstName;
         document.getElementById("tySummaryQty").textContent = quantityValue;
         document.getElementById("tySummaryPayment").textContent = paymentValue;
-        const total = 35 * (parseInt(quantityValue, 10) || 1);
+        const total = 20 * (parseInt(quantityValue, 10) || 1);
         document.getElementById("tySummaryTotal").textContent = "$" + total;
         document.getElementById("tyEmail").textContent = emailValue;
 
