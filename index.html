@@ -408,6 +408,9 @@ section.set {
     margin-bottom: 14px;
 }
 
+.was { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; text-decoration: line-through; color: var(--ink-soft); margin-right: 8px; }
+.elf-price .was { color: rgba(255,253,247,0.62); }
+.off-tag { display: inline-block; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 10px; margin-left: 8px; border: 2px solid var(--ink); border-radius: 999px; background: var(--face); color: var(--ink); vertical-align: middle; }
 .elf-price {
     font-family: 'Anton', sans-serif;
     font-size: 2.4rem;
@@ -1022,8 +1025,8 @@ window.onRecaptchaLoad = function() { if (window.ensureCaptcha) window.ensureCap
         <div class="elf-card-inner">
             <span class="elf-badge" id="elfBadge">Limited availability</span>
             <h3><span class="xmas-word-red">Elf box</span> <span class="xmas-word-green">preorder</span></h3>
-            <p class="elf-desc">Secure your preorder now and guarantee in time for your elf's return.</p>
-            <div class="elf-price">$35</div>
+            <p class="elf-desc">Fifteen elf accessories for $20. That is about $1.33 a piece, down from $35, and <span id="elfLeft">a limited run</span>, so it will not last.</p>
+            <div class="elf-price"><span class="was">$35</span>$20<span class="off-tag">43% off</span></div>
             <span class="elf-btn">Reserve mine</span>
         </div>
     </a>
@@ -1231,6 +1234,7 @@ fetch("https://script.google.com/macros/s/AKfycbxGV_bi18ADdYlFTuu6bTra7m6Q2a8S3P
     const n = parseInt(d.stock, 10);
     if (isNaN(n)) return;
     b.textContent = n <= 0 ? "Sold out" : "Only " + n + " left";
+    const lf = document.getElementById("elfLeft"); if (lf) lf.textContent = n <= 0 ? "sold out" : "only " + n + (n === 1 ? " box" : " boxes") + " left";
     if (n <= 0) {
       const btn = document.querySelector(".elf-btn"); if (btn) btn.textContent = "Sold out";
       const card = document.querySelector(".elf-card");
